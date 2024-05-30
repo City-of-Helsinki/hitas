@@ -100,6 +100,27 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
     return obfuscated_owners
 
 
+def find_regulated_ownerships() -> list[Ownership]:
+    return list(
+        Ownership.objects.select_related(
+            "owner",
+            "sale__apartment__building__real_estate__housing_company__postal_code",
+            "sale__apartment__building__real_estate__housing_company",
+        )
+        .filter(
+            sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        )
+        .exclude(
+            sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        )
+        .order_by(
+            "owner__name",
+            "sale__apartment__building__real_estate__housing_company__postal_code__value",
+            "sale__apartment__street_address",
+        )
+    )
+
+
 def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
     return list(
         Ownership.objects.select_related(

@@ -1441,6 +1441,17 @@ def test__api__multiple_ownerships_report__no_owners(api_client: HitasAPIClient)
 
 
 @pytest.mark.django_db
+def test__api__regulated_ownerships_report__no_owners(api_client: HitasAPIClient):
+    url = reverse("hitas:regulated-ownerships-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert len(list(worksheet.values)) == 1, "There should be only the header row"
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize("non_disclosure", [False, True])
 def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClient, non_disclosure):
     owner: Owner = OwnerFactory.create(non_disclosure=non_disclosure)
@@ -1452,7 +1463,7 @@ def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClie
     ownership_2: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
-        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_II,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     url = reverse("hitas:multiple-ownerships-report-list")
@@ -1497,6 +1508,30 @@ def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClie
             ownership_2.apartment.postal_code.cost_area,
         ),
     ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("non_disclosure", [False, True])
+def test__api__regulated_ownerships_report__single_owner(api_client: HitasAPIClient, non_disclosure):
+    owner: Owner = OwnerFactory.create(non_disclosure=non_disclosure)
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+
+    url = reverse("hitas:regulated-ownerships-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert len(list(worksheet.values)) == 3, "There should be 2 ownership rows and 1 header row"
 
 
 @pytest.mark.django_db
@@ -1608,6 +1643,46 @@ def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIC
             ownership_5.apartment.postal_code.cost_area,
         ),
     ]
+
+
+@pytest.mark.django_db
+def test__api__regulated_ownerships_report__multiple_owners(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create(name="Owner 1")
+    OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+
+    owner_2: Owner = OwnerFactory.create(name="Owner 2", non_disclosure=True)
+    OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00003",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+
+    url = reverse("hitas:regulated-ownerships-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert len(list(worksheet.values)) == 6, "There should be 5 ownership rows and 1 header row"
 
 
 @pytest.mark.django_db

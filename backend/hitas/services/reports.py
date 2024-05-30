@@ -20,7 +20,7 @@ from hitas.models.housing_company import (
     HousingCompanyWithUnregulatedReportAnnotations,
     RegulationStatus,
 )
-from hitas.models.ownership import OwnershipWithApartmentCount
+from hitas.models.ownership import Ownership, OwnershipWithApartmentCount
 from hitas.utils import format_sheet, resize_columns
 
 T = TypeVar("T")
@@ -88,6 +88,16 @@ class SalesInfo(TypedDict):
     sum: Decimal
     minimum: Decimal
     maximum: Decimal
+
+
+class OwnershipReportColumns(NamedTuple):
+    owner_name: str
+    apartment_address: str
+    postal_code: str
+    owner_identifier: str
+    housing_company_name: str
+    housing_company_completion_date: datetime.date | str
+    cost_area: int | str
 
 
 class MultipleOwnershipReportColumns(NamedTuple):
@@ -711,6 +721,52 @@ def sort_sales_by_cost_area(sales: list[ApartmentSale]) -> SalesByCostArea:
         overall_minimum=overall_minimum,
         overall_maximum=overall_maximum,
     )
+
+
+def build_regulated_ownerships_report_excel(ownerships: list[Ownership]) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = OwnershipReportColumns(
+        owner_name="Omistajan nimi",
+        apartment_address="Asunnon osoite",
+        postal_code="Postinumero",
+        owner_identifier="Omistajan henkilö- tai Y-tunnus",
+        housing_company_name="Yhtiön nimi",
+        housing_company_completion_date="Yhtiön valmistumispäivä",
+        cost_area="Kalleusalue",
+    )
+    worksheet.append(column_headers)
+
+    # Cache completion_date as it is the most expensive operation here
+    # because it queries all apartment completion dates on each iteration
+    # and there are relatively few housing companies.
+    completion_dates_by_housing_company_id = {}
+
+    for ownership in ownerships:
+        try:
+            completion_date = completion_dates_by_housing_company_id[
+                ownership.apartment.building.real_estate.housing_company.pk
+            ]
+        except KeyError:
+            completion_date = ownership.apartment.building.real_estate.housing_company.completion_date
+            completion_dates_by_housing_company_id[
+                ownership.apartment.building.real_estate.housing_company.pk
+            ] = completion_date
+        worksheet.append(
+            OwnershipReportColumns(
+                owner_name=Owner.OBFUSCATED_OWNER_NAME if ownership.owner.non_disclosure else ownership.owner.name,
+                apartment_address=ownership.apartment.address,
+                postal_code=ownership.apartment.postal_code.value,
+                owner_identifier="" if ownership.owner.non_disclosure else ownership.owner.identifier,
+                housing_company_name=ownership.apartment.building.real_estate.housing_company.display_name,
+                housing_company_completion_date=completion_date,
+                cost_area=ownership.apartment.postal_code.cost_area,
+            )
+        )
+
+    _basic_format_sheet(column_headers, worksheet)
+    return workbook
 
 
 def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartmentCount]) -> Workbook:
