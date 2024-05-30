@@ -120,6 +120,13 @@ router.register(
     basename="sales-by-postal-code-and-area-report",
 )
 
+# /api/v1/reports/download-regulated-ownerships-report
+router.register(
+    r"reports/download-regulated-ownerships-report",
+    views.RegulatedOwnershipsReportView,
+    basename="regulated-ownerships-report",
+)
+
 # /api/v1/reports/download-multiple-ownerships-report
 router.register(
     r"reports/download-multiple-ownerships-report",

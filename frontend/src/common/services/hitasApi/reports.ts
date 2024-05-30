@@ -68,6 +68,9 @@ export const downloadUnregulatedHousingCompaniesPDF = () =>
 export const downloadHousingCompanyStatesReportPDF = () =>
     fetchAndDownloadPDF("/reports/download-housing-company-states-report");
 
+export const downloadRegulatedOwnershipsReportExcel = () =>
+    fetchAndDownloadPDF("/reports/download-regulated-ownerships-report");
+
 export const downloadMultipleOwnershipsReportPDF = () =>
     fetchAndDownloadPDF("/reports/download-multiple-ownerships-report");
 
