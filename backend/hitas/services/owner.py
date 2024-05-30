@@ -101,6 +101,7 @@ def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
         Ownership.objects.select_related(
             "owner",
             "sale__apartment__building__real_estate__housing_company__postal_code",
+            "sale__apartment__building__real_estate__housing_company",
         )
         .annotate(
             apartment_count=subquery_count(Ownership, "owner"),

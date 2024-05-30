@@ -95,6 +95,10 @@ class MultipleOwnershipReportColumns(NamedTuple):
     apartment_address: str
     postal_code: str
     apartment_count: int | str
+    owner_identifier: str
+    housing_company_name: str
+    housing_company_completion_date: datetime.date | str
+    cost_area: int | str
 
 
 class OwnersByHousingCompanyReportColumns(NamedTuple):
@@ -718,6 +722,10 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
         apartment_address="Asunnon osoite",
         postal_code="Postinumero",
         apartment_count="Omistajan asuntojen lukumäärä",
+        owner_identifier="Omistajan henkilö- tai Y-tunnus",
+        housing_company_name="Yhtiön nimi",
+        housing_company_completion_date="Yhtiön valmistumispäivä",
+        cost_area="Kalleusalue",
     )
     worksheet.append(column_headers)
 
@@ -728,6 +736,10 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
                 apartment_address=ownership.apartment.address,
                 postal_code=ownership.apartment.postal_code.value,
                 apartment_count=ownership.apartment_count,
+                owner_identifier="" if ownership.owner.non_disclosure else ownership.owner.identifier,
+                housing_company_name=ownership.apartment.building.real_estate.housing_company.display_name,
+                housing_company_completion_date=ownership.apartment.building.real_estate.housing_company.completion_date,
+                cost_area=ownership.apartment.postal_code.cost_area,
             )
         )
 
