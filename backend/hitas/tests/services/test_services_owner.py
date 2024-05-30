@@ -167,6 +167,7 @@ def test_obfuscate_owners_without_regulated_apartments__half_hitas_sales_after_r
         sales=[],
         building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
         building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        completion_date="2020-01-01",
     )
 
     unsold_apartments_count = get_number_of_unsold_apartments(apartment.housing_company)
