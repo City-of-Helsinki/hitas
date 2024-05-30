@@ -1427,7 +1427,16 @@ def test__api__multiple_ownerships_report__no_owners(api_client: HitasAPIClient)
     worksheet: Worksheet = workbook.worksheets[0]
 
     assert list(worksheet.values) == [
-        ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
+        (
+            "Omistajan nimi",
+            "Asunnon osoite",
+            "Postinumero",
+            "Omistajan asuntojen lukumäärä",
+            "Omistajan henkilö- tai Y-tunnus",
+            "Yhtiön nimi",
+            "Yhtiön valmistumispäivä",
+            "Kalleusalue",
+        ),
     ]
 
 
@@ -1438,10 +1447,12 @@ def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClie
     ownership_1: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ownership_2: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_II,
     )
 
     url = reverse("hitas:multiple-ownerships-report-list")
@@ -1451,18 +1462,39 @@ def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClie
     worksheet: Worksheet = workbook.worksheets[0]
 
     assert list(worksheet.values) == [
-        ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
+        (
+            "Omistajan nimi",
+            "Asunnon osoite",
+            "Postinumero",
+            "Omistajan asuntojen lukumäärä",
+            "Omistajan henkilö- tai Y-tunnus",
+            "Yhtiön nimi",
+            "Yhtiön valmistumispäivä",
+            "Kalleusalue",
+        ),
         (
             Owner.OBFUSCATED_OWNER_NAME if non_disclosure else ownership_1.owner.name,
             ownership_1.apartment.address,
             ownership_1.apartment.postal_code.value,
             2,
+            None if non_disclosure else ownership_1.owner.identifier,
+            ownership_1.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_1.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_1.apartment.postal_code.cost_area,
         ),
         (
             Owner.OBFUSCATED_OWNER_NAME if non_disclosure else ownership_2.owner.name,
             ownership_2.apartment.address,
             ownership_2.apartment.postal_code.value,
             2,
+            None if non_disclosure else ownership_2.owner.identifier,
+            ownership_2.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_2.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_2.apartment.postal_code.cost_area,
         ),
     ]
 
@@ -1473,24 +1505,29 @@ def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIC
     ownership_1: Ownership = OwnershipFactory.create(
         owner=owner_1,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ownership_2: Ownership = OwnershipFactory.create(
         owner=owner_1,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     owner_2: Owner = OwnerFactory.create(name="Owner 2", non_disclosure=True)
     ownership_3: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ownership_4: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ownership_5: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00003",
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     url = reverse("hitas:multiple-ownerships-report-list")
@@ -1500,12 +1537,76 @@ def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIC
     worksheet: Worksheet = workbook.worksheets[0]
 
     assert list(worksheet.values) == [
-        ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
-        (ownership_1.owner.name, ownership_1.apartment.address, ownership_1.apartment.postal_code.value, 2),
-        (ownership_2.owner.name, ownership_2.apartment.address, ownership_2.apartment.postal_code.value, 2),
-        (Owner.OBFUSCATED_OWNER_NAME, ownership_3.apartment.address, ownership_3.apartment.postal_code.value, 3),
-        (Owner.OBFUSCATED_OWNER_NAME, ownership_4.apartment.address, ownership_4.apartment.postal_code.value, 3),
-        (Owner.OBFUSCATED_OWNER_NAME, ownership_5.apartment.address, ownership_5.apartment.postal_code.value, 3),
+        (
+            "Omistajan nimi",
+            "Asunnon osoite",
+            "Postinumero",
+            "Omistajan asuntojen lukumäärä",
+            "Omistajan henkilö- tai Y-tunnus",
+            "Yhtiön nimi",
+            "Yhtiön valmistumispäivä",
+            "Kalleusalue",
+        ),
+        (
+            ownership_1.owner.name,
+            ownership_1.apartment.address,
+            ownership_1.apartment.postal_code.value,
+            2,
+            None if ownership_1.owner.non_disclosure else ownership_1.owner.identifier,
+            ownership_1.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_1.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_1.apartment.postal_code.cost_area,
+        ),
+        (
+            ownership_2.owner.name,
+            ownership_2.apartment.address,
+            ownership_2.apartment.postal_code.value,
+            2,
+            None if ownership_2.owner.non_disclosure else ownership_2.owner.identifier,
+            ownership_2.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_2.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_2.apartment.postal_code.cost_area,
+        ),
+        (
+            Owner.OBFUSCATED_OWNER_NAME,
+            ownership_3.apartment.address,
+            ownership_3.apartment.postal_code.value,
+            3,
+            None if ownership_3.owner.non_disclosure else ownership_3.owner.identifier,
+            ownership_3.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_3.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_3.apartment.postal_code.cost_area,
+        ),
+        (
+            Owner.OBFUSCATED_OWNER_NAME,
+            ownership_4.apartment.address,
+            ownership_4.apartment.postal_code.value,
+            3,
+            None if ownership_4.owner.non_disclosure else ownership_4.owner.identifier,
+            ownership_4.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_4.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_4.apartment.postal_code.cost_area,
+        ),
+        (
+            Owner.OBFUSCATED_OWNER_NAME,
+            ownership_5.apartment.address,
+            ownership_5.apartment.postal_code.value,
+            3,
+            None if ownership_5.owner.non_disclosure else ownership_5.owner.identifier,
+            ownership_5.apartment.building.real_estate.housing_company.display_name,
+            datetime.datetime.combine(
+                ownership_5.apartment.building.real_estate.housing_company.completion_date, datetime.datetime.min.time()
+            ),
+            ownership_5.apartment.postal_code.cost_area,
+        ),
     ]
 
 
