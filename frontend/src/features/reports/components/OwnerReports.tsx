@@ -1,4 +1,4 @@
-import {DownloadButton, Heading} from "../../../common/components";
+import {Divider, DownloadButton, Heading} from "../../../common/components";
 import {downloadMultipleOwnershipsReportPDF, downloadRegulatedOwnershipsReportExcel} from "../../../common/services";
 
 const OwnerReports = () => {
@@ -19,6 +19,7 @@ const OwnerReports = () => {
                     </div>
                 </div>
             </div>
+            <Divider size="s" />
             <div className="report-container">
                 <div className="column">
                     <Heading type="sub">Sääntelyn piirissä olevien Hitas-asuntojen omistajat</Heading>
