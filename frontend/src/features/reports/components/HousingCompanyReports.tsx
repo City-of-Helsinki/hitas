@@ -3,6 +3,7 @@ import {DownloadButton, Heading, QueryStateHandler} from "../../../common/compon
 import {IHousingCompanyState} from "../../../common/schemas";
 import {
     downloadHousingCompanyStatesReportPDF,
+    downloadRegulatedHalfHitasHousingCompaniesExcel,
     downloadRegulatedHousingCompaniesPDF,
     downloadUnregulatedHousingCompaniesPDF,
     useGetHousingCompanyStatesQuery,
@@ -63,6 +64,23 @@ export const HousingCompanyReportRegulated = () => {
                     <DownloadButton
                         buttonText="Lataa raportti"
                         onClick={downloadRegulatedHousingCompaniesPDF}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const HousingCompanyReportRegulatedHalfHitas = () => {
+    return (
+        <div className="report-container">
+            <div className="column">
+                <Heading type="sub">Säännellyt Puolihitas-yhtiöt</Heading>
+                <span>Listaus sääntelyn piirissä olevista Puolihitas-taloyhtiöistä</span>
+                <div>
+                    <DownloadButton
+                        buttonText="Lataa raportti"
+                        onClick={downloadRegulatedHalfHitasHousingCompaniesExcel}
                     />
                 </div>
             </div>

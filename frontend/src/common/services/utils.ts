@@ -54,7 +54,10 @@ export const fetchAndDownloadPDF = (url: string, method: "GET" | "POST" = "GET",
             }
         })
         // eslint-disable-next-line no-console
-        .catch((error) => console.error(error));
+        .catch((error) => {
+            console.error(error);
+            hdsToast.error(`Virhe ladattaessa tiedostoa. (${error?.message ?? error})`);
+        });
 };
 
 export const safeInvalidate = (error, tags) => (!error ? tags : []);
