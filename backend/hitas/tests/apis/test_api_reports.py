@@ -540,7 +540,7 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
 
 
 @pytest.mark.django_db
-def test__api__regulated_half_hitas_housing_companies_report__multiple_housing_companies(api_client: HitasAPIClient):
+def test__api__half_hitas_housing_companies_report__multiple_housing_companies(api_client: HitasAPIClient):
     housing_company_1: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00001",
         postal_code__cost_area=1,
@@ -569,7 +569,7 @@ def test__api__regulated_half_hitas_housing_companies_report__multiple_housing_c
         apartment__building__real_estate__housing_company=housing_company_2,
     )
 
-    url = reverse("hitas:regulated-half-hitas-housing-companies-report-list")
+    url = reverse("hitas:half-hitas-housing-companies-report-list")
     response: HttpResponse = api_client.get(url)
 
     workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)

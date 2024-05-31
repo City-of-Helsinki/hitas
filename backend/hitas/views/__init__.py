@@ -29,12 +29,12 @@ from hitas.views.postal_code import HitasPostalCodeViewSet
 from hitas.views.property_manager import PropertyManagerViewSet
 from hitas.views.real_estate import RealEstateViewSet
 from hitas.views.reports import (
+    HalfHitasHousingCompaniesReportView,
     HousingCompanyStatesJSONReportView,
     HousingCompanyStatesReportView,
     MultipleOwnershipsReportView,
     OwnershipsByCompanyJSONReportView,
     OwnershipsByHousingCompanyReport,
-    RegulatedHalfHitasHousingCompaniesReportView,
     RegulatedHousingCompaniesReportView,
     RegulatedOwnershipsReportView,
     SalesByPostalCodeAndAreaReportView,

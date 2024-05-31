@@ -3,7 +3,7 @@ import {DownloadButton, Heading, QueryStateHandler} from "../../../common/compon
 import {IHousingCompanyState} from "../../../common/schemas";
 import {
     downloadHousingCompanyStatesReportPDF,
-    downloadRegulatedHalfHitasHousingCompaniesExcel,
+    downloadHalfHitasHousingCompaniesExcel,
     downloadRegulatedHousingCompaniesPDF,
     downloadUnregulatedHousingCompaniesPDF,
     useGetHousingCompanyStatesQuery,
@@ -71,23 +71,6 @@ export const HousingCompanyReportRegulated = () => {
     );
 };
 
-export const HousingCompanyReportRegulatedHalfHitas = () => {
-    return (
-        <div className="report-container">
-            <div className="column">
-                <Heading type="sub">Säännellyt Puolihitas-yhtiöt</Heading>
-                <span>Listaus sääntelyn piirissä olevista Puolihitas-taloyhtiöistä</span>
-                <div>
-                    <DownloadButton
-                        buttonText="Lataa raportti"
-                        onClick={downloadRegulatedHalfHitasHousingCompaniesExcel}
-                    />
-                </div>
-            </div>
-        </div>
-    );
-};
-
 export const HousingCompanyReportReleased = () => {
     return (
         <div className="report-container">
@@ -98,6 +81,23 @@ export const HousingCompanyReportReleased = () => {
                     <DownloadButton
                         buttonText="Lataa raportti"
                         onClick={downloadUnregulatedHousingCompaniesPDF}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const HousingCompanyReportHalfHitas = () => {
+    return (
+        <div className="report-container">
+            <div className="column">
+                <Heading type="sub">Puolihitas-yhtiöt</Heading>
+                <span>Listaus Puolihitas-taloyhtiöistä</span>
+                <div>
+                    <DownloadButton
+                        buttonText="Lataa raportti"
+                        onClick={downloadHalfHitasHousingCompaniesExcel}
                     />
                 </div>
             </div>

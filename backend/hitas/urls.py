@@ -85,11 +85,11 @@ router.register(
     basename="regulated-housing-companies-report",
 )
 
-# /api/v1/reports/download-regulated-half-hitas-housing-companies-report
+# /api/v1/reports/download-half-hitas-housing-companies-report
 router.register(
-    r"reports/download-regulated-half-hitas-housing-companies-report",
-    views.RegulatedHalfHitasHousingCompaniesReportView,
-    basename="regulated-half-hitas-housing-companies-report",
+    r"reports/download-half-hitas-housing-companies-report",
+    views.HalfHitasHousingCompaniesReportView,
+    basename="half-hitas-housing-companies-report",
 )
 
 # /api/v1/reports/download-unregulated-housing-companies-report

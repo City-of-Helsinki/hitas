@@ -2,7 +2,7 @@ import {Accordion} from "hds-react";
 import {Divider, Heading} from "../../common/components";
 import {
     HousingCompanyReportRegulated,
-    HousingCompanyReportRegulatedHalfHitas,
+    HousingCompanyReportHalfHitas,
     HousingCompanyReportReleased,
     HousingCompanyStatusTable,
 } from "./components/HousingCompanyReports";
@@ -35,9 +35,9 @@ const ReportsPage = () => {
                     <Divider size="s" />
                     <HousingCompanyReportRegulated />
                     <Divider size="s" />
-                    <HousingCompanyReportRegulatedHalfHitas />
-                    <Divider size="s" />
                     <HousingCompanyReportReleased />
+                    <Divider size="s" />
+                    <HousingCompanyReportHalfHitas />
                 </Accordion>
 
                 <Accordion
