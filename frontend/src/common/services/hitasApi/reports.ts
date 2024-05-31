@@ -62,8 +62,8 @@ export const downloadSalesByPostalCodeAndAreaReportPDF = ({
 export const downloadRegulatedHousingCompaniesPDF = () =>
     fetchAndDownloadPDF("/reports/download-regulated-housing-companies-report");
 
-export const downloadRegulatedHalfHitasHousingCompaniesExcel = () =>
-    fetchAndDownloadPDF("/reports/download-regulated-half-hitas-housing-companies-report");
+export const downloadHalfHitasHousingCompaniesExcel = () =>
+    fetchAndDownloadPDF("/reports/download-half-hitas-housing-companies-report");
 
 export const downloadUnregulatedHousingCompaniesPDF = () =>
     fetchAndDownloadPDF("/reports/download-unregulated-housing-companies-report");

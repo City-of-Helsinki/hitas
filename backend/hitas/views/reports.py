@@ -10,8 +10,8 @@ from rest_framework.viewsets import ViewSet
 from hitas.models import HousingCompany, Owner, Ownership
 from hitas.services.apartment_sale import find_sales_on_interval_for_reporting
 from hitas.services.housing_company import (
+    find_half_hitas_housing_companies_for_reporting,
     find_housing_companies_for_state_reporting,
-    find_regulated_half_hitas_housing_companies_for_reporting,
     find_regulated_housing_companies_for_reporting,
     find_unregulated_housing_companies_for_reporting,
 )
@@ -73,13 +73,13 @@ class RegulatedHousingCompaniesReportView(ViewSet):
         return get_excel_response(filename=filename, excel=workbook)
 
 
-class RegulatedHalfHitasHousingCompaniesReportView(ViewSet):
+class HalfHitasHousingCompaniesReportView(ViewSet):
     renderer_classes = [HitasJSONRenderer, ExcelRenderer]
 
     def list(self, request: Request, *args, **kwargs) -> HttpResponse:
-        housing_companies = find_regulated_half_hitas_housing_companies_for_reporting()
+        housing_companies = find_half_hitas_housing_companies_for_reporting()
         workbook = build_regulated_housing_companies_report_excel(housing_companies)
-        filename = "Valvonnan piirissä olevat puolihitas-yhtiöt.xlsx"
+        filename = "Puolihitas-yhtiöt.xlsx"
         return get_excel_response(filename=filename, excel=workbook)
 
 

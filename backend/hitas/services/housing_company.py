@@ -340,14 +340,13 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
     )
 
 
-def find_regulated_half_hitas_housing_companies_for_reporting() -> list[HousingCompanyWithRegulatedReportAnnotations]:
+def find_half_hitas_housing_companies_for_reporting() -> list[HousingCompanyWithRegulatedReportAnnotations]:
     return list(
         HousingCompany.objects.select_related("postal_code")
         .prefetch_related(
             "real_estates__buildings__apartments",
         )
         .filter(
-            regulation_status=RegulationStatus.REGULATED,
             hitas_type=HitasType.HALF_HITAS,
         )
         .alias(
