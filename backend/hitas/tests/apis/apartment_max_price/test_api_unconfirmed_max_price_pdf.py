@@ -95,7 +95,7 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer, no
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -203,7 +203,7 @@ def test__api__unconfirmed_max_price_pdf__old_hitas_ruleset(api_client: HitasAPI
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -420,7 +420,7 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI

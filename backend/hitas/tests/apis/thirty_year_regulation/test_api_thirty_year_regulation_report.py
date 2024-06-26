@@ -93,7 +93,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -155,7 +155,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -275,7 +275,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -332,7 +332,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -482,7 +482,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
@@ -544,7 +544,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         Hitas
         Työpajankatu 8
         Email hitas@hel.fi
-        PL 58231
+        PL 58237
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
