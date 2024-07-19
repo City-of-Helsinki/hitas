@@ -3,6 +3,7 @@ import {AddressSchema, APIIdString, CodeSchema, PageInfoSchema} from "./common";
 import {housingCompanyHitasTypes, housingCompanyRegulationStatus} from "./enums";
 import {ImprovementSchema, MarketPriceIndexImprovementSchema} from "./improvements";
 import {PropertyManagerSchema} from "./propertyManager";
+import {DocumentSchema} from "./document";
 
 // ********************************
 // * Building
@@ -128,6 +129,7 @@ export const HousingCompanyDetailsSchema = object({
         market_price_index: MarketPriceIndexImprovementSchema.array(),
         construction_price_index: ImprovementSchema.array(),
     }),
+    documents: DocumentSchema.array(),
 });
 export type IHousingCompanyDetails = z.infer<typeof HousingCompanyDetailsSchema>;
 
