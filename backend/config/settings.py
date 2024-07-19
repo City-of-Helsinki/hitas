@@ -156,6 +156,11 @@ TEMPLATES = [
 STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = "static/"
 
+# ----- File uploads -----------------------------------------------------------------------------------
+
+MEDIA_ROOT = BASE_DIR / "mediaroot"
+MEDIA_URL = "media/"
+
 # ----- Email ------------------------------------------------------------------------------------------
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
