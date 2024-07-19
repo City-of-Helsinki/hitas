@@ -1,4 +1,6 @@
+from django.shortcuts import redirect
 from rest_framework import serializers
+from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser, MultiPartParser
 
 from hitas.models.apartment import Apartment
@@ -10,7 +12,7 @@ from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 class DocumentSerializerBase(HitasModelSerializer):
     file_content = serializers.FileField(source="file", write_only=True, required=False)
-    file_link = serializers.FileField(source="file", read_only=True)
+    file_link = serializers.SerializerMethodField()
     file_type_display = serializers.SerializerMethodField()
 
     class Meta:
@@ -23,6 +25,9 @@ class DocumentSerializerBase(HitasModelSerializer):
             "file_link",
             "file_type_display",
         ]
+
+    def get_file_link(self, obj):
+        return obj.get_file_link()
 
     def get_file_type_display(self, obj):
         if not obj.original_filename:
@@ -64,6 +69,11 @@ class DocumentViewSetBase(HitasModelViewSet):
 
     def perform_destroy(self, instance):
         return super().perform_destroy(instance)
+
+    @action(detail=True, methods=["GET"])
+    def redirect(self, request, **kwargs):
+        obj = self.get_object()
+        return redirect(obj.file.url)
 
 
 class HousingCompanyDocumentViewSet(DocumentViewSetBase):
