@@ -5,6 +5,7 @@ from hitas.views.apartment_sale import ApartmentSaleViewSet
 from hitas.views.building import BuildingViewSet
 from hitas.views.codes import ApartmentTypeViewSet, BuildingTypeViewSet, DeveloperViewSet
 from hitas.views.condition_of_sale import ConditionOfSaleViewSet
+from hitas.views.document import ApartmentDocumentViewSet, HousingCompanyDocumentViewSet
 from hitas.views.email import (
     ConfirmedMaxPriceCalculationEmailViewSet,
     RegulationLetterEmailViewSet,

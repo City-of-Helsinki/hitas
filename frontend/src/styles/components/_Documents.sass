@@ -53,3 +53,98 @@
     .input-field
       height: auto
       margin-bottom: $spacing-m
+
+.view--create-documents
+  .field-sets
+    background-color: $color-black-5
+
+  .document-list-item-file-row
+    display: flex
+
+  .documents-list-item
+    position: relative
+    background: #fff
+    padding: 1em
+    margin-bottom: 2.5em
+
+    label
+      font-weight: 700
+
+    .input-field--text
+      width: calc(100% - 60px)
+
+    .input-field--file
+      flex-grow: 0
+      display: flex
+      gap: 1.5em
+
+      [class*="FileInput-module_fileList_"]
+        margin-top: 24px
+
+      [class*="FileInput-module_fileListItemButton_"]
+        display: none
+
+      [class*="TextInput-module_inputWrapper_"] + [class*="TextInput-module_"]
+        display: none
+
+    .document-item-file-link
+      display: flex
+      align-items: center
+      gap: var(--spacing-2-xs)
+      padding: var(--spacing-s) var(--spacing-xs) var(--spacing-s) var(--spacing-2-xs)
+      margin-top: 24px
+      margin-bottom: 7px
+      background-color: var(--color-info-light)
+      font-size: var(--fontsize-body-s)
+      text-decoration: underline
+      text-underline-offset: 2px
+      &:hover
+        text-decoration: none
+
+    .icon--remove
+      position: absolute
+      top: 1em
+      right: 1em
+      cursor: pointer
+      > svg
+        color: $color-black-80
+        &:hover
+          color: $color-error
+
+    .documents-list-item-metadata
+      margin-top: 0.5em
+      display: flex
+      gap: 1em
+
+  [class*="FileInput-module_fileInputWrapper_"]
+    margin-top: 0
+
+.document-create-confirm-leave-modal.document-create-confirm-leave-modal
+  width: 620px
+
+[class*="__tab"].documents.documents
+  display: block
+  margin: $spacing-layout-s
+  padding: $spacing-layout-s
+  background: $color-white
+
+.documents-table
+  width: 100%
+  border-collapse: collapse
+  th
+    text-align: left
+  th, td
+    padding: $spacing-xs
+  tbody tr:nth-child(odd)
+    background-color: $color-black-5
+
+  a:not(.document-item-file-link)
+    &:hover
+      text-decoration: underline
+      text-underline-offset: 2px
+
+  .document-table-link
+    text-decoration: underline
+    text-underline-offset: 2px
+    &:hover
+      text-decoration: none

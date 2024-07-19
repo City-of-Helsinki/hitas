@@ -5,6 +5,7 @@ export * from "./enums";
 export * from "./functions";
 export * from "./housingCompany";
 export * from "./improvements";
+export * from "./document";
 export * from "./indices";
 export * from "./owner";
 export * from "./propertyManager";
