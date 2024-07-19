@@ -45,6 +45,9 @@ env = environ.Env(
     EMAIL_HOST_USER=(str, ""),
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(bool, True),
+    AZURE_ACCOUNT_NAME=(str, None),
+    AZURE_ACCOUNT_KEY=(str, None),
+    AZURE_CONTAINER=(str, None),
 )
 env.read_env(BASE_DIR / ".env")
 
@@ -160,6 +163,19 @@ STATIC_URL = "static/"
 
 MEDIA_ROOT = BASE_DIR / "mediaroot"
 MEDIA_URL = "media/"
+
+AZURE_ACCOUNT_NAME = env("AZURE_ACCOUNT_NAME")
+AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
+AZURE_CONTAINER = env("AZURE_CONTAINER")
+AZURE_URL_EXPIRATION_SECS = 7200
+AZURE_CONNECTION_STRING = (
+    f"DefaultEndpointsProtocol=https;"
+    f"AccountName={AZURE_ACCOUNT_NAME};"
+    f"AccountKey={AZURE_ACCOUNT_KEY};"
+    f"EndpointSuffix=core.windows.net"
+)
+if AZURE_ACCOUNT_NAME is not None:
+    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
 
 # ----- Email ------------------------------------------------------------------------------------------
 

@@ -1,7 +1,9 @@
 import os
 from uuid import uuid4
 
+from crum import get_current_request
 from django.db import models
+from django.urls import reverse
 from django.utils.deconstruct import deconstructible
 from safedelete import SOFT_DELETE_CASCADE
 
@@ -42,6 +44,18 @@ class HousingCompanyDocument(BaseDocument):
     def get_parent(self):
         return self.housing_company
 
+    def get_file_link(self):
+        request = get_current_request()
+        return request.build_absolute_uri(
+            reverse(
+                "hitas:document-redirect",
+                kwargs={
+                    "housing_company_uuid": self.housing_company.uuid.hex,
+                    "uuid": self.uuid.hex,
+                },
+            )
+        )
+
 
 class AparmentDocument(BaseDocument):
     file = models.FileField(upload_to=DocumentFilenameGenerator("apartment_documents"))
@@ -49,3 +63,16 @@ class AparmentDocument(BaseDocument):
 
     def get_parent(self):
         return self.apartment
+
+    def get_file_link(self):
+        request = get_current_request()
+        return request.build_absolute_uri(
+            reverse(
+                "hitas:document-redirect",
+                kwargs={
+                    "housing_company_uuid": self.apartment.housing_company.uuid.hex,
+                    "apartment_uuid": self.apartment.uuid.hex,
+                    "uuid": self.uuid.hex,
+                },
+            )
+        )
