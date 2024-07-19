@@ -850,6 +850,249 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  # Housing company documents
+
+  /api/v1/housing-companies/{housing_company_id}/documents:
+    get:
+      description: Fetch documents for a housing company
+      operationId: list-housing-company-documents
+      tags:
+        - Documents
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
+      responses:
+        "200":
+          description: Successfully fetched list of documents
+          content:
+            application/json:
+              schema:
+                description: Single page of documents
+                type: object
+                additionalProperties: false
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: "#/components/schemas/PageInfo"
+                  contents:
+                    description: List of documents
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      description: Add a new document for a housing company
+      operationId: create-housing-company-document
+      tags:
+        - Documents
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              additionalProperties: false
+              $ref: "#/components/schemas/DocumentCreate"
+      responses:
+        "201":
+          description: Successfully added a new document for a housing company
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/housing-companies/{housing_company_id}/documents/{document_id}:
+    get:
+      description: Fetch a single document by id
+      operationId: read-housing-company-document
+      tags:
+        - Documents
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: document_id
+          required: true
+          in: path
+          description: Document ID
+          schema:
+            type: string
+            example: 33b1b8fa60b47df8ccba0d554a913bb
+      responses:
+        "200":
+          description: Successfully read a document details
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: "#/components/schemas/Document"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      description: Update a document
+      operationId: update-housing-company-document
+      tags:
+        - Documents
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: document_id
+          required: true
+          in: path
+          description: Document ID
+          schema:
+            type: string
+            example: 33b1b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              additionalProperties: false
+              $ref: "#/components/schemas/DocumentUpdate"
+      responses:
+        "200":
+          description: Successfully updated a document
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      description: Remove a document
+      operationId: delete-housing-company-document
+      tags:
+        - Documents
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: document_id
+          required: true
+          in: path
+          description: Document ID
+          schema:
+            type: string
+            example: 33b1b8fa60b47df8ccba0d554a913bb
+      responses:
+        "204":
+          description: Document successfully removed.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/housing-companies/{housing_company_id}/documents/{document_id}/redirect:
+    get:
+      description: Redirect to a document's URL
+      operationId: redirect-housing-company-document
+      tags:
+        - Documents
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: document_id
+          required: true
+          in: path
+          description: Document ID
+          schema:
+            type: string
+            example: 33b1b8fa60b47df8ccba0d554a913bb
+      responses:
+        "302":
+          description: Redirect to a document's URL
+          headers:
+            Location:
+              description: URL to the document
+              schema:
+                type: string
+                example: https://example.com/document.pdf
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   # Apartment
 
   /api/v1/housing-companies/{housing_company_id}/apartments:
@@ -1987,6 +2230,293 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # Apartment documents
+
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/documents:
+    get:
+      description: Fetch documents for an apartment
+      operationId: list-apartment-documents
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      responses:
+        "200":
+          description: Successfully fetched list of documents
+          content:
+            application/json:
+              schema:
+                description: Single page of documents
+                type: object
+                additionalProperties: false
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: "#/components/schemas/PageInfo"
+                  contents:
+                    description: List of documents
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      description: Add a new document for an apartment
+      operationId: create-apartment-document
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              additionalProperties: false
+              $ref: "#/components/schemas/DocumentCreate"
+      responses:
+        "201":
+          description: Successfully fetched list of documents
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/documents/{document_id}:
+    get:
+      description: Fetch a document for an apartment
+      operationId: read-apartment-document
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: document_id
+          required: true
+          in: path
+          description: Apartment document ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      responses:
+        "200":
+          description: Successfully read an apartments document
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: "#/components/schemas/Document"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      description: Update a document for an apartment
+      operationId: update-apartment-document
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: document_id
+          required: true
+          in: path
+          description: Apartment document ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              additionalProperties: false
+              $ref: "#/components/schemas/DocumentUpdate"
+      responses:
+        "200":
+          description: Successfully updated an apartments document
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      description: Remove a document for an apartment
+      operationId: delete-apartment-document
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: document_id
+          required: true
+          in: path
+          description: Apartment document ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      responses:
+        "204":
+          description: Apartment document successfully removed.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/documents/{document_id}/redirect:
+    get:
+      description: Redirect to a document for an apartment
+      operationId: redirect-apartment-document
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: document_id
+          required: true
+          in: path
+          description: Apartment document ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      responses:
+        "302":
+          description: Redirect to the document
+          headers:
+            Location:
+              description: URL to the document
+              schema:
+                type: string
+                example: https://example.com/document.pdf
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -5282,6 +5812,11 @@ components:
                     example: 13359.75
                   completion_date:
                     $ref: "#/components/schemas/YearMonth"
+        documents:
+          description: List of documents related to this housing company
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
 
     HousingCompanyPartialUpdateDetails:
       description: Single housing company's details
@@ -5908,6 +6443,11 @@ components:
                       - 0
                       - 2.5
                       - 10
+        documents:
+          description: List of documents related to this apartment
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
         conditions_of_sale:
           readOnly: true
           type: array
@@ -8168,6 +8708,78 @@ components:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false
+
+    Document:
+      description: Document information
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - created_at
+        - modified_at
+        - display_name
+        - file_link
+        - file_type_display
+      properties:
+        id:
+          description: ID of this document
+          type: string
+          example: 3f3250c982014789abf40249a05c3504
+        created_at:
+          description: Document creation timestamp
+          type: string
+          format: date-time
+          example: 2024-07-18T12:53:29.202739+03:00
+        modified_at:
+          description: Document modification timestamp
+          type: string
+          format: date-time
+          example: 2024-07-19T13:13:26.862166+03:00
+        display_name:
+          description: Document display name
+          type: string
+          example: Asiakirja
+        file_link:
+          description: Document file link
+          type: string
+          example: https://absolute.url.to.test/documents/3f3250c982014789abf40249a05c3504/redirect
+        file_type_display:
+          description: Document file type display
+          type: string
+          example: PDF-tiedosto
+
+    DocumentCreate:
+      description: Document create data
+      type: object
+      additionalProperties: false
+      required:
+        - display_name
+        - file_content
+      properties:
+        display_name:
+          description: Document display name
+          type: string
+          example: Asiakirja
+        file_content:
+          description: Document file content
+          type: string
+          format: binary
+
+    DocumentUpdate:
+      description: Document update data
+      type: object
+      additionalProperties: false
+      required:
+        - display_name
+      properties:
+        display_name:
+          description: Document display name
+          type: string
+          example: Asiakirja
+        file_content:
+          description: Document file content
+          type: string
+          format: binary
 
     ApartmentConditionOfSale:
       description: Condition of Sale under an apartment
