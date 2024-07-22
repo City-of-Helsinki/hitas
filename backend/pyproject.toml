@@ -48,7 +48,7 @@ pytest-django = "^4.5.2"
 pytest-freezegun = "^0.4.2"
 factory-boy = "^3.3.0"
 ipython = "^8.14.0"
-openapi-core = "0.16.6" # Updating past this version breaks tests
+openapi-core = "0.19.2"
 testcontainers = {extras = ["postgresql"], version = "^3.7.1"}
 django-debug-toolbar = "^3.8.1" # Updating to 4 breaks query count tests
 pre-commit = "^3.3.3"

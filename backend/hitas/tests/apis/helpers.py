@@ -7,35 +7,22 @@ import yaml
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import connection
-from openapi_core import Spec
+from jsonschema_path import SchemaPath
+from openapi_core.casting.schemas import oas30_read_schema_casters_factory
 from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIResponse
-from openapi_core.templating.paths.datatypes import ServerOperationPath
-from openapi_core.unmarshalling.schemas import oas30_request_schema_unmarshallers_factory
-from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
+from openapi_core.templating.paths.datatypes import PathOperationServer
+from openapi_core.unmarshalling.schemas import oas30_read_schema_validators_factory
 from openapi_core.validation.request.protocols import Request
-from openapi_core.validation.request.validators import RequestValidator
-from openapi_core.validation.response import openapi_response_validator
+from openapi_core.validation.request.validators import APICallRequestValidator
+from openapi_core.validation.response import V30ResponseValidator
+from openapi_spec_validator.validation import openapi_spec_validator_proxy
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 
 with open(f"{settings.BASE_DIR}/openapi.yaml", "r") as spec_file:
-    _openapi_spec = Spec.create(yaml.safe_load(spec_file))
-
-
-class WSGIRequestWorkaround:
-    """
-    Body is only readable once so keep a copy of it for validation purposes. DRF reads it once before us
-    """
-
-    def __init__(self, r: WSGIRequest, request_body: str):
-        self.r = r
-        self.request_body = request_body
-
-    def __getattr__(self, item):
-        if item == "body":
-            return self.request_body
-
-        return getattr(self.r, item)
+    openapi_spec_data = yaml.safe_load(spec_file)
+    openapi_spec_validator_proxy.validate(openapi_spec_data)
+    _openapi_spec = SchemaPath.from_dict(openapi_spec_data)
 
 
 class DjangoOpenAPIResponseWorkaround(DjangoOpenAPIResponse):
@@ -57,35 +44,27 @@ def validate_openapi(
 
     # Validate request
     if validate_request:
-        result = RequestValidatorWorkaround(
-            schema_unmarshallers_factory=oas30_request_schema_unmarshallers_factory
+        RequestValidatorWorkaround(
+            _openapi_spec,
+            schema_validators_factory=oas30_read_schema_validators_factory,
+            schema_casters_factory=oas30_read_schema_casters_factory,
         ).validate(
-            _openapi_spec, OpenAPIUrlPatternWorkaround(WSGIRequestWorkaround(response.wsgi_request, request_body))
+            WSGIRequestWorkaround(response.wsgi_request, request_body),
         )
-        handle_result(result)
 
     # Validate response
     if validate_response:
-        result = openapi_response_validator.validate(
+        V30ResponseValidator(
             _openapi_spec,
-            OpenAPIUrlPatternWorkaround(response.wsgi_request),
+        ).validate(
+            response.wsgi_request,
             DjangoOpenAPIResponseWorkaround(response),
         )
-        handle_result(result)
 
 
-def handle_result(result):
-    for error in result.errors:
-        if isinstance(error, InvalidSchemaValue):
-            for suberror in error.schema_errors:
-                print(suberror)  # noqa: T201
-
-    result.raise_for_errors()
-
-
-class RequestValidatorWorkaround(RequestValidator):
-    def _find_path(self, spec: Spec, request: Request, base_url: Optional[str] = None) -> ServerOperationPath:
-        result = super()._find_path(spec, request, base_url)
+class RequestValidatorWorkaround(APICallRequestValidator):
+    def _find_path(self, request: Request) -> PathOperationServer:
+        result = super()._find_path(request)
 
         # Workaround
         for k, v in result[3].variables.items():
@@ -95,31 +74,18 @@ class RequestValidatorWorkaround(RequestValidator):
         return result
 
 
-class OpenAPIUrlPatternWorkaround(DjangoOpenAPIRequest):
+class WSGIRequestWorkaround(DjangoOpenAPIRequest):
+    """
+    Body is only readable once so keep a copy of it for validation purposes. DRF reads it once before us
+    """
+
+    def __init__(self, request: WSGIRequest, request_body: str):
+        self.request_body = request_body
+        super().__init__(request)
+
     @property
-    def path_pattern(self) -> Optional[str]:
-        if self.request.resolver_match is None:
-            return None
-
-        route = self.request.resolver_match.route
-
-        # For detail view, DefaultRouter creates routes likes this:
-        # - /api/v1/housing-companies/(?P<housing_company_id>[^/.]+)$
-        # openapi-core tries to simplify the URL so it can look the
-        # correct OpenAPI definition but fails and ends up with:
-        # - http://testserver/api/v1/housing-companies/{housing_company_id}/.]+)$
-        # - http://testserver/api/v1/housing-companies/{housing_company_id}/.]+)/real-estates$
-        # Let's remove the /.]+) from the url pattern if it's there ($ was removed in the previous step)
-        if route.find("/.]+)"):
-            route = route.replace("/.]+)", "")
-
-        route = self.path_regex.sub(r"{\1}", route)
-        # Delete start and end marker to allow concatenation.
-        if route[:1] == "^":
-            route = route[1:]
-        if route[-1:] == "$":
-            route = route[:-1]
-        return "/" + route
+    def body(self) -> bytes:
+        return self.request_body
 
 
 class HitasAPIClient(APIClient):
