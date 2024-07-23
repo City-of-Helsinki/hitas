@@ -703,6 +703,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 },
             ],
         },
+        "documents": [],
         "notes": ap1.notes,
         "conditions_of_sale": [
             {
@@ -1979,6 +1980,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                 "construction_price_index": [],
                 "market_price_index": [],
             },
+            "documents": [],
             "notes": None,
             "ownerships": [],
             "prices": {
