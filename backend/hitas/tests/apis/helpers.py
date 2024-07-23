@@ -137,6 +137,12 @@ class HitasAPIClient(APIClient):
     ) -> Response:
         response: Response = super().generic(method, path, data, content_type, secure=False, **kwargs)
 
+        if content_type and content_type.startswith("multipart/form-data"):
+            # openapi-core 0.16.6 can not validate multipart/form-data requests
+            # and there are issues with upgrading to a newer openapi-core versions.
+            # Until the openapi-core can be upgraded, disable request validation for file uploads.
+            openapi_validate_request = False
+
         validate_openapi(
             data,
             response,

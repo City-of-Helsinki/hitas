@@ -395,6 +395,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                 },
             ],
         },
+        "documents": [],
     }
 
 

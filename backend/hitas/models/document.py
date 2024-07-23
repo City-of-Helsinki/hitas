@@ -3,9 +3,11 @@ from uuid import uuid4
 
 from crum import get_current_request
 from django.db import models
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.deconstruct import deconstructible
 from safedelete import SOFT_DELETE_CASCADE
+from safedelete.signals import pre_softdelete
 
 from hitas.models._base import ExternalSafeDeleteHitasModel
 
@@ -76,3 +78,21 @@ class AparmentDocument(BaseDocument):
                 },
             )
         )
+
+
+@receiver(pre_softdelete, sender=HousingCompanyDocument)
+@receiver(pre_softdelete, sender=AparmentDocument)
+def handle_file_deletion_on_delete(sender, instance, **kwargs):
+    instance.file.delete(save=False)
+
+
+@receiver(models.signals.pre_save, sender=HousingCompanyDocument)
+@receiver(models.signals.pre_save, sender=AparmentDocument)
+def handle_file_deletion_on_save(sender, instance, **kwargs):
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+    if old_instance.file.name != instance.file.name:
+        # Delete the old file before saving the new one so that there are no dangling files
+        old_instance.file.delete(save=False)
