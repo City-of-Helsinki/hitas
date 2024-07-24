@@ -328,7 +328,7 @@ const LoadedApartmentCreatePage = () => {
                             />
                         </div>
                         <div className="row">
-                            <NumberInput
+                            <TextInput
                                 name="address.floor"
                                 label="Kerros"
                             />
