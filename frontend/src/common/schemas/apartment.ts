@@ -259,7 +259,7 @@ export type SurfaceAreaPriceCeilingCalculation = z.infer<typeof SurfaceAreaPrice
 
 export const ApartmentAddressSchema = AddressSchema.extend({
     apartment_number: writableRequiredNumber,
-    floor: nullishNumber,
+    floor: string().nullable(),
     stair: string().min(1, "Pakollinen kenttä!"),
 });
 export type IApartmentAddress = z.infer<typeof ApartmentAddressSchema>;
