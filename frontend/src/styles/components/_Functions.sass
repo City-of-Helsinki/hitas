@@ -112,6 +112,7 @@
         padding: $spacing-m
       .list-headers
         width: 63%
+        padding-right: 0
       .results-list__item
         cursor: inherit
         padding: 0
@@ -128,7 +129,16 @@
           @include flex-flow(row nowrap)
           @include justify-content(space-between)
           @include align-items(center)
+          gap: $spacing-s
           width: 63%
+          & > a
+            width: 100%
+          .date
+            min-width: 90px
+            text-align: right
+          .property-manager
+            width: 100%
+            text-align: right
         .buttons
           @include flexbox()
           @include justify-content(flex-end)

@@ -8,9 +8,9 @@ const ListHeaders = () => (
         <div className="list-header name">Nimi ja osoite</div>
         <div className="list-header date">Valmistumispäivä</div>
         <div className="list-header property-manager">
-            Isännöitsijätiedot
+            Isännöitsijän
             <br />
-            päivitetty viimeksi
+            sähköpostiosoite
         </div>
     </div>
 );
