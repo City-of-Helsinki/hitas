@@ -96,7 +96,20 @@ class ApartmentFilterSet(HitasFilterSet):
         max_length=11,
     )
     has_conditions_of_sale = BooleanFilter()
+    has_no_ownerships = BooleanFilter(method="has_no_ownerships_filter")
     is_regulated = BooleanFilter(method="is_regulated_filter")
+
+    def has_no_ownerships_filter(self, queryset, name, value):
+        if value is None:
+            return queryset
+        if value is True:
+            return queryset.annotate(
+                _ownership_count=Count("sales__ownerships", filter=Q(sales__ownerships__deleted__isnull=True))
+            ).filter(_ownership_count=0)
+        else:
+            return queryset.annotate(
+                _ownership_count=Count("sales__ownerships", filter=Q(sales__ownerships__deleted__isnull=True))
+            ).exclude(_ownership_count=0)
 
     def is_regulated_filter(self, queryset, name, value):
         if value is None:
@@ -146,6 +159,7 @@ class ApartmentFilterSet(HitasFilterSet):
             "owner_name",
             "owner_identifier",
             "has_conditions_of_sale",
+            "has_no_ownerships",
         ]
 
 

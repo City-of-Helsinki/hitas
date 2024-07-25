@@ -192,6 +192,13 @@ const ApartmentFilters = ({filterParams, setFilterParams}): React.JSX.Element =>
                 setFilterParams={setFilterParams}
                 applyOnlyOnTrue
             />
+            <FilterCheckboxField
+                label="Ei omistajuuksia"
+                filterFieldName="has_no_ownerships"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+                applyOnlyOnTrue
+            />
         </div>
     );
 };
