@@ -48,6 +48,7 @@ const OwnershipList = () => {
                                     name={`ownerships.${index}.owner`}
                                     transform={(obj) => formatOwner(obj)}
                                     RelatedModelMutateComponent={OwnerMutateForm}
+                                    isModalDefaultOpen={formObject.getValues(`ownerships.${index}.owner`) === undefined}
                                 />
                             </div>
                             <div className="percentage">

@@ -213,6 +213,7 @@ interface RelatedModelInputProps {
     RelatedModelMutateComponent?: IRelatedModelMutateComponent;
     required?: boolean;
     disabled?: boolean;
+    isModalDefaultOpen?: boolean;
 }
 
 const RelatedModelInput = ({
@@ -229,11 +230,12 @@ const RelatedModelInput = ({
 
     required,
     disabled,
+    isModalDefaultOpen,
 }: RelatedModelInputProps) => {
     const formObject = useFormContext();
     formObject.register(name);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(isModalDefaultOpen ?? false);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
