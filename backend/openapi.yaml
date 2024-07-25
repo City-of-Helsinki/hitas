@@ -907,6 +907,13 @@ paths:
           schema:
             type: boolean
             example: true
+        - name: has_no_ownerships
+          description: List only apartments that have no ownerships
+          required: false
+          in: query
+          schema:
+            type: boolean
+            example: true
       responses:
         "200":
           description: Successfully fetched list of apartments
@@ -2036,6 +2043,13 @@ paths:
             example: 131052-308T
         - name: has_conditions_of_sale
           description: Filter apartments based on whether there are conditions of sale for its ownerships or not
+          required: false
+          in: query
+          schema:
+            type: boolean
+            example: true
+        - name: has_no_ownerships
+          description: List only apartments that have no ownerships
           required: false
           in: query
           schema:

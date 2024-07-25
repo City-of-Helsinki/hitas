@@ -285,6 +285,41 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, nu
 
 
 @pytest.mark.django_db
+def test__api__apartment__filter__no_ownerships(api_client: HitasAPIClient):
+    url = reverse("hitas:apartment-list") + "?" + urlencode({"has_no_ownerships": "true"})
+    apartment = ApartmentFactory.create(sales=[])
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()["contents"]) == 1, "Search should find one apartment without ownerships"
+
+    apartment_sale = ApartmentSaleFactory.create(apartment=apartment)
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()["contents"]) == 0, "Search should find no apartments since the one was sold"
+
+    apartment_sale.delete()
+    apartment_sale.refresh_from_db()
+    assert apartment_sale.deleted, "ApartmentSale should be soft-deleted"
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()["contents"]) == 1, "Soft-deleted sale should not count as an ownership"
+
+
+@pytest.mark.django_db
+def test__api__apartment__filter__no_ownerships__false(api_client: HitasAPIClient):
+    url = reverse("hitas:apartment-list") + "?" + urlencode({"has_no_ownerships": "false"})
+    apartment = ApartmentFactory.create(sales=[])
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()["contents"]) == 0, "Search should find no apartments"
+
+    ApartmentSaleFactory.create(apartment=apartment)
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()["contents"]) == 1, "Search should find one apartment"
+
+
+@pytest.mark.django_db
 def test__api__apartment__filter__regulation_status(api_client: HitasAPIClient):
     ApartmentFactory.create(building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED)
     ApartmentFactory.create(
