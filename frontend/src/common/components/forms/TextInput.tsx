@@ -9,10 +9,13 @@ const TextInput = ({name, label = "", required, invalid, ...rest}: FormInputProp
 
     const {
         register,
-        formState: {errors},
+        formState: {errors, dirtyFields},
     } = formObject;
     const formText = register(name, {required: required});
-    const fieldError = dotted(errors, formText.name);
+    const isFieldDirty = dirtyFields[name] ?? false;
+    const hasValue = formObject.getValues(formText.name) !== "";
+    const shouldShowError = isFieldDirty || hasValue;
+    const fieldError = shouldShowError ? dotted(errors, formText.name) : undefined;
 
     return (
         <div className={`input-field input-field--text ${required ? "input-field--required" : ""}`}>
