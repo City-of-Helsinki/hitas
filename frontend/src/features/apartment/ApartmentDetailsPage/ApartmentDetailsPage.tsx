@@ -265,7 +265,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                 </div>
                             </div>
                         </Tabs.TabPanel>
-                        <Tabs.TabPanel>
+                        <Tabs.TabPanel className="documents-tab-container">
                             <div className="apartment-details__tab documents">
                                 <Heading type="list">
                                     <span>Dokumentit</span>
