@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim-bullseye AS base
+FROM public.ecr.aws/docker/library/python:3.11.4-slim-bullseye AS base
 
 # Setup environment variables.
 ENV PYTHONUNBUFFERED=1 \
