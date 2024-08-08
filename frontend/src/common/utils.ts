@@ -161,12 +161,18 @@ export function validateSocialSecurityNumber(value: string): boolean {
 export const today = () => new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
 
 // Toast hook with easier Notification typing
+const toastDefaults = {
+    duration: 6000,
+};
 export const hdsToast = {
     success: (message: string | React.JSX.Element, opts?: ToastOptions) =>
-        toast(message, {...opts, className: "success"}),
-    info: (message: string | React.JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "info"}),
-    error: (message: string | React.JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "error"}),
-    alert: (message: string | React.JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "alert"}),
+        toast(message, {...toastDefaults, ...opts, className: "success"}),
+    info: (message: string | React.JSX.Element, opts?: ToastOptions) =>
+        toast(message, {...toastDefaults, ...opts, className: "info"}),
+    error: (message: string | React.JSX.Element, opts?: ToastOptions) =>
+        toast(message, {...toastDefaults, ...opts, className: "error"}),
+    alert: (message: string | React.JSX.Element, opts?: ToastOptions) =>
+        toast(message, {...toastDefaults, ...opts, className: "alert"}),
 };
 
 // Returns true if obj is empty, false otherwise. Returns true if obj is undefined or null.

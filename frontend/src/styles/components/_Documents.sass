@@ -137,6 +137,10 @@
     padding: $spacing-xs
   tbody tr:nth-child(odd)
     background-color: $color-black-5
+  td:first-child
+    word-break: break-word
+  td:not(:first-child)
+    white-space: nowrap
 
   a:not(.document-item-file-link)
     &:hover
@@ -148,3 +152,7 @@
     text-underline-offset: 2px
     &:hover
       text-decoration: none
+
+.view--apartment-details
+  .documents-tab-container
+    min-height: calc(1000px + $spacing-l)
