@@ -35,6 +35,7 @@ from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
     ReadOnlyDeveloperSerializer,
 )
+from hitas.views.document import HousingCompanyDocumentSerializer
 from hitas.views.property_manager import ReadOnlyPropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 from hitas.views.utils import (
@@ -203,6 +204,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     summary = serializers.SerializerMethodField()
     release_date = serializers.SerializerMethodField()
     improvements = HousingCompanyImprovementSerializer(source="*")
+    documents = HousingCompanyDocumentSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         mpi: list = validated_data.pop("market_price_improvements")
@@ -355,6 +357,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "last_modified",
             "summary",
             "improvements",
+            "documents",
         ]
 
 

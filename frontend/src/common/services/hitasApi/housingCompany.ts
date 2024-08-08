@@ -4,6 +4,8 @@ import {
     IBuilding,
     IBuildingWritable,
     ICodeResponse,
+    IDocument,
+    IDocumentWritable,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
@@ -151,6 +153,33 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
+        saveHousingCompanyDocument: builder.mutation<
+            IDocument,
+            {
+                data: IDocumentWritable;
+                id?: string;
+                housingCompanyId: string;
+            }
+        >({
+            query: ({data, id, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/documents${idOrBlank(id)}`,
+                method: id === undefined ? "POST" : "PUT",
+                body: data,
+            }),
+            extraOptions: {
+                isFormDataFileUpload: true,
+            },
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "HousingCompany", id: arg.housingCompanyId}]),
+        }),
+        deleteHousingCompanyDocument: builder.mutation<unknown, {housingCompanyId: string; documentId: string}>({
+            query: ({housingCompanyId, documentId}) => ({
+                url: `housing-companies/${housingCompanyId}/documents/${documentId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "HousingCompany", id: arg.housingCompanyId}]),
+        }),
     }),
 });
 
@@ -169,4 +198,6 @@ export const {
     useSaveHousingCompanyMutation,
     useSaveRealEstateMutation,
     useValidateSalesCatalogMutation,
+    useSaveHousingCompanyDocumentMutation,
+    useDeleteHousingCompanyDocumentMutation,
 } = housingCompanyApi;

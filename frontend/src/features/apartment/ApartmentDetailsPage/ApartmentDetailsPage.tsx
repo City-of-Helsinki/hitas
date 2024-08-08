@@ -1,6 +1,6 @@
 import {IconAlertCircle, Tabs} from "hds-react";
 import React, {useContext, useState} from "react";
-import {DetailField, Divider, ImprovementsTable} from "../../../common/components";
+import {DetailField, Divider, DocumentsTable, EditButton, Heading, ImprovementsTable} from "../../../common/components";
 import {
     MutateForm,
     MutateModal,
@@ -265,8 +265,18 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                 </div>
                             </div>
                         </Tabs.TabPanel>
-                        <Tabs.TabPanel>
-                            <div className="apartment-details__tab documents">Dokumentit</div>
+                        <Tabs.TabPanel className="documents-tab-container">
+                            <div className="apartment-details__tab documents">
+                                <Heading type="list">
+                                    <span>Dokumentit</span>
+                                    <EditButton pathname="documents" />
+                                </Heading>
+                                {apartment.documents?.length ? (
+                                    <DocumentsTable parentObject={apartment} />
+                                ) : (
+                                    "Ei dokumentteja"
+                                )}
+                            </div>
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>

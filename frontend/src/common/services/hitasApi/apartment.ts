@@ -11,7 +11,9 @@ import {
     ICodeResponse,
     IConditionOfSale,
     ICreateConditionOfSale,
+    IDocument,
     IOwner,
+    IDocumentWritable,
 } from "../../schemas";
 import {idOrBlank, safeInvalidate} from "../utils";
 
@@ -145,6 +147,43 @@ const apartmentApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "Apartment"}, {type: "HousingCompany", id: arg.housingCompanyId}]),
         }),
+        saveApartmentDocument: builder.mutation<
+            IDocument,
+            {
+                data: IDocumentWritable;
+                id?: string;
+                housingCompanyId: string;
+                apartmentId: string;
+            }
+        >({
+            query: ({data, id, housingCompanyId, apartmentId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/documents${idOrBlank(id)}`,
+                method: id === undefined ? "POST" : "PUT",
+                body: data,
+            }),
+            extraOptions: {
+                isFormDataFileUpload: true,
+            },
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [
+                    {type: "Apartment", id: arg.apartmentId},
+                    {type: "HousingCompany", id: arg.housingCompanyId},
+                ]),
+        }),
+        deleteApartmentDocument: builder.mutation<
+            unknown,
+            {housingCompanyId: string; apartmentId: string; documentId: string}
+        >({
+            query: ({housingCompanyId, apartmentId, documentId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/documents/${documentId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [
+                    {type: "Apartment", id: arg.apartmentId},
+                    {type: "HousingCompany", id: arg.housingCompanyId},
+                ]),
+        }),
     }),
 });
 
@@ -159,6 +198,8 @@ export const {
     useGetObfuscatedOwnersQuery,
     usePatchApartmentMutation,
     useSaveApartmentMutation,
+    useSaveApartmentDocumentMutation,
+    useDeleteApartmentDocumentMutation,
 } = apartmentApi;
 
 const apartmentMaximumPriceApi = hitasApi.injectEndpoints({

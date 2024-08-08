@@ -35,6 +35,11 @@ const baseQuery = fetchBaseQuery({
             if (!headers.has("Content-Type")) {
                 headers.set("Content-type", "application/json; charset=UTF-8");
             }
+            if ((api.extra as {isFormDataFileUpload?: boolean})?.isFormDataFileUpload) {
+                // File uploads require content type `multipart/form-data`.
+                // The header must be set by the browser so that it includes the correct boundary string.
+                headers.delete("Content-type");
+            }
             const csrfToken = getCookie("csrftoken");
             csrfToken && headers.set("X-CSRFToken", csrfToken);
         }
@@ -49,6 +54,14 @@ const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
     api,
     extraOptions
 ) => {
+    // File uploads need to know they are file uploads so that the headers are set correctly by the browser.
+    // One way to pass information to `prepareHeaders` is through `api.extra`. The payload is not available.
+    // The official RTK documentation on how `api.extra` is supposed to be populated is lacking, at the time of writing.
+    // According to this stackoverflow https://stackoverflow.com/a/77153535 the `api.extra` is supposed to be populated
+    // by setting the `extraOptions` property in the query builder. In practice `api.extra` stays `undefined`.
+    // Since we have access to both `api.extra` and `extraOptions` here, we can emulate that behavior by applying the `extraOptions`.
+    api.extra = {...(api.extra ?? {}), ...extraOptions};
+
     const result = await baseQuery(args, api, extraOptions);
 
     // Handle CSRF errors by redirecting to login page

@@ -53,8 +53,8 @@ export const fetchAndDownloadPDF = (url: string, method: "GET" | "POST" = "GET",
                 hdsToast.error(`Virhe ladattaessa tiedostoa. (${response.status} ${response.statusText})`);
             }
         })
-        // eslint-disable-next-line no-console
         .catch((error) => {
+            // eslint-disable-next-line no-console
             console.error(error);
             hdsToast.error(`Virhe ladattaessa tiedostoa. (${error?.message ?? error})`);
         });

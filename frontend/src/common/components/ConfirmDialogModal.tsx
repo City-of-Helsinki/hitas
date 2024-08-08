@@ -15,6 +15,7 @@ interface ConfirmDialogModalProps {
     linkURL?: string;
     linkText?: string;
     buttonText?: string;
+    cancelButtonText?: string;
     isLoading?: boolean;
     isVisible?: boolean;
     setIsVisible?;
@@ -66,7 +67,7 @@ const ActionSuccess = ({successText, linkURL, linkText}) => {
     );
 };
 
-const DefaultDialogContent = ({modalText, cancelAction, confirmAction, buttonText}) => (
+const DefaultDialogContent = ({modalText, cancelAction, confirmAction, buttonText, cancelButtonText}) => (
     <>
         <Dialog.Content>
             <p>{modalText}</p>
@@ -76,7 +77,7 @@ const DefaultDialogContent = ({modalText, cancelAction, confirmAction, buttonTex
                     variant="secondary"
                     onClick={cancelAction}
                 >
-                    Peruuta
+                    {cancelButtonText ?? "Peruuta"}
                 </Button>
                 <Button
                     theme="black"
@@ -99,6 +100,7 @@ const ConfirmDialogModal = ({
     linkURL,
     linkText,
     buttonText,
+    cancelButtonText,
     error,
     isLoading,
     isVisible,
@@ -147,6 +149,7 @@ const ConfirmDialogModal = ({
                         cancelAction={cancelAction}
                         confirmAction={confirmAction}
                         buttonText={buttonText}
+                        cancelButtonText={cancelButtonText}
                     />
                 )
             )}

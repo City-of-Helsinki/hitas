@@ -13,7 +13,9 @@ export default function ScrollToTop() {
             window.history.scrollRestoration = "manual";
         }
 
-        window.scrollTo(0, 0);
+        // This does nothing: `window.scrollTo(0, 0)`
+        // because the main scroll container is the App div.
+        document.querySelector(".App")?.scrollTo(0, 0);
     }, [pathname]);
 
     return <></>;

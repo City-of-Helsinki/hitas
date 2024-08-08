@@ -173,6 +173,9 @@ housing_company_router.register(r"real-estates", views.RealEstateViewSet, basena
 # /api/v1/housing-companies/{housing_company_id}/apartments
 housing_company_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
 
+# /api/v1/housing-companies/{housing_company_id}/documents
+housing_company_router.register(r"documents", views.HousingCompanyDocumentViewSet, basename="document")
+
 # /api/v1/housing-companies/{housing_company_id}/sales-catalog-validate
 housing_company_router.register(
     r"sales-catalog-validate", views.SalesCatalogValidateView, basename="sales-catalog-validate"
@@ -192,6 +195,9 @@ apartment_router.register(r"maximum-prices", views.ApartmentMaximumPriceViewSet,
 
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/sales
 apartment_router.register(r"sales", views.ApartmentSaleViewSet, basename="apartment-sale")
+
+# /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/documents
+apartment_router.register(r"documents", views.ApartmentDocumentViewSet, basename="document")
 
 app_name = "hitas"
 urlpatterns = [

@@ -2,7 +2,14 @@ import {Button, IconAngleDown, IconAngleUp, IconPlus, Tabs} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
-import {DetailField, DownloadButton, EditButton, Heading, ImprovementsTable} from "../../common/components";
+import {
+    DetailField,
+    DocumentsTable,
+    DownloadButton,
+    EditButton,
+    Heading,
+    ImprovementsTable,
+} from "../../common/components";
 import {MutateForm, MutateModal, propertyManagerMutateFormProps} from "../../common/components/mutateComponents";
 import {IPropertyManager} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
@@ -155,7 +162,17 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                         </div>
                     </Tabs.TabPanel>
                     <Tabs.TabPanel>
-                        <div className="company-details__tab documents">Dokumentit</div>
+                        <div className="company-details__tab documents">
+                            <Heading type="list">
+                                <span>Dokumentit</span>
+                                <EditButton pathname="documents" />
+                            </Heading>
+                            {housingCompany.documents?.length ? (
+                                <DocumentsTable parentObject={housingCompany} />
+                            ) : (
+                                "Ei dokumentteja"
+                            )}
+                        </div>
                     </Tabs.TabPanel>
                 </Tabs>
                 <MutateModal

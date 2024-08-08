@@ -8,6 +8,7 @@ import {
     ApartmentConditionsOfSalePage,
     ApartmentCreatePage,
     ApartmentDetailsPage,
+    ApartmentDocumentsPage,
     ApartmentImprovementsPage,
     ApartmentListPage,
     ApartmentMaxPricePage,
@@ -20,6 +21,7 @@ import {
     HousingCompanyBuildingsPage,
     HousingCompanyCreatePage,
     HousingCompanyDetailsPage,
+    HousingCompanyDocumentsPage,
     HousingCompanyImprovementsPage,
     HousingCompanyListPage,
     HousingCompanyRealEstatesPage,
@@ -70,6 +72,10 @@ export default function Router() {
                             path="buildings"
                             element={protect(<HousingCompanyBuildingsPage />)}
                         />
+                        <Route
+                            path="documents"
+                            element={protect(<HousingCompanyDocumentsPage />)}
+                        />
                         <Route path="apartments">
                             <Route
                                 index
@@ -103,6 +109,10 @@ export default function Router() {
                                 <Route
                                     path="conditions-of-sale"
                                     element={protect(<ApartmentConditionsOfSalePage />)}
+                                />
+                                <Route
+                                    path="documents"
+                                    element={protect(<ApartmentDocumentsPage />)}
                                 />
                             </Route>
                         </Route>

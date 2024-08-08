@@ -15,6 +15,7 @@ import {indexNames} from "./enums";
 import {HousingCompanyRegulationStatusSchema} from "./housingCompany";
 import {ApartmentConstructionPriceIndexImprovementSchema, MarketPriceIndexImprovementSchema} from "./improvements";
 import {OwnerSchema, OwnershipSchema, OwnershipsListSchema} from "./owner";
+import {DocumentSchema} from "./document";
 
 // ********************************
 // * Unconfirmed maximum price
@@ -399,6 +400,7 @@ export const ApartmentDetailsSchema = object({
         market_price_index: MarketPriceIndexImprovementSchema.array(),
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
+    documents: DocumentSchema.array(),
     links: ApartmentLinkedModelsSchema,
     conditions_of_sale: ApartmentConditionOfSaleSchema.array(),
     sell_by_date: string().nullable(),

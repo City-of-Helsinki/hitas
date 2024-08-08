@@ -65,6 +65,7 @@ from hitas.utils import (
 )
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
+from hitas.views.document import AparmentDocumentSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasCharFilter,
@@ -663,6 +664,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     links = serializers.SerializerMethodField()
     building = ReadOnlyBuildingSerializer(write_only=True)
     improvements = ApartmentImprovementSerializer(source="*")
+    documents = AparmentDocumentSerializer(many=True, read_only=True)
     conditions_of_sale = serializers.SerializerMethodField()
     sell_by_date = serializers.SerializerMethodField()
 
@@ -782,6 +784,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "notes",
             "building",
             "improvements",
+            "documents",
             "conditions_of_sale",
             "sell_by_date",
         ]

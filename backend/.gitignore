@@ -1,4 +1,5 @@
 static
+mediaroot
 /oracle-data
 .pytest_cache
 .ruff_cache

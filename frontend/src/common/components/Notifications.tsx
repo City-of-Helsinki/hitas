@@ -41,7 +41,7 @@ export default function Notifications(): React.JSX.Element {
                             position: "fixed",
                             top: "var(--spacing-layout-s)",
                             right: "var(--spacing-layout-s)",
-                            width: "200px",
+                            whiteSpace: "pre-wrap",
                             transition: "all 0.3s ease-out",
                             transform: `translateY(${offset}px)`,
                             zIndex: 999,
