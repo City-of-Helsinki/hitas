@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM public.ecr.aws/docker/library/node:18-alpine AS build
 
 RUN mkdir /hitas
 WORKDIR /hitas
@@ -15,7 +15,7 @@ ADD webpack.config.js ./
 
 RUN yarn build
 
-FROM nginxinc/nginx-unprivileged:1.23-alpine
+FROM public.ecr.aws/nginx/nginx-unprivileged:1.23-alpine
 COPY --from=build /hitas/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080
