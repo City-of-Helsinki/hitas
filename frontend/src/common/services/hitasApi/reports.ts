@@ -50,13 +50,35 @@ export const downloadSalesReportPDF = ({startDate, endDate}: {startDate: string;
 export const downloadSalesByPostalCodeAndAreaReportPDF = ({
     startDate,
     endDate,
+    filter,
+}: {
+    startDate: string;
+    endDate: string;
+    filter?: string;
+}) => {
+    const params = `start_date=${startDate}&end_date=${endDate}` + (filter ? `&filter=${filter}` : "");
+    const url = `/reports/download-sales-by-postal-code-and-area-report?${params}`;
+    fetchAndDownloadPDF(url);
+};
+
+export const downloadReSalesByPostalCodeAndAreaReportPDF = ({
+    startDate,
+    endDate,
 }: {
     startDate: string;
     endDate: string;
 }) => {
-    const params = `start_date=${startDate}&end_date=${endDate}`;
-    const url = `/reports/download-sales-by-postal-code-and-area-report?${params}`;
-    fetchAndDownloadPDF(url);
+    downloadSalesByPostalCodeAndAreaReportPDF({startDate, endDate, filter: "resale"});
+};
+
+export const downloadFirstSalesByPostalCodeAndAreaReportPDF = ({
+    startDate,
+    endDate,
+}: {
+    startDate: string;
+    endDate: string;
+}) => {
+    downloadSalesByPostalCodeAndAreaReportPDF({startDate, endDate, filter: "firstsale"});
 };
 
 export const downloadRegulatedHousingCompaniesPDF = () =>

@@ -40,6 +40,7 @@ from hitas.views.utils.excel import ExcelRenderer, get_excel_response
 class SalesReportSerializer(serializers.Serializer):
     start_date = serializers.DateField()
     end_date = serializers.DateField()
+    filter = serializers.ChoiceField(choices=["all", "resale", "firstsale"], default="all")
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         if attrs["start_date"] > attrs["end_date"]:
@@ -129,10 +130,17 @@ class SalesByPostalCodeAndAreaReportView(ViewSet):
 
         start: datetime.date = serializer.validated_data["start_date"]
         end: datetime.date = serializer.validated_data["end_date"]
+        sales_filter = serializer.validated_data["filter"]
 
-        sales = find_sales_on_interval_for_reporting(start, end)
+        sales = find_sales_on_interval_for_reporting(start, end, sales_filter)
         workbook = build_sales_by_postal_code_and_area_report_excel(sales)
-        filename = f"Yhtiöt postinumero ja kalleusalueittain aikavälillä {start.isoformat()} - {end.isoformat()}.xlsx"
+        if sales_filter == "all":
+            filename = "Kaikki kaupat postinumeroittain ja alueittain"
+        elif sales_filter == "resale":
+            filename = "Jälleenmyynnit postinumeroittain ja alueittain"
+        elif sales_filter == "firstsale":
+            filename = "Uudiskohteet postinumeroittain ja alueittain"
+        filename += f" {start.isoformat()} - {end.isoformat()}.xlsx"
         return get_excel_response(filename=filename, excel=workbook)
 
 

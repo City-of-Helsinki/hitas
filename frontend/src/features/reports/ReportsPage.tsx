@@ -7,7 +7,12 @@ import {
     HousingCompanyStatusTable,
 } from "./components/HousingCompanyReports";
 import OwnerReports from "./components/OwnerReports";
-import {SalesReportAll, SalesReportByAreas} from "./components/SalesReports";
+import {
+    FirstSalesReportByAreas,
+    ReSalesReportByAreas,
+    SalesReportAll,
+    SalesReportByAreas,
+} from "./components/SalesReports";
 import {SurfaceAreaPriceCeilingCalculationReport} from "./components/SurfaceAreaPriceCalculationReports";
 import {JobPerformanceReport} from "./components/JobPerformanceReport";
 
@@ -24,6 +29,10 @@ const ReportsPage = () => {
                     <SalesReportAll />
                     <Divider size="s" />
                     <SalesReportByAreas />
+                    <Divider size="s" />
+                    <ReSalesReportByAreas />
+                    <Divider size="s" />
+                    <FirstSalesReportByAreas />
                 </Accordion>
 
                 <Accordion
