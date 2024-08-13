@@ -2,7 +2,12 @@ import {useForm} from "react-hook-form";
 import {DownloadButton, Heading} from "../../../common/components";
 import {DateInput, FormProviderForm} from "../../../common/components/forms";
 import {SalesReportFormSchema} from "../../../common/schemas";
-import {downloadSalesByPostalCodeAndAreaReportPDF, downloadSalesReportPDF} from "../../../common/services";
+import {
+    downloadFirstSalesByPostalCodeAndAreaReportPDF,
+    downloadReSalesByPostalCodeAndAreaReportPDF,
+    downloadSalesByPostalCodeAndAreaReportPDF,
+    downloadSalesReportPDF,
+} from "../../../common/services";
 import {getLatestFullMonth} from "../../../common/utils";
 import {format} from "date-fns";
 
@@ -63,8 +68,26 @@ export const SalesReportAll = () => {
 export const SalesReportByAreas = () => {
     return (
         <BaseSalesReport
-            header="Raportti kaupoista postinumeroittain ja alueittain"
+            header="Kaikki kaupat postinumeroittain ja alueittain"
             downloadReportFunction={downloadSalesByPostalCodeAndAreaReportPDF}
+        />
+    );
+};
+
+export const ReSalesReportByAreas = () => {
+    return (
+        <BaseSalesReport
+            header="Jälleenmyynnit postinumeroittain ja alueittain"
+            downloadReportFunction={downloadReSalesByPostalCodeAndAreaReportPDF}
+        />
+    );
+};
+
+export const FirstSalesReportByAreas = () => {
+    return (
+        <BaseSalesReport
+            header="Uudiskohteet postinumeroittain ja alueittain"
+            downloadReportFunction={downloadFirstSalesByPostalCodeAndAreaReportPDF}
         />
     );
 };
