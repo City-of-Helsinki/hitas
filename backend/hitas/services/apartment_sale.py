@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db.models import Window
+from django.db.models import Subquery, Window
 from django.db.models.functions import RowNumber
 
 from hitas.models import ApartmentSale
@@ -24,15 +24,16 @@ def find_sales_on_interval_for_reporting(
         )
     )
     if sales_filter in ["resale", "firstsale"]:
-        queryset = queryset.annotate(
+        subquery = ApartmentSale.objects.annotate(
             sale_number_in_order=Window(
                 expression=RowNumber(),
                 partition_by="apartment",
                 order_by=["purchase_date", "id"],
             ),
         )
-    if sales_filter == "resale":
-        queryset = queryset.filter(sale_number_in_order__gt=1)
-    elif sales_filter == "firstsale":
-        queryset = queryset.filter(sale_number_in_order=1)
+        if sales_filter == "resale":
+            subquery = subquery.filter(sale_number_in_order__gt=1)
+        elif sales_filter == "firstsale":
+            subquery = subquery.filter(sale_number_in_order=1)
+        queryset = queryset.filter(id__in=Subquery(subquery.values("id")))
     return list(queryset)

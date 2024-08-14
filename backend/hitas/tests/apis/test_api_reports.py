@@ -1417,25 +1417,16 @@ def test__api__sales_by_area_report__multiple__different_postal_code(api_client:
 
 @pytest.mark.django_db
 def test__api__sales_by_area_report__filter_resales(api_client: HitasAPIClient):
-    # All apartments in the same area -> included in the same report row sale count
-    area_args = {
-        "apartment__building__real_estate__housing_company__postal_code__value": "00002",
-        "apartment__building__real_estate__housing_company__postal_code__cost_area": 1,
-    }
-    sale_args = dict(**area_args, purchase_date=datetime.date(2020, 1, 1))
+    sale_args = {"purchase_date": datetime.date(2020, 1, 1)}
     ApartmentSaleFactory.create(**sale_args)  # Excluded: first sale
-    apartment = ApartmentFactory.create(
-        sales=[],
-        building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__postal_code__cost_area=1,
-    )
+    apartment = ApartmentFactory.create(sales=[])
     ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Excluded: first sale
     ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Included: resale
     sale_to_be_soft_deleted = ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Excluded: soft-deleted
     sale_to_be_soft_deleted.delete()
     ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Included: resale
     ApartmentSaleFactory.create(
-        **area_args, purchase_date=datetime.date(2021, 1, 1), apartment=apartment
+        purchase_date=datetime.date(2021, 1, 1), apartment=apartment
     )  # Excluded: outside of date range
     data = {
         "start_date": "2020-01-01",
@@ -1447,31 +1438,27 @@ def test__api__sales_by_area_report__filter_resales(api_client: HitasAPIClient):
     assert response.status_code == status.HTTP_200_OK
     workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
     worksheet: Worksheet = workbook.worksheets[0]
-    sales_count = list(worksheet.values)[1][3]
+    sales_count = list(worksheet.values)[-1][3]
     assert sales_count == 2, "There should be two resales"
 
 
 @pytest.mark.django_db
 def test__api__sales_by_area_report__filter_firstsales(api_client: HitasAPIClient):
-    # All apartments in the same area -> included in the same report row sale count
-    area_args = {
-        "apartment__building__real_estate__housing_company__postal_code__value": "00002",
-        "apartment__building__real_estate__housing_company__postal_code__cost_area": 1,
-    }
-    sale_args = dict(**area_args, purchase_date=datetime.date(2020, 1, 1))
+    sale_args = {"purchase_date": datetime.date(2020, 1, 1)}
     ApartmentSaleFactory.create(**sale_args)  # Included: first sale
     sale_to_be_soft_deleted = ApartmentSaleFactory.create(**sale_args)  # Excluded: soft-deleted
     sale_to_be_soft_deleted.delete()
-    ApartmentSaleFactory.create(**area_args, purchase_date=datetime.date(2021, 1, 1))  # Excluded: outside of date range
-    apartment = ApartmentFactory.create(
-        sales=[],
-        building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__postal_code__cost_area=1,
-    )
+    ApartmentSaleFactory.create(purchase_date=datetime.date(2021, 1, 1))  # Excluded: outside of date range
+    apartment = ApartmentFactory.create(sales=[])
     sale_to_be_soft_deleted = ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Excluded: soft-deleted
     sale_to_be_soft_deleted.delete()
     ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Included: first sale
     ApartmentSaleFactory.create(**sale_args, apartment=apartment)  # Excluded: resale
+    apartment2 = ApartmentFactory.create(sales=[])
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2019, 1, 1), apartment=apartment2
+    )  # Excluded: outside of date range
+    ApartmentSaleFactory.create(**sale_args, apartment=apartment2)  # Excluded: resale
     data = {
         "start_date": "2020-01-01",
         "end_date": "2020-01-31",
@@ -1482,7 +1469,7 @@ def test__api__sales_by_area_report__filter_firstsales(api_client: HitasAPIClien
     assert response.status_code == status.HTTP_200_OK
     workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
     worksheet: Worksheet = workbook.worksheets[0]
-    sales_count = list(worksheet.values)[1][3]
+    sales_count = list(worksheet.values)[-1][3]
     assert sales_count == 2, "There should be two first sales"
 
 
