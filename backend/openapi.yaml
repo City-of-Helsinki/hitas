@@ -4129,6 +4129,13 @@ paths:
           schema:
             type: string
             example: 2023-02-01
+        - name: filter
+          required: false
+          in: query
+          description: Filter sales by `resale` or `firstsale` only.
+          schema:
+            type: string
+            example: "resale"
       responses:
         "200":
           description: Successfully downloaded a sales report by area and postal code
