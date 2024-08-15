@@ -38,13 +38,15 @@ export const HousingCompanyStatusTable = () => {
                 error={error}
                 isLoading={isLoading}
             >
-                <Table
-                    cols={statusTableColumns}
-                    rows={data as IHousingCompanyState[]}
-                    indexKey="status"
-                    theme={tableThemeBlack}
-                    zebra
-                />
+                <div className="housing-company-status-table">
+                    <Table
+                        cols={statusTableColumns}
+                        rows={data as IHousingCompanyState[]}
+                        indexKey="status"
+                        theme={tableThemeBlack}
+                        zebra
+                    />
+                </div>
                 <DownloadButton
                     buttonText="Lataa raportti"
                     onClick={downloadHousingCompanyStatesReportPDF}
