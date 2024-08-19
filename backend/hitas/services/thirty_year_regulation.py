@@ -804,8 +804,8 @@ def get_thirty_year_regulation_results_for_housing_company(
     results.turned_30 = results.completion_date + relativedelta(years=30)
     price_by_area = Decimal(results.parent.sales_data["price_by_area"].get(results.postal_code, 0))
     difference_from = max(
-        results.parent.surface_area_price_ceiling,
-        results.adjusted_average_price_per_square_meter,
+        results.parent.surface_area_price_ceiling or Decimal("0"),
+        results.adjusted_average_price_per_square_meter or Decimal("0"),
     )
     results.difference = difference_from - price_by_area
     return results
@@ -830,7 +830,9 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     )
     worksheet.append(column_headers)
 
-    for row in results.rows.order_by("completion_date").all():
+    result_rows = results.rows.order_by("completion_date").exclude(housing_company__hitas_type=HitasType.HALF_HITAS)
+
+    for row in result_rows:
         data = ReportColumns(
             display_name=row.housing_company.display_name,
             acquisition_price=row.realized_acquisition_price,
