@@ -8451,6 +8451,13 @@ components:
           type: string
           readOnly: true
           example: ismo@example.com
+        modified_at:
+          description: Last modified timestamp
+          type: string
+          nullable: true
+          readOnly: true
+          format: date-time
+          example: 1985-12-10T00:00:00+00:00
 
     PropertyManager:
       description: Property manager information
