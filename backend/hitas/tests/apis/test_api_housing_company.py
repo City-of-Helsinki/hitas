@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 from django.urls import reverse
 from django.utils.http import urlencode
-from rest_framework import status
+from rest_framework import serializers, status
 
 from hitas import exceptions
 from hitas.models import (
@@ -362,6 +362,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
             "id": hc1.property_manager.uuid.hex,
             "name": hc1.property_manager.name,
             "email": hc1.property_manager.email,
+            "modified_at": serializers.DateTimeField().to_representation(hc1.property_manager.modified_at),
         },
         "acquisition_price": float(hc1.acquisition_price),
         "primary_loan": float(hc1.primary_loan),

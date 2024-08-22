@@ -33,6 +33,7 @@ class ReadOnlyPropertyManagerSerializer(serializers.Serializer):
     id = UUIDRelatedField(queryset=PropertyManager.objects)
     name = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True, allow_blank=True)
+    modified_at = serializers.DateTimeField(read_only=True)
 
     def to_internal_value(self, data: dict[str, Any]) -> dict[str, Any]:
         super().to_internal_value(data)

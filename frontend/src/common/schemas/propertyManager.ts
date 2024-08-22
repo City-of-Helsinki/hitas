@@ -9,6 +9,7 @@ export const PropertyManagerSchema = object({
     id: APIIdString.optional(),
     name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
     email: string().email(errorMessages.emailInvalid).or(z.literal("")),
+    modified_at: string().optional(),
 });
 export type IPropertyManager = z.infer<typeof PropertyManagerSchema>;
 
