@@ -188,6 +188,7 @@ const IndexCalculationConstructionPriceIndexBefore2011Schema = IndexCalculationS
                 interest_during_construction: number(),
                 interest_during_construction_percentage: number(),
                 housing_company_acquisition_price: number(),
+                depreciation_multiplier: number(),
                 housing_company_assets: number(),
                 apartment_share_of_housing_company_assets: number(),
                 additional_work_during_construction: number(),

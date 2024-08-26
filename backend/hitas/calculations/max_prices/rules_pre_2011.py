@@ -69,10 +69,13 @@ class RulesPre2011(CalculatorRules):
                 message="Cannot create max price calculation for an apartment without a first sale purchase price.",
             )
 
+        depreciation_multiplier_for_apartment = depreciation_multiplier(
+            months_between_dates(apartment.completion_date, calculation_date)
+        )
         housing_company_index_adjusted_acquisition_price = (
             apartment.completion_date_realized_housing_company_acquisition_price
             * apartment.calculation_date_cpi
-            * depreciation_multiplier(months_between_dates(apartment.completion_date, calculation_date))
+            * depreciation_multiplier_for_apartment
         ) / apartment.completion_date_cpi
 
         hc_improvements_result = calculate_housing_company_improvements_pre_2011_construction_price_index(
@@ -168,6 +171,7 @@ class RulesPre2011(CalculatorRules):
                 completion_date_index=apartment.completion_date_cpi,
                 calculation_date=calculation_date,
                 calculation_date_index=apartment.calculation_date_cpi,
+                depreciation_multiplier=depreciation_multiplier_for_apartment,
             ),
         )
 
