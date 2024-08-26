@@ -42,8 +42,8 @@ import {
 } from "./components/HousingCompanyViewContextProvider";
 
 const regulationStatusOptions = [
-    // Don't allow manually setting the regulation status to "released_by_hitas", as it should be set automatically.
     {label: getHousingCompanyRegulationStatusName("regulated"), value: "regulated"},
+    {label: getHousingCompanyRegulationStatusName("released_by_hitas"), value: "released_by_hitas"},
     {label: getHousingCompanyRegulationStatusName("released_by_plot_department"), value: "released_by_plot_department"},
 ];
 
