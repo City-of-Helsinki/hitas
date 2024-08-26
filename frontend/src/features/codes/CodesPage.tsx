@@ -40,6 +40,7 @@ const CodesPage = (): React.JSX.Element => {
                         listFieldsWithTitles={{name: "Nimi", identifier: "Henkilö- tai Y-tunnus"}}
                         useGetQuery={useGetOwnersQuery}
                         emptyFilterParams={{name: "", identifier: ""}}
+                        filterTitles={{name: "Nimi", identifier: "Henkilö- tai Y-tunnus"}}
                         dialogTitles={{modify: "Muokkaa henkilötietoja"}}
                         MutateFormComponent={OwnerMutateForm}
                     />
@@ -49,6 +50,7 @@ const CodesPage = (): React.JSX.Element => {
                         listFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
                         useGetQuery={useGetPropertyManagersQuery}
                         emptyFilterParams={{name: "", email: ""}}
+                        filterTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
                         dialogTitles={{modify: "Muokkaa isännöitsijän tietoja", new: "Lisää isännöitsijä"}}
                         MutateFormComponent={MutateForm}
                         mutateFormProps={propertyManagerMutateFormProps}
@@ -59,6 +61,7 @@ const CodesPage = (): React.JSX.Element => {
                         listFieldsWithTitles={{value: "Nimi"}}
                         useGetQuery={useGetDevelopersQuery}
                         emptyFilterParams={{value: ""}}
+                        filterTitles={{value: "Nimi"}}
                         dialogTitles={{modify: "Muokkaa rakennuttajan tietoja", new: "Lisää rakennuttaja"}}
                         MutateFormComponent={MutateForm}
                         mutateFormProps={developerMutateFormProps}

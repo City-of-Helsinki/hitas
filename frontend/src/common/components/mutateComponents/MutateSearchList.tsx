@@ -128,6 +128,7 @@ function ResultList<
 interface IMutateSearchListProps<
     TListFieldsWithTitles extends object,
     TFilterQueryParams extends object,
+    TFilterTitles extends object,
     TFormFieldsWithTitles extends object,
 > {
     listFieldsWithTitles: TListFieldsWithTitles;
@@ -135,6 +136,7 @@ interface IMutateSearchListProps<
     resultListMaxRows?: number;
     useGetQuery;
     emptyFilterParams: TFilterQueryParams;
+    filterTitles?: TFilterTitles;
     dialogTitles?: {modify?: string; new?: string};
     MutateFormComponent;
     mutateFormProps?: IMutateFormProps<TFormFieldsWithTitles>;
@@ -146,6 +148,7 @@ interface IMutateSearchListProps<
 export default function MutateSearchList<
     TListFieldsWithTitles extends object,
     TFilterQueryParams extends object,
+    TFilterTitles extends object,
     TFormFieldsWithTitles extends object,
 >({
     listFieldsWithTitles,
@@ -154,9 +157,10 @@ export default function MutateSearchList<
     useGetQuery,
     MutateFormComponent,
     emptyFilterParams,
+    filterTitles,
     dialogTitles,
     mutateFormProps,
-}: IMutateSearchListProps<TListFieldsWithTitles, TFilterQueryParams, TFormFieldsWithTitles>) {
+}: IMutateSearchListProps<TListFieldsWithTitles, TFilterQueryParams, TFilterTitles, TFormFieldsWithTitles>) {
     // search strings
     const [filterParams, setFilterParams] = useState<TFilterQueryParams>(emptyFilterParams);
 
@@ -176,12 +180,12 @@ export default function MutateSearchList<
     return (
         <div className="listing">
             <div className="filters">
-                {Object.entries(emptyFilterParams).map(([field, title], i) => (
+                {Object.entries(emptyFilterParams).map(([field, _defaultValue], i) => (
                     <TextInput
                         key={field}
                         id="filter__name"
                         ref={(element) => (ref.current[field] = element)}
-                        label={title as string}
+                        label={(filterTitles?.[field] ?? "") as string}
                         value={filterParams[field]}
                         onChange={(e) => setFilterParams((prev) => ({...prev, [field]: e.target.value}))}
                         onButtonClick={() => clearAndFocus(field)}
