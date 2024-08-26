@@ -1820,6 +1820,7 @@ paths:
                           completion_date_index: 244.9
                           calculation_date: "2022-09-07"
                           calculation_date_index: 364.4
+                          depreciation_multiplier: 0.98
                         maximum_price: 180749.97
                         valid_until: "2022-12-07"
                         maximum: false
@@ -6781,6 +6782,12 @@ components:
           type: number
           minimum: 0
           example: 146.4
+        depreciation_multiplier:
+          description: Depreciation multiplier for the apartment
+          type: number
+          minimum: 0
+          maximum: 1
+          example: 0.9
 
     ApartmentMaximumPriceImprovements2011Onwards:
       description: Improvement information used in the calculation

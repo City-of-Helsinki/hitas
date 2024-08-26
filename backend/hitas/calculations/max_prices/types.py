@@ -56,6 +56,7 @@ class IndexCalculation:
         additional_work_during_construction: Decimal
         index_adjusted_additional_work_during_construction: Decimal
         apartment_improvements: MaxPriceImprovements
+        depreciation_multiplier: Decimal
 
     @dataclass
     class CalculationVarsMarketPriceIndexBefore2011(CommonCalculationVars):

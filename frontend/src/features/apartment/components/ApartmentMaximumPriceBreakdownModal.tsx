@@ -242,6 +242,11 @@ const ConstructionPricePre2011Breakdown = ({
                 value={calculation.calculation_variables.housing_company_acquisition_price}
             />
             <BreakdownValue
+                label="Poistokerroin"
+                value={calculation.calculation_variables.depreciation_multiplier}
+                unit=""
+            />
+            <BreakdownValue
                 label="+ Kiinteistön parannukset"
                 value={calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment}
             />
