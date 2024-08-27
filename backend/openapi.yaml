@@ -5652,6 +5652,13 @@ components:
         property_manager:
           nullable: true
           $ref: "#/components/schemas/ReadOnlyPropertyManager"
+        property_manager_changed_at:
+          description: When the property manager was last changed
+          type: string
+          nullable: true
+          readOnly: true
+          format: date-time
+          example: 1985-12-10T00:00:00+00:00
         summary:
           description: Summary data for this housing company across all apartments
           type: object
