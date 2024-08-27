@@ -105,6 +105,7 @@ export const HousingCompanyDetailsSchema = object({
     building_type: CodeSchema,
     developer: CodeSchema,
     property_manager: PropertyManagerSchema.nullable(),
+    property_manager_changed_at: string().optional(),
     acquisition_price: number(),
     primary_loan: number().optional(),
     sales_price_catalogue_confirmation_date: string().nullable(),

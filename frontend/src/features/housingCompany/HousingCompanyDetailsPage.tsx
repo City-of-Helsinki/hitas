@@ -109,9 +109,13 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                                         )}
                                         {housingCompany.property_manager ? (
                                             <div className="detail-field-metadata">
-                                                Päivitetty viimeksi:{" "}
+                                                Vaihdettu:{" "}
                                                 {housingCompany.property_manager.modified_at
                                                     ? formatDate(housingCompany.property_manager.modified_at)
+                                                    : "tieto puuttuu"}
+                                                , muokattu:{" "}
+                                                {housingCompany.property_manager_changed_at
+                                                    ? formatDate(housingCompany.property_manager_changed_at)
                                                     : "tieto puuttuu"}
                                             </div>
                                         ) : null}

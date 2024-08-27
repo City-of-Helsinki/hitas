@@ -364,6 +364,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
             "email": hc1.property_manager.email,
             "modified_at": serializers.DateTimeField().to_representation(hc1.property_manager.modified_at),
         },
+        "property_manager_changed_at": serializers.DateTimeField().to_representation(hc1.property_manager_changed_at),
         "acquisition_price": float(hc1.acquisition_price),
         "primary_loan": float(hc1.primary_loan),
         "sales_price_catalogue_confirmation_date": str(hc1.sales_price_catalogue_confirmation_date),

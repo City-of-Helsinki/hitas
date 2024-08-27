@@ -197,6 +197,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     building_type = ReadOnlyBuildingTypeSerializer()
     developer = ReadOnlyDeveloperSerializer()
     property_manager = ReadOnlyPropertyManagerSerializer(allow_null=True, required=False)
+    property_manager_changed_at = serializers.DateTimeField(read_only=True)
     acquisition_price = HitasDecimalField()
     notes = serializers.CharField(required=False, allow_blank=True)
     archive_id = serializers.IntegerField(source="id", read_only=True)
@@ -348,6 +349,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "building_type",
             "developer",
             "property_manager",
+            "property_manager_changed_at",
             "acquisition_price",
             "primary_loan",
             "sales_price_catalogue_confirmation_date",

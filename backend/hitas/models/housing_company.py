@@ -279,6 +279,24 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
         # Release date was not found
         return None
 
+    @property
+    def property_manager_changed_at(self) -> Optional[datetime.datetime]:
+        latest_logentry: LogEntry = (
+            LogEntry.objects.get_for_object(self)
+            .annotate(changes_as_json=Cast("changes", output_field=models.JSONField()))
+            .filter(
+                action__in=[LogEntry.Action.UPDATE, LogEntry.Action.CREATE],
+                changes_as_json__property_manager__isnull=False,
+            )
+            # Ignore cases where property manager was not actually changed
+            .exclude(changes_as_json__property_manager__0=F("changes_as_json__property_manager__1"))
+            .order_by("-timestamp", "-id")
+            .first()
+        )
+        if latest_logentry is not None:
+            return latest_logentry.timestamp
+        return None
+
     class Meta:
         verbose_name = _("Housing company")
         verbose_name_plural = _("Housing companies")
