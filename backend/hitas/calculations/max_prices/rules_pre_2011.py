@@ -171,7 +171,7 @@ class RulesPre2011(CalculatorRules):
                 completion_date_index=apartment.completion_date_cpi,
                 calculation_date=calculation_date,
                 calculation_date_index=apartment.calculation_date_cpi,
-                depreciation_multiplier=depreciation_multiplier_for_apartment,
+                depreciation_multiplier=str(depreciation_multiplier_for_apartment),
             ),
         )
 

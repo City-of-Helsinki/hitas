@@ -6791,10 +6791,8 @@ components:
           example: 146.4
         depreciation_multiplier:
           description: Depreciation multiplier for the apartment
-          type: number
-          minimum: 0
-          maximum: 1
-          example: 0.9
+          type: string
+          example: '0.9999'
 
     ApartmentMaximumPriceImprovements2011Onwards:
       description: Improvement information used in the calculation
