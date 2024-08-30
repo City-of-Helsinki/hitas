@@ -5,6 +5,7 @@ export {default as DetailField} from "./DetailField";
 export {default as Divider} from "./Divider";
 export {default as DownloadButton} from "./DownloadButton";
 export {default as EditButton} from "./EditButton";
+export {default as FileDropZone} from "./FileDropZone";
 export {default as GenericActionModal} from "./GenericActionModal";
 export {default as GenericDocumentsPage} from "./GenericDocumentsPage";
 export {default as GenericImprovementsPage} from "./GenericImprovementsPage";
