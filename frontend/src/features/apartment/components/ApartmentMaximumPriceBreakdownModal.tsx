@@ -241,11 +241,10 @@ const ConstructionPricePre2011Breakdown = ({
                 label="Yhtiön tarkistettu hankinta-arvo"
                 value={calculation.calculation_variables.housing_company_acquisition_price}
             />
-            <BreakdownValue
-                label="Poistokerroin"
-                value={calculation.calculation_variables.depreciation_multiplier}
-                unit=""
-            />
+            <div className="confirmation-modal__breakdown-row">
+                <label>Poistokerroin</label>
+                <p>{calculation.calculation_variables.depreciation_multiplier?.replace(".", ",")}</p>
+            </div>
             <BreakdownValue
                 label="+ Kiinteistön parannukset"
                 value={calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment}
