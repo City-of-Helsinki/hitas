@@ -3,7 +3,7 @@ import {useCallback, useRef, useState} from "react";
 import {SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {IApartmentDetails, IHousingCompanyDetails} from "../schemas";
 import {FileInput, FormProviderForm, TextInput} from "./forms";
-import {ConfirmDialogModal, SaveButton} from "./index";
+import {ConfirmDialogModal, FileDropZone, SaveButton} from "./index";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useNavigate} from "react-router-dom";
@@ -135,6 +135,7 @@ const DocumentsListItems = ({name, remove}) => {
                                 formObject.setValue(`${name}.${index}.file_object`, filesArray[0], {shouldDirty: true});
                             }}
                             required={!document.file_link}
+                            defaultValue={document.file_object ? [document.file_object] : []}
                         />
                         {!document.file_object && document.file_link && (
                             <a
@@ -201,17 +202,6 @@ export const DocumentFieldSet = ({fieldsetHeader, name}) => {
     );
 };
 
-const DocumentFieldSets = ({apartment}) => {
-    return (
-        <div className="field-sets">
-            <DocumentFieldSet
-                fieldsetHeader={apartment === undefined ? "Taloyhtiön dokumentit" : "Asunnon dokumentit"}
-                name="documents"
-            />
-        </div>
-    );
-};
-
 type IGenericDocumentsPage = {
     housingCompany: IHousingCompanyDetails;
     apartment?: IApartmentDetails;
@@ -264,6 +254,16 @@ const GenericDocumentsPage = ({housingCompany, apartment}: IGenericDocumentsPage
         defaultValues: initialFormData,
         mode: "all",
     });
+
+    const {
+        fields: documentFields,
+        append: appendDocument,
+        remove: removeDocument,
+    } = useFieldArray({
+        name: "documents",
+        control: formObject.control,
+    });
+    formObject.register("documents");
 
     // API Handling
     const [saveDocument, {isSaveLoading}] = saveDocumentHook();
@@ -335,8 +335,35 @@ const GenericDocumentsPage = ({housingCompany, apartment}: IGenericDocumentsPage
                 ) : (
                     ""
                 )}
-                <DocumentFieldSets apartment={apartment} />
-
+                <div className="field-sets">
+                    <Fieldset heading={apartment === undefined ? "Taloyhtiön dokumentit" : "Asunnon dokumentit"}>
+                        <ul className="documents-list">
+                            {documentFields.length ? (
+                                <DocumentsListItems
+                                    name="documents"
+                                    remove={removeDocument}
+                                />
+                            ) : (
+                                <div>Ei dokumentteja</div>
+                            )}
+                            <li className="row row--buttons">
+                                <DocumentAddEmptyLineButton append={appendDocument} />
+                            </li>
+                        </ul>
+                    </Fieldset>
+                    <FileDropZone
+                        onFileDrop={(files) => {
+                            for (const file of files) {
+                                appendDocument({
+                                    ...emptyDocument,
+                                    key: uuidv4(),
+                                    file_object: file,
+                                });
+                            }
+                        }}
+                        helpText="Pudota tiedostot tähän lisätäksesi ne dokumenteiksi."
+                    />
+                </div>
                 <div className="row row--buttons">
                     <Button
                         iconLeft={<IconArrowLeft />}
