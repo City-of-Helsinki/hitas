@@ -12,21 +12,24 @@
   bottom: 0
   width: auto
   height: auto
-  background: rgba($color-white, 0.90)
-  border: 2px dotted rgba($color-coat-of-arms, 0.90)
+  background: rgba($color-white, 1)
+  border: 2px dotted rgba($color-coat-of-arms, 1)
   &.is-dragging-over-drop-zone
-    background: rgba($color-bus-light, 0.95)
+    background: rgba($color-bus-light, 1)
     border-color: rgba($color-coat-of-arms, 1)
   transition: all 200ms ease-in-out
 
 .file-drop-zone-helptext
+  & > div
+    display: flex
+    align-items: center
+    gap: $spacing-layout-2-xs
   display: grid
   place-items: center
   top: 0%
   bottom: 30%
   position: sticky
   font-size: 28px
-  font-weight: 700
   height: 250px
   pointer-events: none
   color: $color-coat-of-arms
