@@ -1,3 +1,4 @@
+import {IconUpload} from "hds-react";
 import React, {useEffect} from "react";
 
 interface FileDropZoneProps {
@@ -95,7 +96,12 @@ export default function FileDropZone({
     return (
         <>
             <div className="file-drop-zone">
-                <div className="file-drop-zone-helptext">{helpText ?? "Pudota tiedostot tähän."}</div>
+                <div className="file-drop-zone-helptext">
+                    <div>
+                        <IconUpload />
+                        {helpText ?? "Pudota tiedostot tähän."}
+                    </div>
+                </div>
             </div>
         </>
     );
