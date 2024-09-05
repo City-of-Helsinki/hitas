@@ -1,5 +1,5 @@
 import {Button, Fieldset, IconArrowLeft, IconCrossCircle, IconDocument, IconPlus, StatusLabel} from "hds-react";
-import {useCallback, useRef, useState} from "react";
+import {useCallback, useState} from "react";
 import {SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {IApartmentDetails, IHousingCompanyDetails} from "../schemas";
 import {FileInput, FormProviderForm, TextInput} from "./forms";
@@ -98,14 +98,12 @@ const DocumentRemoveLineButton = ({name, index, remove}) => {
 const DocumentsListItems = ({name, remove}) => {
     const formObject = useFormContext();
     const documents = formObject.watch(name);
-    const documentListItemRef = useRef(null);
     return (
         <>
             {documents.map((document, index) => (
                 <li
                     className="documents-list-item"
                     key={`document-item-${document.id ?? document.key}`}
-                    ref={documentListItemRef}
                 >
                     <TextInput
                         label="Nimi"
@@ -119,21 +117,6 @@ const DocumentsListItems = ({name, remove}) => {
                                 document.file_link || document.file_object ? "Vaihda tiedosto" : "Valitse tiedosto"
                             }
                             name={`${name}.${index}.file_object`}
-                            onChange={(filesArray) => {
-                                // File is a required field but the HDS file input clears the native input after selection so the form is always invalid.
-                                // This is a hack to make sure the native input has a file if the user has selected one so that the form can be submitted.
-                                const documentListItem = documentListItemRef.current as HTMLElement | null;
-                                const fileInput = documentListItem?.querySelector(
-                                    'input[type="file"]'
-                                ) as HTMLInputElement | null;
-                                if (fileInput) {
-                                    const datatransfer = new DataTransfer();
-                                    datatransfer.items.add(filesArray[0]);
-                                    setTimeout(() => (fileInput.files = datatransfer.files), 10);
-                                }
-                                // Explicitly mark as dirty, since react-hook-form does not support File objects for dirty checking.
-                                formObject.setValue(`${name}.${index}.file_object`, filesArray[0], {shouldDirty: true});
-                            }}
                             required={!document.file_link}
                             defaultValue={document.file_object ? [document.file_object] : []}
                         />
