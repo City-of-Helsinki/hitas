@@ -40,7 +40,8 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install build dependencies
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
       curl \
       libpq-dev \
       build-essential
