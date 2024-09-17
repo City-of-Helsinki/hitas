@@ -932,7 +932,7 @@ class ApartmentViewSet(HitasModelViewSet):
 
         calculation_month = monthify(input_data.validated_data["calculation_date"])
 
-        apartment = self.get_object()
+        apartment: Apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
         _validate_apartment_unconfirmed_prices(apartment_data, calculation_month)
 
@@ -947,7 +947,7 @@ class ApartmentViewSet(HitasModelViewSet):
         if body_parts is None:
             raise ModelConflict("Missing body template", error_code="missing")
 
-        filename = f"Hinta-arvio {apartment.address}.pdf"
+        filename = f"Arvio {apartment.housing_company.display_name} {apartment.stair} {apartment.apartment_number}.pdf"
         context = {
             "apartment": apartment_data,
             "additional_info": request.data.get("additional_info", ""),
@@ -994,7 +994,10 @@ class ApartmentViewSet(HitasModelViewSet):
         if body_parts is None:
             raise ModelConflict("Missing body template", error_code="missing")
 
-        filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
+        filename = (
+            f"Laskelma {mpc.apartment.housing_company.display_name}"
+            f"{mpc.apartment.stair} {mpc.apartment.apartment_number}.pdf"
+        )
         context = {
             "maximum_price_calculation": mpc,
             "user": request.user,
