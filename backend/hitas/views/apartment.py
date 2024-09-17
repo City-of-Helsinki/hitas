@@ -996,7 +996,7 @@ class ApartmentViewSet(HitasModelViewSet):
 
         filename = (
             f"Laskelma {mpc.apartment.housing_company.display_name}"
-            f"{mpc.apartment.stair} {mpc.apartment.apartment_number}.pdf"
+            f" {mpc.apartment.stair} {mpc.apartment.apartment_number}.pdf"
         )
         context = {
             "maximum_price_calculation": mpc,
