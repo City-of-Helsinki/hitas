@@ -255,143 +255,143 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
             ),
             "Missing quarter_1": InvalidInput(
                 invalid_data={
-                    "H3": None,
+                    "B3": None,
                 },
                 fields=[
                     {
-                        "field": "H3.quarter_1",
+                        "field": "B3.quarter_1",
                         "message": "This field is mandatory and cannot be null.",
                     },
                 ],
             ),
             "Invalid quarter_1": InvalidInput(
                 invalid_data={
-                    "H3": "foobar",
+                    "B3": "foobar",
                 },
                 fields=[
                     {
-                        "field": "H3.quarter_1",
+                        "field": "B3.quarter_1",
                         "message": "'FOOBAR' is not a valid quarter.",
                     },
                 ],
             ),
             "Missing quarter_2": InvalidInput(
                 invalid_data={
-                    "J3": None,
+                    "D3": None,
                 },
                 fields=[
                     {
-                        "field": "J3.quarter_2",
+                        "field": "D3.quarter_2",
                         "message": "This field is mandatory and cannot be null.",
                     },
                 ],
             ),
             "Invalid quarter_2": InvalidInput(
                 invalid_data={
-                    "J3": "foobar",
+                    "D3": "foobar",
                 },
                 fields=[
                     {
-                        "field": "J3.quarter_2",
+                        "field": "D3.quarter_2",
                         "message": "'FOOBAR' is not a valid quarter.",
                     },
                 ],
             ),
             "Missing quarter_3": InvalidInput(
                 invalid_data={
-                    "L3": None,
+                    "F3": None,
                 },
                 fields=[
                     {
-                        "field": "L3.quarter_3",
+                        "field": "F3.quarter_3",
                         "message": "This field is mandatory and cannot be null.",
                     },
                 ],
             ),
             "Invalid quarter_3": InvalidInput(
                 invalid_data={
-                    "L3": "foobar",
+                    "F3": "foobar",
                 },
                 fields=[
                     {
-                        "field": "L3.quarter_3",
+                        "field": "F3.quarter_3",
                         "message": "'FOOBAR' is not a valid quarter.",
                     },
                 ],
             ),
             "Missing quarter_4": InvalidInput(
                 invalid_data={
-                    "N3": None,
+                    "H3": None,
                 },
                 fields=[
                     {
-                        "field": "N3.quarter_4",
+                        "field": "H3.quarter_4",
                         "message": "This field is mandatory and cannot be null.",
                     },
                 ],
             ),
             "Invalid quarter_4": InvalidInput(
                 invalid_data={
-                    "N3": "foobar",
+                    "H3": "foobar",
                 },
                 fields=[
                     {
-                        "field": "N3.quarter_4",
+                        "field": "H3.quarter_4",
                         "message": "'FOOBAR' is not a valid quarter.",
                     },
                 ],
             ),
             "Invalid quarter, no Q5": InvalidInput(
                 invalid_data={
-                    "H3": "2022Q5",
+                    "B3": "2022Q5",
                 },
                 fields=[
                     {
-                        "field": "H3.quarter_1",
+                        "field": "B3.quarter_1",
                         "message": "'2022Q5' is not a valid quarter.",
                     },
                 ],
             ),
             "Invalid quarter, improper quarter sign": InvalidInput(
                 invalid_data={
-                    "H3": "2022W1",
+                    "B3": "2022W1",
                 },
                 fields=[
                     {
-                        "field": "H3.quarter_1",
+                        "field": "B3.quarter_1",
                         "message": "'2022W1' is not a valid quarter.",
                     },
                 ],
             ),
             "Invalid quarter, too short": InvalidInput(
                 invalid_data={
-                    "H3": "2022Q",
+                    "B3": "2022Q",
                 },
                 fields=[
                     {
-                        "field": "H3.quarter_1",
+                        "field": "B3.quarter_1",
                         "message": "Ensure this field has at least 6 characters.",
                     },
                 ],
             ),
             "Invalid price": InvalidInput(
                 invalid_data={
-                    "H5": "foo",
+                    "B5": "foo",
                 },
                 fields=[
                     {
-                        "field": "H5.quarter_1_price",
+                        "field": "B5.quarter_1_price",
                         "message": "A valid integer is required.",
                     },
                 ],
             ),
             "Invalid sale_count": InvalidInput(
                 invalid_data={
-                    "I5": "foo",
+                    "C5": "foo",
                 },
                 fields=[
                     {
-                        "field": "I5.quarter_1_sale_count",
+                        "field": "C5.quarter_1_sale_count",
                         "message": "A valid integer is required.",
                     },
                 ],
