@@ -1,5 +1,6 @@
-import {IconAlertCircle, Tabs} from "hds-react";
+import {Button, IconAlertCircle, IconAngleLeft, IconAngleRight, Select, Tabs} from "hds-react";
 import React, {useContext, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import {DetailField, Divider, DocumentsTable, EditButton, Heading, ImprovementsTable} from "../../../common/components";
 import {
     MutateForm,
@@ -61,11 +62,22 @@ const PropertyManagerEditModalButton = ({propertyManager}: {propertyManager: IPr
 };
 
 const LoadedApartmentDetails = (): React.JSX.Element => {
+    const navigate = useNavigate();
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
     // find out if apartment has owners with non-disclosure set to true
     const hasObfuscatedOwners = apartment.ownerships.some((ownership) => ownership.owner.non_disclosure);
+
+    const adjacentApartmentOptions = apartment.adjacent_apartments.map((adjacentApartment) => ({
+        label: `${adjacentApartment.stair}${adjacentApartment.apartment_number}`,
+        value: adjacentApartment.id,
+    }));
+    const apartmentIndex = apartment.adjacent_apartments.findIndex(
+        (adjacentApartment) => apartment.id === adjacentApartment.id
+    );
+    const previousApartment = apartment.adjacent_apartments[apartmentIndex - 1];
+    const nextApartment = apartment.adjacent_apartments[apartmentIndex + 1];
 
     const alert = () => (
         <>
@@ -81,17 +93,57 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
     return (
         <>
             <h2 className="apartment-stats">
-                <span className="apartment-stats--number">
-                    {apartment.address.stair}
-                    {apartment.address.apartment_number}
+                <Select
+                    className="apartment-stats--apartment-select"
+                    label=""
+                    options={adjacentApartmentOptions}
+                    onChange={(selected) =>
+                        navigate(
+                            `/housing-companies/${apartment.links.housing_company.id}/apartments/${selected.value}`
+                        )
+                    }
+                    value={adjacentApartmentOptions[apartmentIndex]}
+                />
+                <span className="apartment-stats--metadata">
+                    <span>
+                        {apartment.rooms ?? ""}
+                        {apartment.type?.value ?? ""}
+                    </span>
+                    <span>{apartment.surface_area ? apartment.surface_area + "m²" : ""}</span>
+                    <span>{apartment.address.floor ? apartment.address.floor + ".krs" : ""}</span>
                 </span>
-                <span>
-                    {apartment.rooms ?? ""}
-                    {apartment.type?.value ?? ""}
-                </span>
-                <span>{apartment.surface_area ? apartment.surface_area + "m²" : ""}</span>
-                <span>{apartment.address.floor ? apartment.address.floor + ".krs" : ""}</span>
                 {hasObfuscatedOwners && alert()}
+                {apartmentIndex}
+                <div className="apartment-heading-buttons">
+                    {previousApartment && (
+                        <Link
+                            to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${previousApartment.id}`}
+                        >
+                            <Button
+                                variant="supplementary"
+                                theme="black"
+                                iconLeft={<IconAngleLeft />}
+                            >
+                                {previousApartment.stair}
+                                {previousApartment.apartment_number}
+                            </Button>
+                        </Link>
+                    )}
+                    {nextApartment && (
+                        <Link
+                            to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${nextApartment.id}`}
+                        >
+                            <Button
+                                variant="supplementary"
+                                theme="black"
+                                iconRight={<IconAngleRight />}
+                            >
+                                {nextApartment.stair}
+                                {nextApartment.apartment_number}
+                            </Button>
+                        </Link>
+                    )}
+                </div>
             </h2>
             <div className="apartment-action-cards">
                 <ApartmentMaximumPricesCard
