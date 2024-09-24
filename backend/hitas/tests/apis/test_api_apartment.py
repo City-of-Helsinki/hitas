@@ -736,6 +736,13 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             }
         ],
         "sell_by_date": str(sale_2.purchase_date),
+        "adjacent_apartments": [
+            {
+                "id": ap1.uuid.hex,
+                "apartment_number": ap1.apartment_number,
+                "stair": ap1.stair,
+            },
+        ],
     }
 
 
@@ -2005,6 +2012,13 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             "type": None,
             "conditions_of_sale": [],
             "sell_by_date": None,
+            "adjacent_apartments": [
+                {
+                    "id": ap.uuid.hex,
+                    "apartment_number": ap.apartment_number,
+                    "stair": ap.stair,
+                }
+            ],
         }
 
 
@@ -2224,6 +2238,7 @@ def test__api__apartment__update__overlapping_shares(
     del data["conditions_of_sale"]
     del data["sell_by_date"]
     del data["ownerships"]
+    del data["adjacent_apartments"]
     data["building"] = {"id": building_1.uuid.hex}
     data["shares"]["start"] = 20
     data["shares"]["end"] = 100

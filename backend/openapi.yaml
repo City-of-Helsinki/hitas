@@ -6374,6 +6374,26 @@ components:
               description: Building ID this apartment is associated with
               type: string
               example: dc1072975bab4ba69f64814f021c6785
+        adjacent_apartments:
+          description: List of adjacent apartments for pagination purposes
+          type: array
+          readOnly: true
+          items:
+            description: Adjacent apartment
+            type: object
+            properties:
+              id:
+                description: Adjacent apartment ID
+                type: string
+                example: dc1072975bab4ba69f64814f021c6785
+              apartment_number:
+                description: Apartment number of the adjacent apartment
+                type: integer
+                example: 2
+              stair:
+                description: Stair number of the adjacent apartment
+                type: string
+                example: A
         notes:
           description: Apartment notes
           type: string

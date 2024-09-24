@@ -651,6 +651,19 @@ class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModel
         ]
 
 
+class AdjacentApartmentSerializer(HitasModelSerializer):
+    apartment_number = serializers.IntegerField(read_only=True)
+    stair = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Apartment
+        fields = [
+            "id",
+            "apartment_number",
+            "stair",
+        ]
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     is_sold = serializers.SerializerMethodField()
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type", required=False, allow_null=True)
@@ -663,6 +676,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     ownerships = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
     building = ReadOnlyBuildingSerializer(write_only=True)
+    adjacent_apartments = serializers.SerializerMethodField()
     improvements = ApartmentImprovementSerializer(source="*")
     documents = AparmentDocumentSerializer(many=True, read_only=True)
     conditions_of_sale = serializers.SerializerMethodField()
@@ -695,6 +709,13 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     @staticmethod
     def get_sell_by_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
         return instance.sell_by_date
+
+    @staticmethod
+    def get_adjacent_apartments(instance: ApartmentWithAnnotations) -> list[dict[str, Any]]:
+        adjacent_apartments = Apartment.objects.filter(
+            building__real_estate__housing_company=instance.housing_company
+        ).order_by("apartment_number", "id")
+        return AdjacentApartmentSerializer(adjacent_apartments, many=True).data
 
     @staticmethod
     def get_links(instance: ApartmentWithAnnotations):
@@ -783,6 +804,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "ownerships",
             "notes",
             "building",
+            "adjacent_apartments",
             "improvements",
             "documents",
             "conditions_of_sale",

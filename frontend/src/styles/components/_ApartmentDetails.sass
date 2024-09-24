@@ -32,7 +32,7 @@
         top: -3px
         left: -3px
 
-    span
+    .apartment-stats--metadata span
       &:not(:last-child):not(:empty):after
         @include inline-flex()
         @include justify-content(center)
@@ -49,6 +49,22 @@
 
       &:after
         display: none !important
+
+    &--apartment-select
+      margin: 0 $spacing-l
+
+      button
+        font-size: $fontsize-heading-l
+        font-weight: 700
+        line-height: 1
+        padding-right: 3px
+
+      [class^="Icon"]
+        top: calc($spacing-xs + 2px)
+        right: 3px
+
+  .apartment-heading-buttons
+    margin-left: auto
 
   .apartment-action-cards
     @include flexbox()

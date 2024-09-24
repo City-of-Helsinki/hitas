@@ -385,6 +385,13 @@ export const ApartmentSchema = object({
 });
 export type IApartment = z.infer<typeof ApartmentSchema>;
 
+export const AdjacentApartmentSchema = object({
+    id: string().nullable(),
+    apartment_number: number(),
+    stair: string(),
+});
+export type IAdjacentApartment = z.infer<typeof AdjacentApartmentSchema>;
+
 export const ApartmentDetailsSchema = object({
     id: APIIdString,
     is_sold: boolean(),
@@ -396,6 +403,7 @@ export const ApartmentDetailsSchema = object({
     prices: ApartmentPricesSchema,
     completion_date: string().nullable(),
     ownerships: OwnershipSchema.array(),
+    adjacent_apartments: AdjacentApartmentSchema.array(),
     notes: string(),
     improvements: object({
         market_price_index: MarketPriceIndexImprovementSchema.array(),
