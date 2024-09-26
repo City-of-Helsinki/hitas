@@ -96,12 +96,13 @@ export default function FilterRelatedModelComboboxField({
             key={`filter__${filterFieldName}`}
             label={label}
             options={options}
-            isOptionDisabled={(option) => option?.disabled}
+            isOptionDisabled={(option) => options.find((o) => o.label === option.label)?.disabled ?? false}
             toggleButtonAriaLabel="Toggle menu"
             onChange={onSelectionChange}
             onFocus={() => setIsQuerySkipped(false)} // Load options only after field is focused to reduce unnecessary api queries
             onBlur={() => setIsQuerySkipped(true)}
             filter={filterFunction}
+            defaultValue={filterParams && filterParams[filterFieldName] ? {label: filterParams[filterFieldName]} : null}
             clearable
         />
     );

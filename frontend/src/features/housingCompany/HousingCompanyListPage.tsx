@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 
 import {Button, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 import {Heading, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {
@@ -155,7 +155,6 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Eleme
                     {value: "true", label: "Säännelty"},
                     {value: "false", label: "Ei säännelty"},
                 ]}
-                defaultOption={{value: "true", label: "Säännelty"}}
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
@@ -163,8 +162,54 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Eleme
     );
 };
 
+interface FilterParams {
+    display_name?: string | undefined;
+    street_address?: string | undefined;
+    postal_code?: string | undefined;
+    developer?: string | undefined;
+    property_manager?: string | undefined;
+    archive_id?: string | undefined;
+    is_regulated?: string | undefined;
+}
+
+const getFilterDefaultsFromQueryParams = () => {
+    const params = new URLSearchParams(location.search);
+    const filterParams: FilterParams = {
+        display_name: params.get("display_name") ?? undefined,
+        street_address: params.get("street_address") ?? undefined,
+        postal_code: params.get("postal_code") ?? undefined,
+        developer: params.get("developer") ?? undefined,
+        property_manager: params.get("property_manager") ?? undefined,
+        archive_id: params.get("archive_id") ?? undefined,
+    };
+    if (params.get("is_regulated")) {
+        filterParams.is_regulated = params.get("is_regulated") ?? undefined;
+    }
+    return filterParams;
+};
+
 const HousingCompanyListPage = (): React.JSX.Element => {
-    const [filterParams, setFilterParams] = useState({is_regulated: "true"});
+    const navigate = useNavigate();
+    const [filterParams, setFilterParams] = useState({
+        is_regulated: "true",
+        ...getFilterDefaultsFromQueryParams(),
+    });
+
+    const updateFilters = (newFilters) => {
+        setFilterParams(newFilters);
+        // Update URL with new filters
+        const queryParams = new URLSearchParams(
+            // Remove undefined
+            JSON.parse(JSON.stringify(newFilters))
+        ).toString();
+        navigate(
+            {
+                pathname: location.pathname,
+                search: queryParams,
+            },
+            {replace: true}
+        );
+    };
 
     return (
         <div className="view--housing-company-list">
@@ -185,14 +230,14 @@ const HousingCompanyListPage = (): React.JSX.Element => {
                         label=""
                         filterFieldName="display_name"
                         filterParams={filterParams}
-                        setFilterParams={setFilterParams}
+                        setFilterParams={updateFilters}
                     />
                     <IconSearch />
                 </div>
                 <HousingCompanyResultsList filterParams={filterParams} />
                 <HousingCompanyFilters
                     filterParams={filterParams}
-                    setFilterParams={setFilterParams}
+                    setFilterParams={updateFilters}
                 />
             </div>
         </div>

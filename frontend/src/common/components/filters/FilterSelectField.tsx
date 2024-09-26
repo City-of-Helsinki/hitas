@@ -30,6 +30,13 @@ export default function FilterSelectField({
         setFilterParams(filters);
     };
 
+    if (defaultOption === undefined) {
+        defaultOption = {
+            label: options.find((o) => o.value === filterParams[filterFieldName])?.label ?? "",
+            value: filterParams[filterFieldName],
+        };
+    }
+
     return (
         <Select
             id={`filter__${filterFieldName}`}
