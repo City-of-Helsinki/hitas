@@ -44,8 +44,7 @@ const HousingCompanyListItem = ({housingCompany}: {housingCompany: IHousingCompa
     );
 };
 
-const HousingCompanyResultsList = ({filterParams}): React.JSX.Element => {
-    const [currentPage, setCurrentPage] = useState(1);
+const HousingCompanyResultsList = ({filterParams, currentPage, setCurrentPage}): React.JSX.Element => {
     const {data, error, isLoading, isFetching} = useGetHousingCompaniesQuery({...filterParams, page: currentPage});
 
     const LoadedHousingCompanyResultsList = ({
@@ -188,19 +187,44 @@ const getFilterDefaultsFromQueryParams = () => {
     return filterParams;
 };
 
+const getPageFromQueryParams = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get("page") ?? undefined;
+};
+
+const removeUndefinedParams = (filterParams) => {
+    return JSON.parse(JSON.stringify(filterParams));
+};
+
 const HousingCompanyListPage = (): React.JSX.Element => {
     const navigate = useNavigate();
     const [filterParams, setFilterParams] = useState({
         is_regulated: "true",
         ...getFilterDefaultsFromQueryParams(),
     });
+    const [currentPage, setCurrentPage] = useState(getPageFromQueryParams() ?? 1);
 
     const updateFilters = (newFilters) => {
         setFilterParams(newFilters);
+        setCurrentPage(1);
         // Update URL with new filters
+        const queryParams = new URLSearchParams(removeUndefinedParams(newFilters)).toString();
+        navigate(
+            {
+                pathname: location.pathname,
+                search: queryParams,
+            },
+            {replace: true}
+        );
+    };
+    const updatePage = (newPage) => {
+        setCurrentPage(newPage);
+        // Update URL with new page
         const queryParams = new URLSearchParams(
-            // Remove undefined
-            JSON.parse(JSON.stringify(newFilters))
+            removeUndefinedParams({
+                ...filterParams,
+                page: newPage,
+            })
         ).toString();
         navigate(
             {
@@ -234,7 +258,11 @@ const HousingCompanyListPage = (): React.JSX.Element => {
                     />
                     <IconSearch />
                 </div>
-                <HousingCompanyResultsList filterParams={filterParams} />
+                <HousingCompanyResultsList
+                    filterParams={filterParams}
+                    currentPage={currentPage}
+                    setCurrentPage={updatePage}
+                />
                 <HousingCompanyFilters
                     filterParams={filterParams}
                     setFilterParams={updateFilters}
