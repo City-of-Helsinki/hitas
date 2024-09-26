@@ -19,7 +19,7 @@ export default function FilterIntegerField({
     filterParams,
     setFilterParams,
 }: FilterIntegerFieldProps): React.JSX.Element {
-    const [inputValue, setInputValue] = useState("");
+    const [inputValue, setInputValue] = useState(filterParams[filterFieldName] ?? "");
     const [isInvalid, setIsInvalid] = useState(false);
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {

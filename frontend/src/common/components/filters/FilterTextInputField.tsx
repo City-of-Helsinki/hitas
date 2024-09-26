@@ -54,6 +54,7 @@ export default function FilterTextInputField({
             onFocus={() => setIsInvalid(false)}
             invalid={isInvalid}
             maxLength={maxLength}
+            defaultValue={filterParams[filterFieldName]}
             {...rest}
         />
     );
