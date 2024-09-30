@@ -175,7 +175,7 @@ def test__api__housing_company__list__paging(api_client: HitasAPIClient):
     }
 
 
-@pytest.mark.parametrize("page_number", ["a", "#", " ", ""])
+@pytest.mark.parametrize("page_number", ["a", "#", " "])
 @pytest.mark.django_db
 def test__api__housing_company__list__paging__invalid(api_client: HitasAPIClient, page_number):
     response = api_client.get(

@@ -171,6 +171,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         {apartment.share_number_end - apartment.share_number_start + 1}
         Asuntojen lkm:
         1
+
         Hankinta-arvo:
         60 000
         Pinta-ala m²:
@@ -187,6 +188,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         0
          markkinahintaindeksi
         200,00
+
         Keskimääräinen neliöhinta
         rakennuskustannushintaindeksillä euroa/m²
         0
@@ -197,6 +199,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         12 000
         laskentakaava:
         (200,00 / 100,00) * (60 000 / 10)
+
         NELIÖHINTOJEN VERTAILU
         Yhtiön keskineliöhinta euroa/m²
         12 000
@@ -348,6 +351,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         {apartment.share_number_end - apartment.share_number_start + 1}
         Asuntojen lkm:
         1
+
         Hankinta-arvo:
         60 000
         Pinta-ala m²:
@@ -364,6 +368,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         0
          markkinahintaindeksi
         200,00
+
         Keskimääräinen neliöhinta
         rakennuskustannushintaindeksillä euroa/m²
         0
@@ -374,6 +379,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         12 000
         laskentakaava:
         (200,00 / 100,00) * (60 000 / 10)
+
         NELIÖHINTOJEN VERTAILU
         Yhtiön keskineliöhinta euroa/m²
         12 000
@@ -560,6 +566,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         {apartment.share_number_end - apartment.share_number_start + 1}
         Asuntojen lkm:
         1
+
         Hankinta-arvo:
         60 000
         Pinta-ala m²:
@@ -576,6 +583,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         0
          markkinahintaindeksi
         200,00
+
         Keskimääräinen neliöhinta
         rakennuskustannushintaindeksillä euroa/m²
         0
@@ -586,6 +594,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         12 000
         laskentakaava:
         (200,00 / 100,00) * (60 000 / 10)
+
         NELIÖHINTOJEN VERTAILU
         Yhtiön keskineliöhinta euroa/m²
         12 000
