@@ -113,7 +113,6 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                     <span>{apartment.address.floor ? apartment.address.floor + ".krs" : ""}</span>
                 </span>
                 {hasObfuscatedOwners && alert()}
-                {apartmentIndex}
                 <div className="apartment-heading-buttons">
                     {previousApartment && (
                         <Link
