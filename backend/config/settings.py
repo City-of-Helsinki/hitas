@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import environ
+import helusers.defaults
 from dateutil.relativedelta import relativedelta
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy
-from helusers import defaults
 from rest_framework.authentication import TokenAuthentication
 
 # ----- ENV Setup --------------------------------------------------------------------------------------
@@ -273,7 +273,10 @@ SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("SOCIAL_AUTH_TUNNISTAMO_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_AUTH_EXTRA_ARGUMENTS = {"ui_locales": "fi"}
 SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = env("SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS")
-SOCIAL_AUTH_TUNNISTAMO_PIPELINE = defaults.SOCIAL_AUTH_PIPELINE
+SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
+    *helusers.defaults.SOCIAL_AUTH_PIPELINE,
+    "hitas.helauth.pipelines.migrate_user_from_tunnistamo_to_tunnistus",
+)
 
 HELUSERS_PASSWORD_LOGIN_DISABLED = False
 HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
