@@ -25,7 +25,7 @@ def migrate_user_from_tunnistamo_to_tunnistus(
         and id_token.is_ad_login
         and id_token.email not in ("", None)
     ):
-        old_user = User.objects.filter(email=id_token.email).exclude(pk=user.pk).first()
+        old_user = User.objects.filter(email__iexact=id_token.email).exclude(pk=user.pk).first()
         if old_user is None:
             return {"user": user}
         new_user = user
