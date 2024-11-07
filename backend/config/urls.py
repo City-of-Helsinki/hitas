@@ -1,26 +1,32 @@
+import helusers.views
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
+from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
-from helusers import views
 
 from hitas.views.health import HealthCheckView
 from users.views import UserInfoView
 
 
-class HitasLogoutView(views.LogoutView):
+class HitasLogoutView(helusers.views.LogoutView):
     success_url_allowed_hosts = settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS
 
 
-class HitasLogoutCompleteView(views.LogoutCompleteView):
+class HitasLogoutCompleteView(helusers.views.LogoutCompleteView):
     success_url_allowed_hosts = settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS
 
 
 helusers_pattern = (
     [
-        path("login/", views.LoginView.as_view(), name="auth_login"),
+        path("login/", helusers.views.LoginView.as_view(), name="auth_login"),
         path("logout/", HitasLogoutView.as_view(), name="auth_logout"),
         path("logout/complete/", HitasLogoutCompleteView.as_view(), name="auth_logout_complete"),
+        path(
+            "logout/oidc/backchannel/",
+            csrf_exempt(helusers.views.OIDCBackChannelLogout.as_view()),
+            name="oidc_backchannel",
+        ),
     ],
     "helusers",
 )
