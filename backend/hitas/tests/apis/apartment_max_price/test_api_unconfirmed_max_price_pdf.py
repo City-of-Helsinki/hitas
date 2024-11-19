@@ -101,7 +101,7 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer, no
         00099 HELSINGIN KAUPUNKI
         {apartment.address}
         {apartment.postal_code.value} HELSINKI
-        HITAS-HUONEISTON ENIMMÄISHINTA
+        HITAS-HUONEISTON ENIMMÄISHINTA-ARVIO
         \x7f ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta
         Omistaja ja omistusosuus (%)
         {expected_name}
@@ -210,7 +210,7 @@ def test__api__unconfirmed_max_price_pdf__old_hitas_ruleset(api_client: HitasAPI
         00099 HELSINGIN KAUPUNKI
         {apartment.address}
         {apartment.postal_code.value} HELSINKI
-        HITAS-HUONEISTON ENIMMÄISHINTA
+        HITAS-HUONEISTON ENIMMÄISHINTA-ARVIO
         \x7f ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta
         Omistaja ja omistusosuus (%)
         {ownership.owner.name}
@@ -428,7 +428,7 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         00099 HELSINGIN KAUPUNKI
         {apartment.address}
         {apartment.postal_code.value} HELSINKI
-        HITAS-HUONEISTON ENIMMÄISHINTA
+        HITAS-HUONEISTON ENIMMÄISHINTA-ARVIO
         \x7f ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta
         Omistaja ja omistusosuus (%)
         {ownership.owner.name}
