@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.11.4-slim-bullseye AS base
+FROM public.ecr.aws/docker/library/python:3.13.0-slim-bullseye AS base
 
 # Setup environment variables.
 ENV PYTHONUNBUFFERED=1 \
@@ -31,7 +31,7 @@ RUN mkdir -p /hitas/backend \
 FROM base AS builder
 
 # Setup environment variables for poetry.
-ENV POETRY_VERSION=1.3.1
+ENV POETRY_VERSION=1.8.4
 ENV POETRY_HOME=/usr/pypoetry
 ENV PATH=$POETRY_HOME/bin:$PATH
 # Set so that poetry uses venv created in '/hitas/venv'.
