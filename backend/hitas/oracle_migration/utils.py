@@ -2,8 +2,8 @@ import datetime
 import sys
 from functools import wraps
 from typing import Callable, Optional, ParamSpec, TypeVar
+from zoneinfo import ZoneInfo
 
-import pytz
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum
 from sqlalchemy.engine import LegacyRow
@@ -12,7 +12,7 @@ from hitas.models import BuildingType
 from hitas.models.apartment import DepreciationPercentage
 from hitas.models.housing_company import RegulationStatus
 
-TZ = pytz.timezone("Europe/Helsinki")
+TZ = ZoneInfo("Europe/Helsinki")
 T = TypeVar("T")
 P = ParamSpec("P")
 
@@ -36,7 +36,7 @@ def date_to_datetime(d: datetime.date) -> Optional[datetime.datetime]:
     if d is None:
         return None
 
-    return TZ.localize(datetime.datetime.combine(d, datetime.datetime.min.time()))
+    return datetime.datetime.combine(d, datetime.datetime.min.time()).replace(tzinfo=TZ)
 
 
 def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
