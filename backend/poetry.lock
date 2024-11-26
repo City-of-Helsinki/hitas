@@ -700,13 +700,13 @@ django = ">=3.2"
 
 [[package]]
 name = "django-environ"
-version = "0.10.0"
+version = "0.11.2"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
 optional = false
-python-versions = ">=3.5,<4"
+python-versions = ">=3.6,<4"
 files = [
-    {file = "django-environ-0.10.0.tar.gz", hash = "sha256:b3559a91439c9d774a9e0c1ced872364772c612cdf6dc919506a2b13f7a77225"},
-    {file = "django_environ-0.10.0-py2.py3-none-any.whl", hash = "sha256:510f8c9c1d0a38b0815f91504270c29440a0cf44fab07f55942fa8d31bbb9be6"},
+    {file = "django-environ-0.11.2.tar.gz", hash = "sha256:f32a87aa0899894c27d4e1776fa6b477e8164ed7f6b3e410a62a6d72caaf64be"},
+    {file = "django_environ-0.11.2-py2.py3-none-any.whl", hash = "sha256:0ff95ab4344bfeff693836aa978e6840abef2e2f1145adff7735892711590c05"},
 ]
 
 [package.extras]
@@ -716,17 +716,17 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
 name = "django-filter"
-version = "23.5"
+version = "24.3"
 description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "django-filter-23.5.tar.gz", hash = "sha256:67583aa43b91fe8c49f74a832d95f4d8442be628fd4c6d65e9f811f5153a4e5c"},
-    {file = "django_filter-23.5-py3-none-any.whl", hash = "sha256:99122a201d83860aef4fe77758b69dda913e874cc5e0eaa50a86b0b18d708400"},
+    {file = "django_filter-24.3-py3-none-any.whl", hash = "sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64"},
+    {file = "django_filter-24.3.tar.gz", hash = "sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3"},
 ]
 
 [package.dependencies]
-Django = ">=3.2"
+Django = ">=4.2"
 
 [[package]]
 name = "django-health-check"
@@ -792,13 +792,13 @@ files = [
 
 [[package]]
 name = "django-post-fetch-hook"
-version = "0.0.2"
+version = "0.0.3"
 description = "Modify data fetched from a database after it has been fetched but before it has been cached in django's result cache."
 optional = false
 python-versions = ">=3.9,<4"
 files = [
-    {file = "django_post_fetch_hook-0.0.2-py3-none-any.whl", hash = "sha256:5ad1426e2d5b0f6cd795f44d5632a5d40a1abc1661108cdde731c5e4277a3d63"},
-    {file = "django_post_fetch_hook-0.0.2.tar.gz", hash = "sha256:36b2c84da05b077373415718a1248e88ddffad8dd2a7d6d44076ef04c21c10cf"},
+    {file = "django_post_fetch_hook-0.0.3-py3-none-any.whl", hash = "sha256:72f2fc0e882624dbefc8d1543f9f627b58158860c4c7c44991d0c65090652038"},
+    {file = "django_post_fetch_hook-0.0.3.tar.gz", hash = "sha256:6b826a739f0419b60ff0a3001345a9055f227cde757986a430b10ac006f10e28"},
 ]
 
 [package.dependencies]
@@ -846,17 +846,17 @@ sftp = ["paramiko (>=1.15)"]
 
 [[package]]
 name = "django-subforms"
-version = "0.2.0"
+version = "0.3.1"
 description = "Wrap django forms as fields and fields as dynamic arrays."
 optional = false
-python-versions = ">=3.8,<4"
+python-versions = "<4,>=3.9"
 files = [
-    {file = "django_subforms-0.2.0-py3-none-any.whl", hash = "sha256:f7d6a3c3ed0d1fea6cb766337f72a73b6d66ca8fc9a00e8175df60e46f80289f"},
-    {file = "django_subforms-0.2.0.tar.gz", hash = "sha256:379f9c75fb2e4d2d20eb2c6b870fe54aba335ce66d1f74361983a123b8365e96"},
+    {file = "django_subforms-0.3.1-py3-none-any.whl", hash = "sha256:d6b7cf8afaa98b8603ca0ad4c09f3188782e4ea3f982d32b7c7fbf1f034cd99e"},
+    {file = "django_subforms-0.3.1.tar.gz", hash = "sha256:26a617095470849b922a91013595dd84b6229ff47ca04c1c2ccdf5e2244999fe"},
 ]
 
 [package.dependencies]
-Django = ">=3.1"
+Django = ">=4.2"
 
 [[package]]
 name = "djangorestframework"
@@ -906,17 +906,17 @@ files = [
 
 [[package]]
 name = "drf-nested-routers"
-version = "0.93.5"
+version = "0.94.1"
 description = "Nested resources for the Django Rest Framework"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "drf-nested-routers-0.93.5.tar.gz", hash = "sha256:1407565abc7bada37c162c7e11bf214ae71625a17fdec6d9a47a17f4a3627d32"},
-    {file = "drf_nested_routers-0.93.5-py2.py3-none-any.whl", hash = "sha256:9a6813554020134a02e62f8c2934b2047717f7da06f8b801752c521e43735c63"},
+    {file = "drf-nested-routers-0.94.1.tar.gz", hash = "sha256:2b846385ed95c9f17bf4242db3b264ac826b5af00dda6c737d3fe7cc7bf2c7db"},
+    {file = "drf_nested_routers-0.94.1-py2.py3-none-any.whl", hash = "sha256:3a8ec45a025c0f39188ec1ec415244beb875a6f4db87911a1f5a606d09b68c9f"},
 ]
 
 [package.dependencies]
-Django = ">=3.2"
+Django = ">=4.2"
 djangorestframework = ">=3.14.0"
 
 [[package]]
@@ -3371,4 +3371,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1)", "tox"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "c56efb5781e9a591f83d42fb47ca6dc8f70ee130e9636709d22bb1aaf63a41c1"
+content-hash = "e6924e2d9e975b8a828a4a3a42ebf15ddd8dfca199e769607ad0a39beb261750"
