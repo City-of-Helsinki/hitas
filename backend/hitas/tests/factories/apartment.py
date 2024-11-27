@@ -30,6 +30,7 @@ from hitas.utils import max_date_if_all_not_null, monthify
 class ApartmentFactory(DjangoModelFactory):
     class Meta:
         model = Apartment
+        skip_postgeneration_save = True
 
     building = factory.SubFactory("hitas.tests.factories.BuildingFactory")
     apartment_type = factory.SubFactory("hitas.tests.factories.ApartmentTypeFactory")
