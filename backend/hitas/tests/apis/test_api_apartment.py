@@ -830,11 +830,15 @@ def _test_unconfirmed_max_prices(
             "value": (
                 143728.20  # (80000 + 15000 + 5000 + 2000) * 0.9394 * 150 / 100
                 if old_hitas_ruleset and pre_2005
-                else 148500.30  # (80000 + 15000 + 5000 + 1000) * 0.9802 * 150 / 100
-                if old_hitas_ruleset
-                else 150000.00  # (80000 + 15000 + 5000) * 150 / 100
-                if create_current_indices and create_completion_indices and not null_values
-                else None
+                else (
+                    148500.30  # (80000 + 15000 + 5000 + 1000) * 0.9802 * 150 / 100
+                    if old_hitas_ruleset
+                    else (
+                        150000.00  # (80000 + 15000 + 5000) * 150 / 100
+                        if create_current_indices and create_completion_indices and not null_values
+                        else None
+                    )
+                )
             ),
             "maximum": (
                 create_current_indices and create_completion_indices and not old_hitas_ruleset and not null_values
@@ -844,9 +848,11 @@ def _test_unconfirmed_max_prices(
             "value": (
                 126250.00  # (80000 + 15000 + 5000 + 1000) * 250 / 200
                 if old_hitas_ruleset
-                else 125000.00  # (80000 + 15000 + 5000) * 250 / 200
-                if create_current_indices and create_completion_indices and not null_values
-                else None
+                else (
+                    125000.00  # (80000 + 15000 + 5000) * 250 / 200
+                    if create_current_indices and create_completion_indices and not null_values
+                    else None
+                )
             ),
             "maximum": False,
         },

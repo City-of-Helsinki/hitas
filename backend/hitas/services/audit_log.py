@@ -71,8 +71,7 @@ def get_last_modified(
     *,
     model_id: str,
     hint: str,
-) -> Subquery:
-    ...
+) -> Subquery: ...
 
 
 @overload
@@ -81,8 +80,7 @@ def get_last_modified(
     *,
     model_id: int,
     hint: str,
-) -> Optional[datetime.date]:
-    ...
+) -> Optional[datetime.date]: ...
 
 
 def last_modified(
