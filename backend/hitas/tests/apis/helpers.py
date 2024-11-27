@@ -20,13 +20,14 @@ from openapi_core.util import forcebool
 from openapi_core.validation.request.protocols import Request
 from openapi_core.validation.request.validators import APICallRequestValidator
 from openapi_core.validation.response import V30ResponseValidator
-from openapi_spec_validator.validation import openapi_spec_validator_proxy
+from openapi_spec_validator.validation import OpenAPIV30SpecValidator
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 
 with open(f"{settings.BASE_DIR}/openapi.yaml", "r") as spec_file:
     openapi_spec_data = yaml.safe_load(spec_file)
-    openapi_spec_validator_proxy.validate(openapi_spec_data)
+    for err in OpenAPIV30SpecValidator(openapi_spec_data).iter_errors():
+        raise err
     _openapi_spec = SchemaPath.from_dict(openapi_spec_data)
 
 
