@@ -42,19 +42,19 @@ version = "^2.0.22"
 markers = "sys_platform != 'win32'"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-pytest-cov = "^4.1.0"
-pytest-django = "^4.5.2"
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
+pytest-django = "^4.9.0"
 pytest-freezer = "^0.4.8"
-factory-boy = "^3.3.0"
-ipython = "^8.14.0"
+factory-boy = "^3.3.1"
+ipython = "^8.29.0"
 openapi-core = "0.19.4"
 testcontainers = {extras = ["postgresql"], version = "^3.7.1"}
-django-debug-toolbar = "^3.8.1" # Updating to 4 breaks query count tests
-pre-commit = "^3.3.3"
-pypdf = "^3.15.2"
-sqlparse = "^0.4.4"
-pytest-xdist = "^3.3.1"
+django-debug-toolbar = "^4.4.6" # Updating to 4 breaks query count tests
+pre-commit = "^4.0.1"
+pypdf = "^5.1.0"
+sqlparse = "^0.5.2"
+pytest-xdist = "^3.6.1"
 
 [tool.poetry.group.migration]
 optional = true
