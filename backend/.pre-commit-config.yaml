@@ -1,7 +1,7 @@
 repos:
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
     -   id: check-toml
     -   id: check-yaml
@@ -11,12 +11,12 @@ repos:
             ]
 
 -   repo: https://github.com/ambv/black
-    rev: 23.7.0
+    rev: 24.10.0
     hooks:
     -   id: black
 
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.287
+    rev: v0.8.0
     hooks:
     -   id: ruff
         args: [
@@ -24,7 +24,7 @@ repos:
             ]
 
 -   repo: https://github.com/pycqa/bandit
-    rev: 1.7.5
+    rev: 1.8.0
     hooks:
     -   id: bandit
         args: [

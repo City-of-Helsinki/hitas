@@ -64,12 +64,10 @@ class UUIDRelatedField(SlugRelatedField):
             raise ValidationError(f"Object does not exist with given id {value!r}.", code="invalid") from error
 
     @overload
-    def to_representation(self, obj: TModel) -> TModel:
-        ...
+    def to_representation(self, obj: TModel) -> TModel: ...
 
     @overload
-    def to_representation(self, obj: UUID) -> str:
-        ...
+    def to_representation(self, obj: UUID) -> str: ...
 
     def to_representation(self, obj):
         if isinstance(obj, UUID):

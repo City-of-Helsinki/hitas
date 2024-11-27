@@ -53,13 +53,11 @@ def latest_sale_qs(apartment_id: str | int, include_first_sale: bool = False) ->
 
 
 @overload
-def get_first_sale_acquisition_price(apartment_id: str) -> Subquery:
-    ...
+def get_first_sale_acquisition_price(apartment_id: str) -> Subquery: ...
 
 
 @overload
-def get_first_sale_acquisition_price(apartment_id: int) -> Optional[datetime.date]:
-    ...
+def get_first_sale_acquisition_price(apartment_id: int) -> Optional[datetime.date]: ...
 
 
 def get_first_sale_acquisition_price(apartment_id: str | int):
@@ -87,13 +85,11 @@ def get_first_sale_acquisition_price(apartment_id: str | int):
 
 
 @overload
-def get_first_sale_purchase_price(apartment_id: str) -> Subquery:
-    ...
+def get_first_sale_purchase_price(apartment_id: str) -> Subquery: ...
 
 
 @overload
-def get_first_sale_purchase_price(apartment_id: int) -> Optional[datetime.date]:
-    ...
+def get_first_sale_purchase_price(apartment_id: int) -> Optional[datetime.date]: ...
 
 
 def get_first_sale_purchase_price(apartment_id: str | int):
@@ -109,13 +105,11 @@ def get_first_sale_purchase_price(apartment_id: str | int):
 
 
 @overload
-def get_first_sale_loan_amount(apartment_id: str) -> Subquery:
-    ...
+def get_first_sale_loan_amount(apartment_id: str) -> Subquery: ...
 
 
 @overload
-def get_first_sale_loan_amount(apartment_id: int) -> Optional[datetime.date]:
-    ...
+def get_first_sale_loan_amount(apartment_id: int) -> Optional[datetime.date]: ...
 
 
 def get_first_sale_loan_amount(apartment_id: str | int):
@@ -131,13 +125,13 @@ def get_first_sale_loan_amount(apartment_id: str | int):
 
 
 @overload
-def get_latest_sale_purchase_price(apartment_id: str, *, include_first_sale: bool = False) -> Subquery:
-    ...
+def get_latest_sale_purchase_price(apartment_id: str, *, include_first_sale: bool = False) -> Subquery: ...
 
 
 @overload
-def get_latest_sale_purchase_price(apartment_id: int, *, include_first_sale: bool = False) -> Optional[datetime.date]:
-    ...
+def get_latest_sale_purchase_price(
+    apartment_id: int, *, include_first_sale: bool = False
+) -> Optional[datetime.date]: ...
 
 
 def get_latest_sale_purchase_price(apartment_id: str | int, *, include_first_sale: bool = False):
@@ -162,13 +156,11 @@ def get_latest_sale_purchase_price(apartment_id: str | int, *, include_first_sal
 
 
 @overload
-def get_first_sale_purchase_date(apartment_id: str) -> Subquery:
-    ...
+def get_first_sale_purchase_date(apartment_id: str) -> Subquery: ...
 
 
 @overload
-def get_first_sale_purchase_date(apartment_id: int) -> Optional[datetime.date]:
-    ...
+def get_first_sale_purchase_date(apartment_id: int) -> Optional[datetime.date]: ...
 
 
 def get_first_sale_purchase_date(apartment_id: str | int):
@@ -184,13 +176,13 @@ def get_first_sale_purchase_date(apartment_id: str | int):
 
 
 @overload
-def get_latest_sale_purchase_date(apartment_id: str, *, include_first_sale: bool = False) -> Subquery:
-    ...
+def get_latest_sale_purchase_date(apartment_id: str, *, include_first_sale: bool = False) -> Subquery: ...
 
 
 @overload
-def get_latest_sale_purchase_date(apartment_id: int, *, include_first_sale: bool = False) -> Optional[datetime.date]:
-    ...
+def get_latest_sale_purchase_date(
+    apartment_id: int, *, include_first_sale: bool = False
+) -> Optional[datetime.date]: ...
 
 
 def get_latest_sale_purchase_date(apartment_id: str | int, *, include_first_sale: bool = False):

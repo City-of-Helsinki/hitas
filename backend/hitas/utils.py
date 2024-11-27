@@ -200,13 +200,11 @@ def check_for_overlap(range_1: set[int], range_2: Iterable[int]) -> tuple[Option
 
 
 @overload
-def roundup(v: Decimal, precision: int = 2) -> Decimal:
-    ...
+def roundup(v: Decimal, precision: int = 2) -> Decimal: ...
 
 
 @overload
-def roundup(v: None, precision: int = 2) -> None:
-    ...
+def roundup(v: None, precision: int = 2) -> None: ...
 
 
 def roundup(v, precision: int = 2):
