@@ -13,6 +13,7 @@ from hitas.tests.factories.owner import OwnershipFactory
 class ApartmentSaleFactory(DjangoModelFactory):
     class Meta:
         model = ApartmentSale
+        skip_postgeneration_save = True
 
     apartment = factory.SubFactory(
         "hitas.tests.factories.ApartmentFactory",
