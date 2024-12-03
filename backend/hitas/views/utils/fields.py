@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from typing import Any, TypeVar, Union, overload
 from uuid import UUID
 
@@ -24,7 +25,9 @@ class ValueOrNullField(serializers.Field):
 
 
 class HitasDecimalField(serializers.DecimalField):
-    def __init__(self, max_digits=15, decimal_places=2, min_value=0, **kwargs):
+    def __init__(self, max_digits=15, decimal_places=2, min_value=None, **kwargs):
+        if min_value is None:
+            min_value = Decimal("0")
         super().__init__(max_digits=max_digits, decimal_places=decimal_places, min_value=min_value, **kwargs)
 
 

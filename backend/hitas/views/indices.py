@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from typing import ClassVar
 
 from dateutil.relativedelta import relativedelta
@@ -55,7 +56,7 @@ class IndicesFilterSet(HitasFilterSet):
 
 class IndicesSerializer(HitasModelSerializer):
     month = YearMonthSerializer(read_only=True)
-    value = HitasDecimalField(allow_null=True, min_value=1)
+    value = HitasDecimalField(allow_null=True, min_value=Decimal("1"))
 
     class Meta:
         model = MarketPriceIndex

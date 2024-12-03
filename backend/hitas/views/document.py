@@ -82,7 +82,7 @@ class HousingCompanyDocumentViewSet(DocumentViewSetBase):
 
     def get_queryset(self):
         housingcompany_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
-        return super().get_queryset().filter(housing_company_id=housingcompany_id)
+        return super().get_queryset().filter(housing_company_id=housingcompany_id).order_by("pk")
 
     def perform_create(self, serializer):
         housingcompany_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
@@ -95,7 +95,7 @@ class ApartmentDocumentViewSet(DocumentViewSetBase):
 
     def get_queryset(self):
         apartment_id = lookup_model_id_by_uuid(self.kwargs["apartment_uuid"], Apartment)
-        return super().get_queryset().filter(apartment_id=apartment_id)
+        return super().get_queryset().filter(apartment_id=apartment_id).order_by("pk")
 
     def perform_create(self, serializer):
         apartment_id = lookup_model_id_by_uuid(self.kwargs["apartment_uuid"], Apartment)
