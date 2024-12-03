@@ -50,7 +50,7 @@ factory-boy = "^3.3.1"
 ipython = "^8.29.0"
 openapi-core = "0.19.4"
 testcontainers = {extras = ["postgresql"], version = "^3.7.1"}
-django-debug-toolbar = "^4.4.6" # Updating to 4 breaks query count tests
+django-debug-toolbar = "^4.4.6"
 pre-commit = "^4.0.1"
 pypdf = "^5.1.0"
 sqlparse = "^0.5.2"
