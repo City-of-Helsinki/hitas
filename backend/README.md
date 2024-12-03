@@ -4,7 +4,7 @@
 ## Prerequisites
 
 * [Python 3.13](https://www.python.org/)
-* [Poetry >= 1.3.0](https://github.com/python-poetry/poetry#installation)
+* [Poetry >= 1.8.4](https://github.com/python-poetry/poetry#installation)
 * [Docker](https://docs.docker.com/get-docker/)
   * alternatively PostgreSQL 13
 
