@@ -69,7 +69,8 @@ faker = "^19"
 DJANGO_SETTINGS_MODULE = "config.settings"
 addopts = "--nomigrations"
 filterwarnings = [
-    "ignore::DeprecationWarning:openapi_core*",
+    # ignore DeprecationWarning for ast.NameConstant in reportlab <= 4.2
+    "ignore:^ast\\.NameConstant is deprecated and will be removed in Python 3\\.14\\; use ast\\.Constant instead$:DeprecationWarning:reportlab\\..*:0",
 ]
 norecursedirs = [
     "node_modules",
