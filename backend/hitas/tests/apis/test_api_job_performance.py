@@ -4,6 +4,7 @@ import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 from rest_framework import status
 
@@ -121,21 +122,21 @@ def test__api__job_performance__apartment_sales(api_client: HitasAPIClient, date
         action=LogEntry.Action.CREATE,
         content_type=ContentType.objects.get_for_model(ApartmentSale),
     )
-    log_entry1.timestamp = "2023-01-01"
+    log_entry1.timestamp = timezone.make_aware(datetime.datetime(2023, 1, 1))
     log_entry1.save()
 
     log_entry2 = LogEntryFactory(
         action=LogEntry.Action.CREATE,
         content_type=ContentType.objects.get_for_model(ApartmentSale),
     )
-    log_entry2.timestamp = "2023-01-02"
+    log_entry2.timestamp = timezone.make_aware(datetime.datetime(2023, 1, 2))
     log_entry2.save()
 
     log_entry3 = LogEntryFactory(
         action=LogEntry.Action.CREATE,
         content_type=ContentType.objects.get_for_model(ApartmentSale),
     )
-    log_entry3.timestamp = "2023-01-03"
+    log_entry3.timestamp = timezone.make_aware(datetime.datetime(2023, 1, 3))
     log_entry3.save()
 
     response = api_client.get(reverse("hitas:job-performance-apartment-sales") + "?" + urlencode(date_params))
