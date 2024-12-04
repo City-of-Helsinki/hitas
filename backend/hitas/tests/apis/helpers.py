@@ -26,8 +26,7 @@ from rest_framework.test import APIClient
 
 with open(f"{settings.BASE_DIR}/openapi.yaml", "r") as spec_file:
     openapi_spec_data = yaml.safe_load(spec_file)
-    for err in OpenAPIV30SpecValidator(openapi_spec_data).iter_errors():
-        raise err
+    OpenAPIV30SpecValidator(openapi_spec_data).validate()
     _openapi_spec = SchemaPath.from_dict(openapi_spec_data)
 
 
