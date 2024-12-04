@@ -414,7 +414,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
         return (
             HousingCompany.objects.select_related("postal_code")
             .annotate(_completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
-            .order_by(F("_completion_date").desc(nulls_last=None), "-id")
+            .order_by("-_completion_date", "-id")
         )
 
     def get_detail_queryset(self):
