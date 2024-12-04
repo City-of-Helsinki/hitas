@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Optional
 
 from dateutil.relativedelta import relativedelta
@@ -127,7 +128,7 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
                         # If this sale is earlier than the latest sale,
                         # its ownerships should be created as already soft-deleted.
                         deleted=(
-                            apartment.latest_purchase_date
+                            timezone.make_aware(datetime.combine((apartment.latest_purchase_date), datetime.min.time()))
                             if apartment.latest_purchase_date is not None
                             and validated_data["purchase_date"] < apartment.latest_purchase_date
                             else None

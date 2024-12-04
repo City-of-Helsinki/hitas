@@ -750,9 +750,9 @@ def build_regulated_ownerships_report_excel(ownerships: list[Ownership]) -> Work
             ]
         except KeyError:
             completion_date = ownership.apartment.building.real_estate.housing_company.completion_date
-            completion_dates_by_housing_company_id[
-                ownership.apartment.building.real_estate.housing_company.pk
-            ] = completion_date
+            completion_dates_by_housing_company_id[ownership.apartment.building.real_estate.housing_company.pk] = (
+                completion_date
+            )
         worksheet.append(
             OwnershipReportColumns(
                 owner_name=Owner.OBFUSCATED_OWNER_NAME if ownership.owner.non_disclosure else ownership.owner.name,

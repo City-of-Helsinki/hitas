@@ -1,5 +1,6 @@
-import pytest
 from _decimal import Decimal
+
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from rest_framework import status

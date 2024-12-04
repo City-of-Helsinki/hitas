@@ -257,13 +257,11 @@ def _validate_prices_and_surface_areas(housing_companies: list[HousingCompanyWit
 
 
 @overload
-def get_regulation_release_date(apartment_id: str) -> Subquery:
-    ...
+def get_regulation_release_date(apartment_id: str) -> Subquery: ...
 
 
 @overload
-def get_regulation_release_date(apartment_id: int) -> Optional[datetime.date]:
-    ...
+def get_regulation_release_date(apartment_id: int) -> Optional[datetime.date]: ...
 
 
 def get_regulation_release_date(housing_company_id: str | int):

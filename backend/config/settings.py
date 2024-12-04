@@ -228,7 +228,6 @@ if env("SENTRY_DSN"):
 LANGUAGE_CODE = "fi"
 TIME_ZONE = "Europe/Helsinki"
 USE_I18N = False
-USE_L10N = True
 USE_TZ = True
 LANGUAGES = [
     ("fi", gettext_lazy("Finnish")),

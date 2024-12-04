@@ -282,7 +282,7 @@ class HitasModelDecimalField(models.DecimalField):
 class HitasImprovement(HitasSafeDeleteModel):
     name: str = models.CharField(max_length=128)
     completion_date: datetime.date = models.DateField()
-    value: Decimal = HitasModelDecimalField(validators=[MinValueValidator(0)])
+    value: Decimal = HitasModelDecimalField(validators=[MinValueValidator(Decimal("0"))])
 
     class Meta:
         abstract = True

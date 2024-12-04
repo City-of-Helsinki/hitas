@@ -44,7 +44,7 @@ class EmailTemplateViewSet(HitasModelViewSet):
 
     def get_default_queryset(self):
         template_type = self.get_template_type()
-        return EmailTemplate.objects.filter(type=template_type).all()
+        return EmailTemplate.objects.filter(type=template_type).all().order_by("pk")
 
     def get_template_type(self) -> str:
         try:

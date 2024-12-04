@@ -5,6 +5,7 @@ from auditlog.models import LogEntry
 from django.db import models
 from django.db.models import Count, F, Q, Value
 from django.db.models.functions import Concat
+from django.utils import timezone
 
 from hitas.models import ApartmentSale, JobPerformance
 from hitas.models.job_performance import JobPerformanceSource
@@ -84,7 +85,7 @@ def find_apartment_sale_creations(start_date: datetime.date, end_date: datetime.
     return LogEntry.objects.get_for_model(ApartmentSale).filter(
         action=LogEntry.Action.CREATE,
         timestamp__range=(
-            datetime.datetime.combine(start_date, datetime.time.min),
-            datetime.datetime.combine(end_date, datetime.time.max),
+            timezone.make_aware(datetime.datetime.combine(start_date, datetime.time.min)),
+            timezone.make_aware(datetime.datetime.combine(end_date, datetime.time.max)),
         ),
     )

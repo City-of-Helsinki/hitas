@@ -46,3 +46,6 @@ class PDFBodyViewSet(HitasModelViewSet):
     model_class = PDFBody
     serializer_class = PDFBodySerializer
     lookup_field = "name"
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("pk")
