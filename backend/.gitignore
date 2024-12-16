@@ -1,7 +1,9 @@
-static
+/static
 mediaroot
 /oracle-data
 .pytest_cache
 .ruff_cache
 **.xlsx
+.~lock.*#
+*.~*
 !**/*.po
