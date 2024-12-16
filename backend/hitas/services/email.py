@@ -84,6 +84,7 @@ def render_confirmed_max_price_calculation_pdf(
         "body_parts": pdf_body.texts,
         "title": filename,
         "date_today": datetime.date.strftime(timezone.now().date(), "%d.%m.%Y"),
+        "three_months_after_date_today": (timezone.now() + datetime.timedelta(days=90)).date(),
     }
     pdf = render_to_pdf(template="confirmed_maximum_price.jinja", context=context)
     return filename, pdf

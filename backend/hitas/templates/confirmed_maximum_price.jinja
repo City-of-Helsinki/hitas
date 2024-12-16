@@ -136,7 +136,7 @@
         {% if is_surface_area_maximum %}
             Enimmäismyyntihinta on vahvistettu rajahinnan perusteella ja laskelma on voimassa {{ maximum_price_calculation.valid_until|format_date }} asti.
         {% else %}
-            Enimmäismyyntihinta on voimassa kolme kuukautta laskelman päiväyksestä.
+            Enimmäismyyntihinta on voimassa {{ three_months_after_date_today|format_date }} asti.
         {% endif %}
     </p>
     <div class="plain-text">{{ body_parts.0|linebreaks }}</div>

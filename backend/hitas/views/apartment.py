@@ -1024,6 +1024,7 @@ class ApartmentViewSet(HitasModelViewSet):
             "maximum_price_calculation": mpc,
             "user": request.user,
             "body_parts": body_parts,
+            "three_months_after_date_today": (timezone.now() + datetime.timedelta(days=90)).date(),
         }
         pdf = get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
 
