@@ -6,6 +6,7 @@
     <style>
         @page {
             size: A4 portrait;
+            @frame h_logo {-pdf-frame-content: header_logo; left: 50pt; width: 100pt; top: 35pt; height: 40pt;}
             @frame h_date {-pdf-frame-content: header_date; left: 325pt; width: 100pt; top: 50pt; height: 40pt;}
             @frame content_frame {left: 50pt; width: 512pt; top: 90pt; height: 632pt;}
             @frame footer {-pdf-frame-content: footer; left: 50pt; width: 500pt; top: 770pt; height: 50pt;}
@@ -36,6 +37,7 @@
 <body>
 
 {% block header %}
+    <div id="header_logo"><img src="{{ logo_path }}" width="90" /></div>
     <div id="header_date">{{ date_today }}</div>
     <div id="header_page_1">Liite 1</div>
     <div id="header_page_2">Liite 2</div>
