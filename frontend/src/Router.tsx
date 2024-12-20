@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Navigate, Route, Routes} from "react-router-dom";
 import App from "./app/App";
 import {selectIsAuthenticated} from "./app/authSlice";
@@ -35,6 +35,13 @@ export default function Router() {
     const protect = (element: React.JSX.Element) => {
         return isAuthenticated ? element : <Unauthorized />;
     };
+
+    function WindowClose() {
+        useEffect(() => {
+            window.close();
+        }, []);
+        return null;
+    }
 
     return (
         <Routes>
@@ -147,6 +154,10 @@ export default function Router() {
                 <Route
                     path="logout"
                     element={isAuthenticated ? <></> : <Logout />}
+                />
+                <Route
+                    path="window-close"
+                    element={<WindowClose />}
                 />
                 <Route
                     index
