@@ -69,7 +69,11 @@ const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
         const errorMessage = (result.error?.data as {detail: string})?.detail;
         if (errorMessage?.startsWith("CSRF Failed:")) {
             hdsToast.error("CSRF Virhe. Uudelleenohjataan kirjautumissivulle.");
-            window.location.href = getSignInUrl(window.location.href);
+            setTimeout(() => {
+                // Open login in a new window/tab to avoid losing form data
+                const callBackUrl = new URL("/window-close", window.location.origin).toString();
+                window.open(getSignInUrl(callBackUrl), "_blank");
+            }, 1000);
         }
     }
     return result;
