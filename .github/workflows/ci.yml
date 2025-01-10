@@ -61,7 +61,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: "Build frontend container"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v5
       with:
         context: frontend
         push: false
@@ -184,7 +184,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: "Build backend container"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v5
       with:
         context: backend
         push: false
