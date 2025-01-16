@@ -90,6 +90,18 @@ const LoadedApartmentSalePage = () => {
     };
 
     useEffect(() => {
+        // purchase_price validation is dependant on, for example, share of loans and other maximum price calculations.
+        // Cross-field validation isn't automatically handled by react-hook-form so we need to notify the form when there are changes.
+        const subscription = formObject.watch((_value) => {
+            // Only trigger purchase_price validation if it has a value to avoid premature "field required" error.
+            if (_value.purchase_price || _value.purchase_price === 0) {
+                formObject.trigger(["purchase_price"]);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [formObject.watch, formObject.trigger]);
+
+    useEffect(() => {
         // No need to trigger a validation when doing an apartments first sale
         // (Triggering can cause e.g. date fields to show errors prematurely if they are empty)
         if (!isApartmentFirstSale) {
