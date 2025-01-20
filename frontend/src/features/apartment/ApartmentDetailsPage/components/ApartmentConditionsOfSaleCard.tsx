@@ -1,4 +1,4 @@
-import {Button, Card, IconGlyphEuro, IconLock} from "hds-react";
+import {Button, Card, IconEuroSign, IconLock} from "hds-react";
 import {Link} from "react-router-dom";
 import {IApartmentConditionOfSale, IApartmentDetails, IHousingCompanyDetails} from "../../../../common/schemas";
 import {formatAddress, formatOwner, hdsToast} from "../../../../common/utils";
@@ -8,7 +8,7 @@ const ApartmentSaleButton = ({onClick, disabled}) => {
     return (
         <Button
             theme="black"
-            iconLeft={<IconGlyphEuro />}
+            iconLeft={<IconEuroSign />}
             onClick={onClick}
             disabled={disabled}
         >
