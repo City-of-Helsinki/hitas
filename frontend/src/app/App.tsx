@@ -1,7 +1,7 @@
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Container, Footer, IconSignout, Navigation} from "hds-react";
+import {Container, Footer, Logo, logoFi, Header, IconUser, IconSignin} from "hds-react";
 import React, {useEffect, useState} from "react";
-import {Link, Outlet} from "react-router-dom";
+import {NavLink, Outlet, useMatch} from "react-router-dom";
 import {Notifications} from "../common/components";
 import {useGetUserInfoQuery} from "../common/services";
 import {hdsToast} from "../common/utils";
@@ -76,40 +76,81 @@ const App = (): React.JSX.Element => {
         <div className="app-container">
             {environment.hasDevelopmentBanner && <div className="development-banner">{environment.name}</div>}
             <div className="App">
-                <Navigation
-                    title="Asumisen palvelut"
-                    menuToggleAriaLabel=""
-                    skipTo=""
-                    skipToContentLabel=""
-                    titleUrl="/"
-                >
-                    {!isUserInfoLoading && !token && (
-                        <Navigation.Actions>
-                            <Navigation.User
-                                authenticated={isAuthenticated && userTitle !== 0}
-                                buttonAriaLabel={`Käyttäjä ${userTitle}`}
-                                label="Kirjaudu sisään"
-                                onSignIn={signIn}
-                                userName={userTitle}
+                <Header>
+                    <Header.ActionBar
+                        title="Asumisen palvelut"
+                        frontPageLabel=""
+                        titleAriaLabel=""
+                        titleHref="/"
+                        logo={
+                            <Logo
+                                src={logoFi}
+                                alt="Helsingin kaupunki"
+                            />
+                        }
+                        logoAriaLabel="Helsingin kaupunki"
+                        logoHref="/"
+                        openFrontPageLinksAriaLabel="Avaa Etusivun linkkivalikko"
+                    >
+                        {!isUserInfoLoading && !token && (
+                            <Header.ActionBarItem
+                                fixedRightPosition
+                                label={isAuthenticated && userTitle ? `${userTitle}` : "Kirjaudu sisään"}
+                                icon={isAuthenticated ? <IconUser /> : <IconSignin />}
+                                onClick={isAuthenticated ? () => {} : signIn}
+                                id="action-bar-login"
                             >
-                                <Navigation.Item
-                                    onClick={logOut}
-                                    variant="supplementary"
-                                    label="Kirjaudu ulos"
-                                    icon={<IconSignout aria-hidden />}
-                                />
-                            </Navigation.User>
-                        </Navigation.Actions>
-                    )}
-                    <Navigation.Row ariaLabel="Main navigation">
-                        <Link to="housing-companies">Yhtiöt</Link>
-                        <Link to="apartments">Asunnot</Link>
-                        <Link to="codes">Koodisto</Link>
-                        <Link to="documents">Dokumenttipohjat</Link>
-                        <Link to="reports">Raportit</Link>
-                        <Link to="functions">Toiminnot</Link>
-                    </Navigation.Row>
-                </Navigation>
+                                {isAuthenticated ? (
+                                    <Header.ActionBarItem
+                                        label="Kirjaudu ulos"
+                                        closeLabel=""
+                                        onClick={logOut}
+                                        id="action-bar-logout"
+                                    />
+                                ) : null}
+                            </Header.ActionBarItem>
+                        )}
+                    </Header.ActionBar>
+
+                    <Header.NavigationMenu>
+                        <Header.Link
+                            as={NavLink}
+                            to="housing-companies"
+                            label="Yhtiöt"
+                            active={!!useMatch("/housing-companies/*")}
+                        />
+                        <Header.Link
+                            as={NavLink}
+                            to="apartments"
+                            label="Asunnot"
+                            active={!!useMatch("/apartments/*")}
+                        />
+                        <Header.Link
+                            as={NavLink}
+                            to="codes"
+                            label="Koodisto"
+                            active={!!useMatch("/codes/*")}
+                        />
+                        <Header.Link
+                            as={NavLink}
+                            to="documents"
+                            label="Dokumenttipohjat"
+                            active={!!useMatch("/documents/*")}
+                        />
+                        <Header.Link
+                            as={NavLink}
+                            to="reports"
+                            label="Raportit"
+                            active={!!useMatch("/reports/*")}
+                        />
+                        <Header.Link
+                            as={NavLink}
+                            to="functions"
+                            label="Toiminnot"
+                            active={!!useMatch("/functions/*")}
+                        />
+                    </Header.NavigationMenu>
+                </Header>
 
                 <Container className="main-content">
                     {isAuthenticating || isUserInfoLoading ? <Spinner /> : <Outlet />}
