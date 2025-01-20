@@ -158,7 +158,18 @@ const App = (): React.JSX.Element => {
 
                 <Notifications />
 
-                <Footer />
+                <Footer title="Asumisen palvelut">
+                    <Footer.Base
+                        backToTopLabel="Takaisin ylös"
+                        logo={
+                            <Logo
+                                src={logoFi}
+                                size="medium"
+                                alt="Helsingin kaupunki"
+                            />
+                        }
+                    />
+                </Footer>
             </div>
         </div>
     );
