@@ -49,7 +49,7 @@ class PropertyManagerViewSet(HitasModelViewSet):
     model_class = PropertyManager
 
     def get_queryset(self):
-        return PropertyManager.objects.all().order_by("id")
+        return PropertyManager.objects.all().order_by("name")
 
     def get_filterset_class(self):
         return PropertyManagerFilterSet

@@ -38,9 +38,9 @@ def test__api__owner__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__owner__list(api_client: HitasAPIClient):
-    owner1: Owner = OwnerFactory.create()
-    owner2: Owner = OwnerFactory.create()
-    non_disclosure_owner = OwnerFactory.create(non_disclosure=True)
+    owner1: Owner = OwnerFactory.create(name="Aa Testinen")
+    owner2: Owner = OwnerFactory.create(name="Bb Testinen")
+    non_disclosure_owner = OwnerFactory.create(name="Cc Testinen", non_disclosure=True)
     deobfuscate(non_disclosure_owner)
     url = reverse("hitas:owner-list")
     response = api_client.get(url)

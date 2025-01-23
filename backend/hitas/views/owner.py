@@ -78,6 +78,9 @@ class OwnerViewSet(HitasModelViewSet):
     serializer_class = OwnerSerializer
     model_class = NonObfuscatedOwner
 
+    def get_queryset(self):
+        return super().get_queryset().exclude(name="", identifier__isnull=True).order_by("name")
+
     def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         instance: Owner = self.get_object()
 

@@ -30,8 +30,8 @@ def test__api__property_manager__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__property_manager__list(api_client: HitasAPIClient):
-    pm1: PropertyManager = PropertyManagerFactory.create()
-    pm2: PropertyManager = PropertyManagerFactory.create()
+    pm1: PropertyManager = PropertyManagerFactory.create(name="Aa Testinen")
+    pm2: PropertyManager = PropertyManagerFactory.create(name="Bb Testinen")
 
     url = reverse("hitas:property-manager-list")
     response = api_client.get(url)
