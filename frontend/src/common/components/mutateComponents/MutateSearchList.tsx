@@ -1,6 +1,6 @@
 import {Button, IconCrossCircle, IconPlus, IconSearch, TextInput} from "hds-react";
 import {useCallback, useRef, useState} from "react";
-import {QueryStateHandler} from "../index";
+import {ListPageNumbers, QueryStateHandler} from "../index";
 import {IMutateFormProps, MutateModal} from "./index";
 
 interface IResultListProps<
@@ -35,12 +35,14 @@ function ResultList<
     setEmptyFilterParams,
     mutateFormProps,
 }: IResultListProps<TFilterQueryParams, TListFieldsWithTitles, TFormFieldsWithTitles>) {
+    const [currentPage, setCurrentPage] = useState(1);
+
     // ensure the params have minimum length
     Object.keys(params).forEach(
         (key) => params[key]?.length && params[key]?.length < searchStringMinLength && delete params[key]
     );
     // get the data
-    const {data, error, isLoading} = useGetQuery({...params, limit: resultListMaxRows});
+    const {data, error, isLoading} = useGetQuery({...params, limit: resultListMaxRows, page: currentPage});
 
     // state for the modals
     const [isMutateModalVisible, setIsMutateModalVisible] = useState(false);
@@ -94,6 +96,11 @@ function ResultList<
                 ))}
             </div>
             <div className="list-footer">
+                <ListPageNumbers
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    pageInfo={data?.page}
+                />
                 <div className="list-footer-item">
                     Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta
                 </div>
