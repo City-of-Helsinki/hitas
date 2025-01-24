@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser, MultiPartParser
@@ -45,6 +46,7 @@ class DocumentSerializerBase(HitasModelSerializer):
         file = validated_data.get("file")
         if file:
             validated_data["original_filename"] = file.name
+            validated_data["modified_at"] = timezone.now()
         return super().update(instance, validated_data)
 
 

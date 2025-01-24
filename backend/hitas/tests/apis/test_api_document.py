@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 
 from hitas.models import (
@@ -174,6 +177,57 @@ def test__api__housingcompany__document__update__file(api_client: HitasAPIClient
     document.refresh_from_db()
     assert document.file.read() == b"test file content 2"
     assert not document.file.storage.exists(old_filename), "Old file should be deleted from storage"
+
+
+@pytest.mark.django_db
+def test__api__document__modified_at(api_client: HitasAPIClient):
+    apartment = ApartmentFactory()
+    document = AparmentDocument.objects.create(
+        apartment=apartment, display_name="Test document", original_filename="testfile.txt"
+    )
+    response = api_client.put(
+        reverse(
+            "hitas:document-detail", args=[apartment.housing_company.uuid.hex, apartment.uuid.hex, document.uuid.hex]
+        ),
+        data={
+            "display_name": "Test document",
+            "file_content": SimpleUploadedFile("testfile.txt", b"test file content 1", content_type="text/plain"),
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    document.refresh_from_db()
+
+    # Pretend document was created 2 days ago
+    document.created_at = timezone.now() - timedelta(days=2)
+    document.modified_at = timezone.now() - timedelta(days=2)
+    document.save()
+    initial_modified_at = document.modified_at
+
+    # Update display_name
+    response = api_client.put(
+        reverse(
+            "hitas:document-detail", args=[apartment.housing_company.uuid.hex, apartment.uuid.hex, document.uuid.hex]
+        ),
+        data={
+            "display_name": "New name",
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    document.refresh_from_db()
+    assert document.modified_at == initial_modified_at, "modified_at should not change when updating display_name only"
+
+    response = api_client.put(
+        reverse(
+            "hitas:document-detail", args=[apartment.housing_company.uuid.hex, apartment.uuid.hex, document.uuid.hex]
+        ),
+        data={
+            "display_name": "New name",
+            "file_content": SimpleUploadedFile("testfile.txt", b"test file content 2", content_type="text/plain"),
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    document.refresh_from_db()
+    assert document.modified_at > initial_modified_at, "modified_at should change when updating file"
 
 
 @pytest.mark.django_db

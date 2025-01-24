@@ -33,7 +33,9 @@ class BaseDocument(ExternalSafeDeleteHitasModel):
     display_name = models.CharField(max_length=1024)
     original_filename = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    # This field is using `auto_now_add=True` instead of `auto_now=True` because
+    # we want to set the `modified_at` using custom logic for example when the file is updated.
+    modified_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
