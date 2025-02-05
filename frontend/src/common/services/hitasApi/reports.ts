@@ -47,6 +47,12 @@ export const downloadSalesReportPDF = ({startDate, endDate}: {startDate: string;
     fetchAndDownloadPDF(url);
 };
 
+export const downloadSalesAndMaximumPricesReportPDF = ({startDate, endDate}: {startDate: string; endDate: string}) => {
+    const params = `start_date=${startDate}&end_date=${endDate}`;
+    const url = `/reports/download-sales-and-maximum-prices-report?${params}`;
+    fetchAndDownloadPDF(url);
+};
+
 export const downloadSalesByPostalCodeAndAreaReportPDF = ({
     startDate,
     endDate,

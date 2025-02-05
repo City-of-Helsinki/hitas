@@ -38,6 +38,7 @@ from hitas.views.reports import (
     OwnershipsByHousingCompanyReport,
     RegulatedHousingCompaniesReportView,
     RegulatedOwnershipsReportView,
+    SalesAndMaximumPricesReportView,
     SalesByPostalCodeAndAreaReportView,
     SalesReportView,
     UnregulatedHousingCompaniesReportView,

@@ -10,6 +10,7 @@ import OwnerReports from "./components/OwnerReports";
 import {
     FirstSalesReportByAreas,
     ReSalesReportByAreas,
+    SalesAndMaximumPricesReport,
     SalesReportAll,
     SalesReportByAreas,
 } from "./components/SalesReports";
@@ -27,6 +28,8 @@ const ReportsPage = () => {
                 >
                     <Divider size="s" />
                     <SalesReportAll />
+                    <Divider size="s" />
+                    <SalesAndMaximumPricesReport />
                     <Divider size="s" />
                     <SalesReportByAreas />
                     <Divider size="s" />
