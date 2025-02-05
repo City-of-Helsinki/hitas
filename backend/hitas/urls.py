@@ -78,6 +78,13 @@ router.register(
 # /api/v1/reports/download-sales-report
 router.register(r"reports/download-sales-report", views.SalesReportView, basename="sales-report")
 
+# /api/v1/reports/download-sales-and-maximum-prices-report
+router.register(
+    r"reports/download-sales-and-maximum-prices-report",
+    views.SalesAndMaximumPricesReportView,
+    basename="sales-and-maximum-prices-report",
+)
+
 # /api/v1/reports/download-regulated-housing-companies-report
 router.register(
     r"reports/download-regulated-housing-companies-report",

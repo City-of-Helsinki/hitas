@@ -5,6 +5,7 @@ import {SalesReportFormSchema} from "../../../common/schemas";
 import {
     downloadFirstSalesByPostalCodeAndAreaReportPDF,
     downloadReSalesByPostalCodeAndAreaReportPDF,
+    downloadSalesAndMaximumPricesReportPDF,
     downloadSalesByPostalCodeAndAreaReportPDF,
     downloadSalesReportPDF,
 } from "../../../common/services";
@@ -61,6 +62,15 @@ export const SalesReportAll = () => {
         <BaseSalesReport
             header="Raportti kaikista kaupoista"
             downloadReportFunction={downloadSalesReportPDF}
+        />
+    );
+};
+
+export const SalesAndMaximumPricesReport = () => {
+    return (
+        <BaseSalesReport
+            header="Vertailu toteutuneet velattomat kauppa- ja enimmäishinnat"
+            downloadReportFunction={downloadSalesAndMaximumPricesReportPDF}
         />
     );
 };

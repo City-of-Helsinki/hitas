@@ -26,6 +26,7 @@ from hitas.services.reports import (
     build_owners_by_housing_companies_report_excel,
     build_regulated_housing_companies_report_excel,
     build_regulated_ownerships_report_excel,
+    build_sales_and_maximum_prices_report_excel,
     build_sales_by_postal_code_and_area_report_excel,
     build_sales_report_excel,
     build_unregulated_housing_companies_report_excel,
@@ -61,6 +62,22 @@ class SalesReportView(ViewSet):
         sales = find_sales_on_interval_for_reporting(start_date=start, end_date=end)
         workbook = build_sales_report_excel(sales)
         filename = f"Hitas kaupat aikavälillä {start.isoformat()} - {end.isoformat()}.xlsx"
+        return get_excel_response(filename=filename, excel=workbook)
+
+
+class SalesAndMaximumPricesReportView(ViewSet):
+    renderer_classes = [HitasJSONRenderer, ExcelRenderer]
+
+    def list(self, request: Request, *args, **kwargs) -> HttpResponse:
+        serializer = SalesReportSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        start: datetime.date = serializer.validated_data["start_date"]
+        end: datetime.date = serializer.validated_data["end_date"]
+
+        sales = find_sales_on_interval_for_reporting(start_date=start, end_date=end)
+        workbook = build_sales_and_maximum_prices_report_excel(sales)
+        filename = f"Hitas kauppa- ja enimmäishinnat aikavälillä {start.isoformat()} - {end.isoformat()}.xlsx"
         return get_excel_response(filename=filename, excel=workbook)
 
 

@@ -29,6 +29,8 @@ from hitas.tests.factories import (
     OwnerFactory,
     OwnershipFactory,
 )
+from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFactory
+from hitas.tests.factories.indices import SurfaceAreaPriceCeilingFactory
 
 # Sales report
 
@@ -412,7 +414,7 @@ def test__api__sales_report__surface_area_missing(api_client: HitasAPIClient):
             {
                 "field": "non_field_errors",
                 "message": (
-                    f"Surface are zero or missing for apartment {sale.apartment.address!r}. "
+                    f"Surface area zero or missing for apartment {sale.apartment.address!r}. "
                     f"Cannot calculate price per square meter."
                 ),
             }
@@ -421,6 +423,113 @@ def test__api__sales_report__surface_area_missing(api_client: HitasAPIClient):
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+@pytest.mark.django_db
+def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
+    # Create sales in the report interval
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 2, 15),
+        purchase_price=130_000,
+        apartment_share_of_housing_company_loans=100,
+        apartment__surface_area=100,
+        apartment__building__real_estate__housing_company__postal_code__value="00002",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+    # Valid calculation
+    ApartmentMaximumPriceCalculationFactory.create(
+        apartment=sale_1.apartment,
+        calculation_date=datetime.date(2019, 1, 1),
+        valid_until=datetime.date(2022, 1, 1),
+        maximum_price=150_000,
+    )
+    # Valid calculation but older
+    ApartmentMaximumPriceCalculationFactory.create(
+        apartment=sale_1.apartment,
+        calculation_date=datetime.date(2018, 1, 1),
+        valid_until=datetime.date(2021, 1, 1),
+        maximum_price=140_000,
+    )
+    # Invalid calculation, too old
+    ApartmentMaximumPriceCalculationFactory.create(
+        apartment=sale_1.apartment,
+        calculation_date=datetime.date(2018, 1, 1),
+        valid_until=datetime.date(2019, 1, 1),
+        maximum_price=120_000,
+    )
+    # Invalid calculation, too new
+    ApartmentMaximumPriceCalculationFactory.create(
+        apartment=sale_1.apartment,
+        calculation_date=datetime.date(2018, 1, 1),
+        valid_until=datetime.date(2019, 1, 1),
+        maximum_price=160_000,
+    )
+    # Sale 2 should fall back to using surface area price ceiling when no calculation is found
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2020, 2, 1), value=2000)
+
+    data = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-02-28",
+    }
+    url = reverse("hitas:sales-and-maximum-prices-report-list") + "?" + urlencode(data)
+    response: HttpResponse = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    rows = list(worksheet.values)
+    assert len(rows[0][0]) > 0, "Row 1 column 1 should have a title"
+    assert len(rows[0][1]) > 0, "Row 1 column 2 should have a title"
+    assert len(rows[0][2]) > 0, "Row 1 column 3 should have a title"
+    assert len(rows[0][3]) > 0, "Row 1 column 4 should have a title"
+    assert len(rows[0][4]) > 0, "Row 1 column 5 should have a title"
+    assert len(rows[0][5]) > 0, "Row 1 column 6 should have a title"
+    assert len(rows[0][6]) > 0, "Row 1 column 7 should have a title"
+    # Sale row 1
+    assert rows[1][0] == sale_1.apartment.postal_code.cost_area
+    assert rows[1][1] == sale_1.apartment.postal_code.value
+    assert rows[1][2] == sale_1.apartment.address
+    assert rows[1][3] == sale_1.apartment.surface_area
+    assert rows[1][4] == datetime.datetime.fromisoformat(sale_1.purchase_date.isoformat())
+    assert rows[1][5] == 60_000  # 50_000 € + 10_000 €
+    assert rows[1][6] == 600  # (50_000 € + 10_000 €) / 100 m²
+    assert rows[1][7] == 150_000
+    assert rows[1][8] == 1_500  # 150_000 € / 100 m²
+    # Sale row 2
+    assert rows[2][0] == sale_2.apartment.postal_code.cost_area
+    assert rows[2][1] == sale_2.apartment.postal_code.value
+    assert rows[2][2] == sale_2.apartment.address
+    assert rows[2][3] == sale_2.apartment.surface_area
+    assert rows[2][4] == datetime.datetime.fromisoformat(sale_2.purchase_date.isoformat())
+    assert rows[2][5] == 130_100
+    assert rows[2][6] == 1_301  # (130_000 + 100) / 100 m²
+    assert rows[2][7] == 200_000  # 2000 € * 100 m²
+    assert rows[2][8] == 2_000
+    # Totals - all sales
+    assert rows[4][5] == 2, "Total amount of sales should be 2"
+    assert rows[5][5] == 95_050, "Mean should be 95_050"
+    assert rows[6][5] == 130_100, "Maximum should be 130_100"
+    assert rows[7][5] == 60_000, "Minimum should be 60_000"
+    # Totals - cost area 1
+    assert rows[9][5] == 2, "Total amount of sales in cost area 1 should be 2"
+    assert rows[10][5] == 95_050, "Mean should be 95_050"
+    assert rows[11][5] == 130_100, "Maximum should be 130_100"
+    assert rows[12][5] == 60_000, "Minimum should be 60_000"
+    # Totals - cost area 2
+    assert rows[14][5] == 0, "Total amount of sales in cost area 2 should be 0"
+    assert rows[15][5] == 0, "Mean should be 0"
+    assert rows[16][5] == 0, "Maximum should be 0"
+    assert rows[17][5] == 0, "Minimum should be 0"
 
 
 # Regulated housing companies report
@@ -1203,7 +1312,7 @@ def test__api__sales_by_area_report__no_surface_area(api_client: HitasAPIClient)
             {
                 "field": "non_field_errors",
                 "message": (
-                    f"Surface are zero or missing for apartment {sale.apartment.address!r}. "
+                    f"Surface area zero or missing for apartment {sale.apartment.address!r}. "
                     f"Cannot calculate price per square meter."
                 ),
             }
