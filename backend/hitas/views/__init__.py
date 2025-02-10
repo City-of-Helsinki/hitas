@@ -36,6 +36,7 @@ from hitas.views.reports import (
     MultipleOwnershipsReportView,
     OwnershipsByCompanyJSONReportView,
     OwnershipsByHousingCompanyReport,
+    PropertyManagersReportView,
     RegulatedHousingCompaniesReportView,
     RegulatedOwnershipsReportView,
     SalesAndMaximumPricesReportView,

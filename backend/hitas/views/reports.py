@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from hitas.models import HousingCompany, Owner, Ownership
+from hitas.models.housing_company import RegulationStatus
+from hitas.models.property_manager import PropertyManager
 from hitas.services.apartment_sale import find_sales_on_interval_for_reporting
 from hitas.services.housing_company import (
     find_half_hitas_housing_companies_for_reporting,
@@ -24,6 +26,7 @@ from hitas.services.reports import (
     build_housing_company_state_report_excel,
     build_multiple_ownerships_report_excel,
     build_owners_by_housing_companies_report_excel,
+    build_property_managers_report_excel,
     build_regulated_housing_companies_report_excel,
     build_regulated_ownerships_report_excel,
     build_sales_and_maximum_prices_report_excel,
@@ -108,6 +111,26 @@ class UnregulatedHousingCompaniesReportView(ViewSet):
         housing_companies = find_unregulated_housing_companies_for_reporting()
         workbook = build_unregulated_housing_companies_report_excel(housing_companies)
         filename = "Vapautuneet yhtiöt.xlsx"
+        return get_excel_response(filename=filename, excel=workbook)
+
+
+class PropertyManagersReportView(ViewSet):
+    renderer_classes = [HitasJSONRenderer, ExcelRenderer]
+
+    def list(self, request: Request, *args, **kwargs) -> HttpResponse:
+        housing_companies = list(
+            HousingCompany.objects.filter(
+                property_manager__isnull=False,
+                regulation_status=RegulationStatus.REGULATED,
+            )
+            .select_related("property_manager")
+            .order_by("property_manager__name")
+        )
+        property_managers_with_no_housing_company = list(
+            PropertyManager.objects.filter(housing_companies__isnull=True).order_by("name")
+        )
+        workbook = build_property_managers_report_excel(housing_companies, property_managers_with_no_housing_company)
+        filename = "Isännöitsijät.xlsx"
         return get_excel_response(filename=filename, excel=workbook)
 
 
