@@ -106,6 +106,13 @@ router.register(
     basename="unregulated-housing-companies-report",
 )
 
+# /api/v1/reports/download-property-managers-report
+router.register(
+    r"reports/download-property-managers-report",
+    views.PropertyManagersReportView,
+    basename="property-managers-report",
+)
+
 # /api/v1/reports/housing-company-states
 router.register(
     r"reports/housing-company-states",

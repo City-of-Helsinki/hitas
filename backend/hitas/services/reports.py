@@ -15,6 +15,7 @@ from rest_framework.settings import api_settings
 from hitas.models import ApartmentSale, Owner
 from hitas.models.housing_company import (
     HitasType,
+    HousingCompany,
     HousingCompanyWithRegulatedReportAnnotations,
     HousingCompanyWithStateReportAnnotations,
     HousingCompanyWithUnregulatedReportAnnotations,
@@ -22,6 +23,7 @@ from hitas.models.housing_company import (
 )
 from hitas.models.indices import SurfaceAreaPriceCeiling
 from hitas.models.ownership import Ownership, OwnershipWithApartmentCount
+from hitas.models.property_manager import PropertyManager
 from hitas.utils import format_sheet, resize_columns
 
 T = TypeVar("T")
@@ -69,6 +71,12 @@ class UnregulatedHousingCompaniesReportColumns(NamedTuple):
     release_date: datetime.date | str
     released_by_ploy_department: str
     apartment_count: int | str
+
+
+class PropertyManagerReportColumns(NamedTuple):
+    property_manager_name: str
+    property_manager_email: str
+    housing_company_name: str
 
 
 class HousingCompanyStatesCount(TypedDict):
@@ -697,6 +705,58 @@ def build_unregulated_housing_companies_report_excel(
             "B": {"alignment": Alignment(horizontal="right")},
             "C": {"number_format": date_format},
             "D": {"number_format": date_format},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
+
+
+def build_property_managers_report_excel(
+    housing_companies: list[HousingCompany],
+    property_managers_with_no_housing_company: list[PropertyManager],
+) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = PropertyManagerReportColumns(
+        property_manager_name="Isännöitsijätoimisto/isännöitsijä",
+        property_manager_email="Sähköpostiosoite",
+        housing_company_name="Taloyhtiön nimi",
+    )
+    worksheet.append(column_headers)
+
+    for housing_company in housing_companies:
+        worksheet.append(
+            PropertyManagerReportColumns(
+                property_manager_name=housing_company.property_manager.name,
+                property_manager_email=housing_company.property_manager.email,
+                housing_company_name=housing_company.display_name,
+            )
+        )
+
+    for property_manager in property_managers_with_no_housing_company:
+        worksheet.append(
+            PropertyManagerReportColumns(
+                property_manager_name=property_manager.name,
+                property_manager_email=property_manager.email,
+                housing_company_name="",
+            )
+        )
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    column_letters = string.ascii_uppercase[: len(column_headers)]
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
         },
     )
 

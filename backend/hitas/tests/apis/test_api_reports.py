@@ -20,6 +20,7 @@ from hitas.models import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.models.property_manager import PropertyManager
 from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -31,6 +32,7 @@ from hitas.tests.factories import (
 )
 from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFactory
 from hitas.tests.factories.indices import SurfaceAreaPriceCeilingFactory
+from hitas.tests.factories.property_manager import PropertyManagerFactory
 
 # Sales report
 
@@ -1009,6 +1011,54 @@ def test__api__unregulated_housing_companies_report__multiple_housing_companies(
         ("Taloyhtiötä yhteensä", 2, None, None, None, None),
         ("Asuntoja yhteensä", 3, None, None, None, None),
     ]
+
+
+# Property managers and their housing companies report
+
+
+@pytest.mark.django_db
+def test__api__property_managers_report(api_client: HitasAPIClient):
+    property_manager_1: PropertyManager = PropertyManagerFactory.create(name="Property Manager A")
+    housing_company_1: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_1)
+
+    property_manager_2: PropertyManager = PropertyManagerFactory.create(name="Property Manager B")
+    housing_company_2: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_2)
+    housing_company_3: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_2)
+
+    property_manager_3: PropertyManager = PropertyManagerFactory.create(name="Property Manager C")
+    housing_company_4: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_3)
+
+    property_manager_4: PropertyManager = PropertyManagerFactory.create(name="Property Manager A2")
+
+    url = reverse("hitas:property-managers-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    rows = list(worksheet.values)
+    assert len(rows[0][0]) > 0, "Row 1 column 1 should have a title"
+    assert len(rows[0][1]) > 0, "Row 1 column 2 should have a title"
+    assert len(rows[0][2]) > 0, "Row 1 column 3 should have a title"
+    # Property manager 1
+    assert rows[1][0] == property_manager_1.name
+    assert rows[1][1] == property_manager_1.email
+    assert rows[1][2] == housing_company_1.display_name
+    # Property manager 2 - Two housing companies
+    assert rows[2][0] == property_manager_2.name
+    assert rows[2][1] == property_manager_2.email
+    assert rows[2][2] == housing_company_2.display_name
+    assert rows[3][0] == property_manager_2.name
+    assert rows[3][1] == property_manager_2.email
+    assert rows[3][2] == housing_company_3.display_name
+    # Property manager 3
+    assert rows[4][0] == property_manager_3.name
+    assert rows[4][1] == property_manager_3.email
+    assert rows[4][2] == housing_company_4.display_name
+    # Property manager 4 - No housing company
+    assert rows[5][0] == property_manager_4.name
+    assert rows[5][1] == property_manager_4.email
+    assert rows[5][2] is None
 
 
 # Housing company state report
