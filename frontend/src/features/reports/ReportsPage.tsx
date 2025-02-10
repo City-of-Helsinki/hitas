@@ -5,6 +5,7 @@ import {
     HousingCompanyReportHalfHitas,
     HousingCompanyReportReleased,
     HousingCompanyStatusTable,
+    PropertyManagerReport,
 } from "./components/HousingCompanyReports";
 import OwnerReports from "./components/OwnerReports";
 import {
@@ -50,6 +51,8 @@ const ReportsPage = () => {
                     <HousingCompanyReportReleased />
                     <Divider size="s" />
                     <HousingCompanyReportHalfHitas />
+                    <Divider size="s" />
+                    <PropertyManagerReport />
                 </Accordion>
 
                 <Accordion

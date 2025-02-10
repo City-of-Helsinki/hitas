@@ -6,6 +6,7 @@ import {
     downloadHalfHitasHousingCompaniesExcel,
     downloadRegulatedHousingCompaniesPDF,
     downloadUnregulatedHousingCompaniesPDF,
+    downloadPropertyManagersReport,
     useGetHousingCompanyStatesQuery,
 } from "../../../common/services";
 import {tableThemeBlack} from "../../../common/themes";
@@ -100,6 +101,23 @@ export const HousingCompanyReportHalfHitas = () => {
                     <DownloadButton
                         buttonText="Lataa raportti"
                         onClick={downloadHalfHitasHousingCompaniesExcel}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const PropertyManagerReport = () => {
+    return (
+        <div className="report-container">
+            <div className="column">
+                <Heading type="sub">Isännöitsijät</Heading>
+                <span>Listaus isännöitsijöistä ja heidän isännöimistään taloyhtiöistä</span>
+                <div>
+                    <DownloadButton
+                        buttonText="Lataa raportti"
+                        onClick={downloadPropertyManagersReport}
                     />
                 </div>
             </div>

@@ -108,6 +108,8 @@ export const downloadMultipleOwnershipsReportPDF = () =>
 export const downloadHousingCompanyWithOwnersExcel = (id: IAPIIdString) =>
     fetchAndDownloadPDF(`/reports/download-ownership-by-housing-company-report/${id}`);
 
+export const downloadPropertyManagersReport = () => fetchAndDownloadPDF("/reports/download-property-managers-report");
+
 // Mutations are used to allow invalidating cache when PDF is downloaded
 export const reportsApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
