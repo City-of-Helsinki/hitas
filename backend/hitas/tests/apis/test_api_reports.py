@@ -800,6 +800,7 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
 @pytest.mark.django_db
 def test__api__unregulated_housing_companies_report__legacy_release_date(api_client: HitasAPIClient):
     housing_company: HousingCompany = HousingCompanyFactory.create(
+        hitas_type=HitasType.HITAS_I,
         postal_code__value="00001",
         regulation_status=RegulationStatus.RELEASED_BY_HITAS,
         legacy_release_date=datetime.date(2022, 1, 1),
@@ -845,6 +846,7 @@ def test__api__unregulated_housing_companies_report__legacy_release_date(api_cli
 @pytest.mark.django_db
 def test__api__unregulated_housing_companies_report__regulation_release_date(api_client: HitasAPIClient):
     housing_company: HousingCompany = HousingCompanyFactory.create(
+        hitas_type=HitasType.HITAS_I,
         postal_code__value="00001",
         regulation_status=RegulationStatus.RELEASED_BY_HITAS,
     )
@@ -912,6 +914,7 @@ def test__api__unregulated_housing_companies_report__regulation_release_date(api
 @pytest.mark.django_db
 def test__api__unregulated_housing_companies_report__released_by_plot_department(api_client: HitasAPIClient):
     housing_company: HousingCompany = HousingCompanyFactory.create(
+        hitas_type=HitasType.HITAS_I,
         postal_code__value="00001",
         regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
         legacy_release_date=datetime.date(2022, 1, 1),
@@ -953,6 +956,7 @@ def test__api__unregulated_housing_companies_report__released_by_plot_department
 @pytest.mark.django_db
 def test__api__unregulated_housing_companies_report__multiple_housing_companies(api_client: HitasAPIClient):
     housing_company_1: HousingCompany = HousingCompanyFactory.create(
+        hitas_type=HitasType.HITAS_I,
         postal_code__value="00001",
         regulation_status=RegulationStatus.RELEASED_BY_HITAS,
         legacy_release_date=datetime.date(2022, 1, 1),
