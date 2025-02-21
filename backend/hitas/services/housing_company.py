@@ -372,6 +372,7 @@ def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWit
         HousingCompany.objects.select_related("postal_code")
         .prefetch_related("real_estates__buildings__apartments")
         .exclude(regulation_status=RegulationStatus.REGULATED)
+        .exclude(hitas_type=HitasType.HALF_HITAS)
         .annotate(
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
             apartment_count=Count("real_estates__buildings__apartments"),
