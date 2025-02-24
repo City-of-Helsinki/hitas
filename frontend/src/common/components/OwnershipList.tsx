@@ -60,10 +60,9 @@ const OwnershipList = () => {
                                 <span>%</span>
                             </div>
                             <div className="icon--remove">
-                                <IconCrossCircle
-                                    size="m"
-                                    onClick={() => remove(index)}
-                                />
+                                <span onClick={() => remove(index)}>
+                                    <IconCrossCircle size="m" />
+                                </span>
                             </div>
                         </li>
                     ))}
