@@ -5648,20 +5648,20 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
-hds-core@3.12.0:
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-3.12.0.tgz#ac47ec2e5c03d5685cdbf27b1c4a7b8ac24fe3d8"
-  integrity sha512-k7veK50ddSxDg97aT/WN7Wf1wCxKoZaJQNTkQvUbrbjDVN5dRUXcOyxcB7ygsSoGWHj4Rv4K2To4gUwrWG4B3A==
+hds-core@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-4.2.0.tgz#2b7bbd94b48a5246c1abdc109d0c4dfdbfed7f32"
+  integrity sha512-D9GqQ/CdIrJp2ypQRB2FEbkfT/D4s/ehjwSWVQ/7pc5bZ8plOEvUTaIf2Kfl46/7U8QrQ6+N9BUd8nSl9TE0hA==
 
-hds-design-tokens@^3.12.0:
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-3.12.0.tgz#1a0b5b73cb1d9da8fffbc76154cf436a3032b4b1"
-  integrity sha512-Pu9oESUoKgYtmlKrdRKcAHodyxJw8fm0qizsqNhfsfZE5Ln88ZkoaCoZLCC4Cyh7sfsCEZh9/1yuoO0Kktf8+Q==
+hds-design-tokens@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-4.2.0.tgz#ed750ca6cd4ea5c90f1034c7921b17f0ee0fa3f2"
+  integrity sha512-rcYFYkVdoThf53pQANnSrif+4y9IW19aSY5q60lf6odhOD24SjB5LKSaJJzd2HXdWQApd3QaIp5HTicSPDmaYQ==
 
-hds-react@^3.12.0:
-  version "3.12.0"
-  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-3.12.0.tgz#cc09dadee2f0ce0a645b402dde80475e970701b1"
-  integrity sha512-g28KjAbZ/yGW4rxnrb+cJD+CVn8FdClkytSd4oJwC1UmSUuF0C8dQLITPDEbEEVfYFnbbuU+bGQZ79/0tWcUSA==
+hds-react@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-4.2.0.tgz#5d8318f5883ea528bc8c30163ccfa0593fa93393"
+  integrity sha512-Tj1TzAb2Ov+JO/WSllcEvD3vlxEkSjJznTBcF1ScrAV/ZNwPDsIix+cs7bVFY/uNB8Kl2qoESf9vcd88cN0HSQ==
   dependencies:
     "@apollo/client" "^3.10.1"
     "@babel/runtime" "7.17.9"
@@ -5679,7 +5679,7 @@ hds-react@^3.12.0:
     date-fns "2.16.1"
     downshift "6.0.6"
     graphql "^16.8.1"
-    hds-core "3.12.0"
+    hds-core "4.2.0"
     jwt-decode "^3.1.2"
     kashe "1.0.4"
     lodash "^4.17.21"
