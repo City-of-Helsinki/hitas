@@ -75,10 +75,9 @@ const ImprovementRemoveLineButton = ({name, index, remove}) => {
 
     return (
         <div className="icon--remove">
-            <IconCrossCircle
-                size="m"
-                onClick={handleRemoveButtonPress}
-            />
+            <span onClick={handleRemoveButtonPress}>
+                <IconCrossCircle size="m" />
+            </span>
 
             <ConfirmDialogModal
                 modalText="Haluatko varmasti poistaa parannuksen?"
