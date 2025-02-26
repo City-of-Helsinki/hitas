@@ -1,6 +1,6 @@
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Accordion, Button, Dialog} from "hds-react";
+import {Accordion, AccordionSize, Button, ButtonPresetTheme, ButtonVariant, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React from "react";
@@ -42,8 +42,8 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
                 {(linkURL || baseURL) && (
                     <Link to={linkURL || baseURL + data.id}>
                         <Button
-                            variant="secondary"
-                            theme="black"
+                            variant={ButtonVariant.Secondary}
+                            theme={ButtonPresetTheme.Black}
                         >
                             {linkText}
                         </Button>
@@ -51,8 +51,8 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
                 )}
                 <Button
                     onClick={() => window.location.reload()}
-                    variant="secondary"
-                    theme="black"
+                    variant={ButtonVariant.Secondary}
+                    theme={ButtonPresetTheme.Black}
                 >
                     Uusi
                 </Button>
@@ -73,7 +73,7 @@ const ActionFailed = ({error}) => {
             </h3>
             {errorFields.length > 1 ? (
                 <Accordion
-                    size="s"
+                    size={AccordionSize.Small}
                     heading="Virheelliset kentät"
                     closeButton={false}
                     initiallyOpen={true}
@@ -143,8 +143,8 @@ export default function SaveDialogModal({
             <Dialog.ActionButtons>
                 <Button
                     onClick={() => setIsVisible(false)}
-                    variant="secondary"
-                    theme="black"
+                    variant={ButtonVariant.Secondary}
+                    theme={ButtonPresetTheme.Black}
                 >
                     Sulje
                 </Button>

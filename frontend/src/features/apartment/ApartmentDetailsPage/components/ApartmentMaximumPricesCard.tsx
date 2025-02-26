@@ -1,4 +1,4 @@
-import {Button, Card, IconDownload} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, Card, IconDownload} from "hds-react";
 import {useContext, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {Link} from "react-router-dom";
@@ -231,8 +231,8 @@ const ApartmentMaximumPricesCard = ({
                 <MaximumPriceDownloadModalButton />
                 <Link to="max-price">
                     <Button
-                        theme="black"
-                        size="small"
+                        theme={ButtonPresetTheme.Black}
+                        size={ButtonSize.Small}
                         disabled={
                             (housingCompany.hitas_type !== "rr_new_hitas" && !housingCompany.completion_date) ||
                             housingCompany.regulation_status !== "regulated" ||

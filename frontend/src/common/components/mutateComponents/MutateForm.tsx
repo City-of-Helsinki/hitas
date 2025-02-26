@@ -1,5 +1,5 @@
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Button, IconArrowLeft} from "hds-react";
+import {Button, ButtonPresetTheme, IconArrowLeft} from "hds-react";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {hdsToast} from "../../utils";
@@ -136,8 +136,8 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
                     ))}
                 <div className="row row--buttons">
                     <Button
-                        theme="black"
-                        iconLeft={<IconArrowLeft />}
+                        theme={ButtonPresetTheme.Black}
+                        iconStart={<IconArrowLeft />}
                         onClick={close}
                     >
                         Peruuta

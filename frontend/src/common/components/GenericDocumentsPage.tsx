@@ -1,4 +1,15 @@
-import {Button, Fieldset, IconArrowLeft, IconCrossCircle, IconDocument, IconPlus, StatusLabel} from "hds-react";
+import {
+    Button,
+    ButtonPresetTheme,
+    ButtonVariant,
+    Fieldset,
+    IconArrowLeft,
+    IconCrossCircle,
+    IconDocument,
+    IconPlus,
+    IconSize,
+    StatusLabel,
+} from "hds-react";
 import {useCallback, useState} from "react";
 import {SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {IApartmentDetails, IHousingCompanyDetails} from "../schemas";
@@ -37,8 +48,8 @@ const DocumentAddEmptyLineButton = ({append}) => {
                     ...emptyDocument,
                 })
             }
-            iconLeft={<IconPlus />}
-            theme="black"
+            iconStart={<IconPlus />}
+            theme={ButtonPresetTheme.Black}
         >
             Lisää dokumentti
         </Button>
@@ -65,7 +76,7 @@ const DocumentRemoveLineButton = ({name, index, remove}) => {
     return (
         <div className="icon--remove">
             <span onClick={handleRemoveButtonPress}>
-                <IconCrossCircle size="m" />
+                <IconCrossCircle size={IconSize.Medium} />
             </span>
 
             <ConfirmDialogModal
@@ -301,9 +312,9 @@ const GenericDocumentsPage = ({housingCompany, apartment}: IGenericDocumentsPage
                         style={{marginTop: "0"}}
                     >
                         <Button
-                            iconLeft={<IconArrowLeft />}
-                            theme="black"
-                            variant="secondary"
+                            iconStart={<IconArrowLeft />}
+                            theme={ButtonPresetTheme.Black}
+                            variant={ButtonVariant.Secondary}
                             className="back-button"
                             onClick={onBackButtonClick}
                         >
@@ -348,9 +359,9 @@ const GenericDocumentsPage = ({housingCompany, apartment}: IGenericDocumentsPage
                 </div>
                 <div className="row row--buttons">
                     <Button
-                        iconLeft={<IconArrowLeft />}
-                        theme="black"
-                        variant="secondary"
+                        iconStart={<IconArrowLeft />}
+                        theme={ButtonPresetTheme.Black}
+                        variant={ButtonVariant.Secondary}
                         className="back-button"
                         onClick={onBackButtonClick}
                     >

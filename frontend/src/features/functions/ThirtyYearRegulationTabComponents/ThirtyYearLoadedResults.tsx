@@ -1,4 +1,4 @@
-import {Button, Dialog} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, ButtonVariant, Dialog} from "hds-react";
 import React, {useState} from "react";
 import {CloseButton, Divider, Heading} from "../../../common/components";
 import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./index";
@@ -40,9 +40,9 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
                     {category === "freed" ? "Valvonnasta vapautetut " : "Valvonnan piiriin jäävät"} yhtiöt
                     {category === "freed" && obfuscatedOwners.length > 0 && (
                         <Button
-                            theme="black"
-                            variant="secondary"
-                            size="small"
+                            theme={ButtonPresetTheme.Black}
+                            variant={ButtonVariant.Secondary}
+                            size={ButtonSize.Small}
                             onClick={() => setIsModalOpen((prev) => !prev)}
                             className="obfuscated-owners-button"
                         >
