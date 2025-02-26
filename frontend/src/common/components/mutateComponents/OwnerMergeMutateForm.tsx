@@ -1,4 +1,4 @@
-import {Button, Dialog, IconArrowLeft} from "hds-react";
+import {Button, ButtonPresetTheme, Dialog, IconArrowLeft} from "hds-react";
 import {TextInput as HDSTextInput, RadioButton} from "hds-react";
 import {useRef, useState} from "react";
 import {FormProviderForm, RelatedModelInput} from "../forms";
@@ -209,8 +209,8 @@ export function OwnerMergeForm({firstOwner, cancelAction, closeModal}) {
                 </div>
                 <div className="row row--buttons">
                     <Button
-                        theme="black"
-                        iconLeft={<IconArrowLeft />}
+                        theme={ButtonPresetTheme.Black}
+                        iconStart={<IconArrowLeft />}
                         onClick={cancelAction}
                     >
                         Peruuta

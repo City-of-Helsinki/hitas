@@ -1,4 +1,4 @@
-import {Button, Card, IconEuroSign, IconLock} from "hds-react";
+import {Button, ButtonPresetTheme, Card, IconEuroSign, IconLock} from "hds-react";
 import {Link} from "react-router-dom";
 import {IApartmentConditionOfSale, IApartmentDetails, IHousingCompanyDetails} from "../../../../common/schemas";
 import {formatAddress, formatOwner, hdsToast} from "../../../../common/utils";
@@ -7,8 +7,8 @@ import ConditionsOfSaleStatus from "../../components/ConditionsOfSaleStatus";
 const ApartmentSaleButton = ({onClick, disabled}) => {
     return (
         <Button
-            theme="black"
-            iconLeft={<IconEuroSign />}
+            theme={ButtonPresetTheme.Black}
+            iconStart={<IconEuroSign />}
             onClick={onClick}
             disabled={disabled}
         >
@@ -139,8 +139,8 @@ const ApartmentConditionsOfSaleCard = ({
                 />
                 <Link to="conditions-of-sale">
                     <Button
-                        theme="black"
-                        iconLeft={<IconLock />}
+                        theme={ButtonPresetTheme.Black}
+                        iconStart={<IconLock />}
                         disabled={
                             !apartment.ownerships.length ||
                             housingCompany.regulation_status !== "regulated" ||

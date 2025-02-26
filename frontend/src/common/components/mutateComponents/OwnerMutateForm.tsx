@@ -1,5 +1,5 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
-import {Button, IconArrowLeft, IconUser} from "hds-react";
+import {Button, ButtonPresetTheme, IconArrowLeft, IconUser} from "hds-react";
 import {useEffect, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -147,8 +147,8 @@ export default function OwnerMutateForm({
                 }
                 <div className="row row--buttons">
                     <Button
-                        theme="black"
-                        iconLeft={<IconArrowLeft />}
+                        theme={ButtonPresetTheme.Black}
+                        iconStart={<IconArrowLeft />}
                         onClick={closeModal}
                     >
                         Peruuta
@@ -156,8 +156,8 @@ export default function OwnerMutateForm({
 
                     {owner !== undefined && (
                         <Button
-                            theme="black"
-                            iconLeft={<IconUser />}
+                            theme={ButtonPresetTheme.Black}
+                            iconStart={<IconUser />}
                             onClick={() => {
                                 setIsOwnerMergeModalVisible(true);
                             }}

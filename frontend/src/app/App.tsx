@@ -1,5 +1,5 @@
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Container, Footer, Logo, logoFi, Header, IconUser, IconSignin} from "hds-react";
+import {Container, Footer, Logo, logoFi, Header, IconUser, IconSignin, LogoSize} from "hds-react";
 import React, {useEffect, useState} from "react";
 import {NavLink, Outlet, useMatch} from "react-router-dom";
 import {Notifications} from "../common/components";
@@ -164,7 +164,7 @@ const App = (): React.JSX.Element => {
                         logo={
                             <Logo
                                 src={logoFi}
-                                size="medium"
+                                size={LogoSize.Medium}
                                 alt="Helsingin kaupunki"
                             />
                         }

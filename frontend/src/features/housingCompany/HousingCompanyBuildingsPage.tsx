@@ -1,6 +1,6 @@
 import React, {useContext, useRef, useState} from "react";
 
-import {Button, IconPlus, IconTrash, Table} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, IconPlus, IconTrash, Table} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
@@ -73,10 +73,10 @@ const ModifyBuildingButton = ({building}: {building?: IAnnotatedBuilding}) => {
     return (
         <>
             <Button
-                theme="black"
-                iconLeft={<IconPlus />}
+                theme={ButtonPresetTheme.Black}
+                iconStart={<IconPlus />}
                 onClick={() => setIsModalOpen(true)}
-                size={isEditing ? "small" : "default"}
+                size={isEditing ? ButtonSize.Small : ButtonSize.Medium}
             >
                 {isEditing ? "Muokkaa" : "Lisää uusi"}
             </Button>
@@ -149,7 +149,7 @@ const DeleteBuildingButton = ({building}: {building: IAnnotatedBuilding}) => {
             <DeleteButton
                 onClick={() => setIsModalOpen(true)}
                 isLoading={isLoading}
-                size="small"
+                size={ButtonSize.Small}
             />
             <GenericActionModal
                 title="Poista rakennus"

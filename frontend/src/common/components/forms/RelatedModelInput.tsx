@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
+import {Button, ButtonPresetTheme, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
 
 import {useFormContext} from "react-hook-form";
 import {dotted} from "../../utils";
@@ -177,8 +177,8 @@ const RelatedModelModal = ({
                             </QueryStateHandler>
                             {RelatedModelMutateComponent ? (
                                 <Button
-                                    theme="black"
-                                    iconLeft={<IconPlus />}
+                                    theme={ButtonPresetTheme.Black}
+                                    iconStart={<IconPlus />}
                                     onClick={() => setIsRelatedModelMutateVisible(true)}
                                 >
                                     Luo uusi

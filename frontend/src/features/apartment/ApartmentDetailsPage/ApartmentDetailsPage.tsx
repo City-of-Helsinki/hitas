@@ -1,4 +1,14 @@
-import {Button, IconAlertCircle, IconAngleLeft, IconAngleRight, Select, Tabs} from "hds-react";
+import {
+    Button,
+    ButtonPresetTheme,
+    ButtonVariant,
+    IconAlertCircle,
+    IconAngleLeft,
+    IconAngleRight,
+    IconSize,
+    Select,
+    Tabs,
+} from "hds-react";
 import React, {useContext, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {DetailField, Divider, DocumentsTable, EditButton, Heading, ImprovementsTable} from "../../../common/components";
@@ -84,7 +94,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
             <div className="alert-icon-background">
                 <IconAlertCircle
                     className="alert-icon"
-                    size="m"
+                    size={IconSize.Medium}
                 />
             </div>
             <span>Asunnossa turvakiellon alaisia omistajia</span>
@@ -119,12 +129,11 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                             to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${previousApartment.id}`}
                         >
                             <Button
-                                variant="supplementary"
-                                theme="black"
-                                iconLeft={<IconAngleLeft />}
+                                variant={ButtonVariant.Supplementary}
+                                theme={ButtonPresetTheme.Black}
+                                iconStart={<IconAngleLeft />}
                             >
-                                {previousApartment.stair}
-                                {previousApartment.apartment_number}
+                                {`${previousApartment.stair}${previousApartment.apartment_number}`}
                             </Button>
                         </Link>
                     )}
@@ -133,12 +142,11 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                             to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${nextApartment.id}`}
                         >
                             <Button
-                                variant="supplementary"
-                                theme="black"
-                                iconRight={<IconAngleRight />}
+                                variant={ButtonVariant.Supplementary}
+                                theme={ButtonPresetTheme.Black}
+                                iconEnd={<IconAngleRight />}
                             >
-                                {nextApartment.stair}
-                                {nextApartment.apartment_number}
+                                {`${nextApartment.stair}${nextApartment.apartment_number}`}
                             </Button>
                         </Link>
                     )}
