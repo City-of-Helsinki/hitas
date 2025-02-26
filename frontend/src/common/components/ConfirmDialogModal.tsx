@@ -1,6 +1,6 @@
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Button, Dialog} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonVariant, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {ReactNode} from "react";
@@ -36,8 +36,8 @@ const ActionFailed = ({error, setIsVisible}) => {
             <Dialog.ActionButtons>
                 <Button
                     onClick={() => setIsVisible(false)}
-                    variant="secondary"
-                    theme="black"
+                    variant={ButtonVariant.Secondary}
+                    theme={ButtonPresetTheme.Black}
                 >
                     Sulje
                 </Button>
@@ -54,8 +54,8 @@ const ActionSuccess = ({successText, linkURL, linkText}) => {
                 <>
                     <Link to={linkURL}>
                         <Button
-                            variant="secondary"
-                            theme="black"
+                            variant={ButtonVariant.Secondary}
+                            theme={ButtonPresetTheme.Black}
                         >
                             {linkText}
                         </Button>
@@ -73,14 +73,14 @@ const DefaultDialogContent = ({modalText, cancelAction, confirmAction, buttonTex
             <p>{modalText}</p>
             <div className="row row--buttons">
                 <Button
-                    theme="black"
-                    variant="secondary"
+                    theme={ButtonPresetTheme.Black}
+                    variant={ButtonVariant.Secondary}
                     onClick={cancelAction}
                 >
                     {cancelButtonText ?? "Peruuta"}
                 </Button>
                 <Button
-                    theme="black"
+                    theme={ButtonPresetTheme.Black}
                     onClick={() => {
                         confirmAction();
                     }}

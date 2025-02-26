@@ -1,4 +1,4 @@
-import {Button, IconPen} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, IconPen} from "hds-react";
 import React from "react";
 import {Link} from "react-router-dom";
 
@@ -19,9 +19,9 @@ export default function EditButton({
             className={className}
         >
             <Button
-                theme="black"
-                size="small"
-                iconLeft={<IconPen />}
+                theme={ButtonPresetTheme.Black}
+                size={ButtonSize.Small}
+                iconStart={<IconPen />}
                 disabled={disabled}
             >
                 Muokkaa

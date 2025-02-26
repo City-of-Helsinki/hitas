@@ -1,4 +1,4 @@
-import {Button, IconCross} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonVariant, IconCross, LoadingSpinner} from "hds-react";
 import React from "react";
 
 interface CloseButtonProps {
@@ -14,11 +14,10 @@ export default function CloseButton({
 }: CloseButtonProps): React.JSX.Element {
     return (
         <Button
-            iconLeft={<IconCross />}
-            variant="secondary"
-            theme="black"
+            iconStart={isLoading ? <LoadingSpinner small /> : <IconCross />}
+            variant={ButtonVariant.Secondary}
+            theme={ButtonPresetTheme.Black}
             onClick={onClick}
-            isLoading={isLoading}
             disabled={disabled}
         >
             Sulje

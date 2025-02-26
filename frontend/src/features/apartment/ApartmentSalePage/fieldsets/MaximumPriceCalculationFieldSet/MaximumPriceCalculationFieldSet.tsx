@@ -1,4 +1,4 @@
-import {Fieldset} from "hds-react";
+import {ButtonVariant, Fieldset} from "hds-react";
 import {useContext} from "react";
 import {useFormContext} from "react-hook-form";
 import {SimpleErrorMessage} from "../../../../../common/components";
@@ -52,7 +52,7 @@ const MaximumPriceCalculationFieldSet = () => {
             />
 
             <CreateMaximumPriceCalculationButton
-                buttonVariant={hasLoanValueChanged ? "primary" : "secondary"}
+                buttonVariant={hasLoanValueChanged ? ButtonVariant.Primary : ButtonVariant.Secondary}
                 getParsedFormData={getParsedFormData}
             />
         </Fieldset>

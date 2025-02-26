@@ -1,4 +1,4 @@
-import {Button, IconTrash} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, ButtonVariant, IconTrash, LoadingSpinner} from "hds-react";
 import React from "react";
 
 interface DeleteButtonProps {
@@ -6,10 +6,11 @@ interface DeleteButtonProps {
     isLoading?: boolean;
     buttonText?: string;
     disabled?: boolean;
-    variant?: "primary" | "secondary" | "success" | "danger";
+    variant?: ButtonVariant;
     className?: string;
-    size?: "small" | "default";
-    iconLeft?: React.ReactNode;
+    size?: ButtonSize;
+    iconStart?: React.ReactNode;
+    iconEnd?: React.ReactNode;
 }
 
 export default function DeleteButton({
@@ -17,18 +18,19 @@ export default function DeleteButton({
     isLoading,
     disabled = false,
     buttonText = "Poista",
-    iconLeft,
+    iconStart,
     className = "",
+    variant = ButtonVariant.Primary,
     ...rest
 }: DeleteButtonProps): React.JSX.Element {
     return (
         <Button
-            iconLeft={iconLeft ?? <IconTrash />}
-            theme="black"
+            iconStart={isLoading ? <LoadingSpinner small /> : iconStart ?? <IconTrash />}
+            theme={ButtonPresetTheme.Black}
             onClick={onClick}
-            isLoading={isLoading}
             disabled={disabled}
             className={`delete-button ${className}`}
+            variant={variant}
             {...rest}
         >
             {buttonText}

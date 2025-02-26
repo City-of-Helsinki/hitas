@@ -1,4 +1,4 @@
-import {Button, IconHistory, StatusLabel} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, IconHistory, StatusLabel} from "hds-react";
 import {Link, useLocation, useParams} from "react-router-dom";
 
 import {EditButton, GenericActionModal, Heading, QueryStateHandler} from "../../../common/components";
@@ -49,9 +49,9 @@ const CancelHousingCompanyRegulationReleaseButton = ({
     return (
         <>
             <Button
-                theme="black"
-                size="small"
-                iconLeft={<IconHistory />}
+                theme={ButtonPresetTheme.Black}
+                size={ButtonSize.Small}
+                iconStart={<IconHistory />}
                 onClick={() => setIsModalOpen(true)}
             >
                 Peruuta vapautus
@@ -64,9 +64,9 @@ const CancelHousingCompanyRegulationReleaseButton = ({
                 closeModal={() => setIsModalOpen(false)}
                 confirmButton={
                     <Button
-                        theme="black"
-                        size="small"
-                        iconLeft={<IconHistory />}
+                        theme={ButtonPresetTheme.Black}
+                        size={ButtonSize.Small}
+                        iconStart={<IconHistory />}
                         onClick={handleCancelHousingCompanyRelease}
                     >
                         Peruuta vapautus

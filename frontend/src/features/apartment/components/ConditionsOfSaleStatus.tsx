@@ -1,4 +1,4 @@
-import {IconLock, IconLockOpen, StatusLabel} from "hds-react";
+import {IconLock, IconLockOpen, IconSize, StatusLabel} from "hds-react";
 
 import {IApartment, IApartmentConditionOfSale, IApartmentDetails} from "../../../common/schemas";
 import {formatDate} from "../../../common/utils";
@@ -66,7 +66,7 @@ const ConditionsOfSaleStatus = ({apartment, conditionOfSale, withSellByDate = tr
         <StatusLabel
             className={`conditions-of-sale-status${withSellByDate ? " conditions-of-sale-status--with-date" : ""}`}
             type={getConditionsOfSaleStatusLabelType()}
-            iconLeft={fulfilled ? <IconLockOpen size="s" /> : <IconLock size="s" />}
+            iconStart={fulfilled ? <IconLockOpen size={IconSize.Small} /> : <IconLock size={IconSize.Small} />}
         >
             {withSellByDate ? (
                 <ConditionsOfSaleStatusText
