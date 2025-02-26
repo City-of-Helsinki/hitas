@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
+import {Button, ButtonPresetTheme, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link, useNavigate} from "react-router-dom";
 
 import {Heading, ListPageNumbers, QueryStateHandler} from "../../common/components";
@@ -241,8 +241,8 @@ const HousingCompanyListPage = (): React.JSX.Element => {
                 <span>Kaikki kohteet</span>
                 <Link to="create">
                     <Button
-                        theme="black"
-                        iconLeft={<IconPlus />}
+                        theme={ButtonPresetTheme.Black}
+                        iconStart={<IconPlus />}
                     >
                         Lisää uusi taloyhtiö
                     </Button>

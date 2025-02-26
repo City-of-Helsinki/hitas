@@ -1,6 +1,6 @@
 import {QueryStateHandler} from "../../../common/components";
 import {ThirtyYearLoadedResults} from "./index";
-import {Button} from "hds-react";
+import {Button, ButtonPresetTheme, LoadingSpinner} from "hds-react";
 import {IThirtyYearRegulationResponse} from "../../../common/schemas";
 
 const RunThirtyYearRegulationButton = ({
@@ -19,11 +19,11 @@ const RunThirtyYearRegulationButton = ({
         <div className="row row--buttons">
             <div className="column">
                 <Button
-                    theme="black"
+                    theme={ButtonPresetTheme.Black}
                     onClick={handleCompareButtonClick}
                     type="submit"
                     disabled={!priceCeilingValue || !hasExternalSalesData || isRegulationLoading}
-                    isLoading={isRegulationLoading}
+                    iconStart={isRegulationLoading ? <LoadingSpinner small /> : undefined}
                 >
                     Aloita vertailu
                 </Button>

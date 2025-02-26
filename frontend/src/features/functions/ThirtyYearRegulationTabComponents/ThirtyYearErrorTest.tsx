@@ -1,4 +1,4 @@
-import {Button} from "hds-react";
+import {Button, ButtonPresetTheme} from "hds-react";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {FormProviderForm, SelectInput} from "../../../common/components/forms";
@@ -44,7 +44,7 @@ const ThirtyYearErrorTestResult = ({testType, selection, calculationDate}) => {
             )}
             <div className="row row--buttons">
                 <Button
-                    theme="black"
+                    theme={ButtonPresetTheme.Black}
                     onClick={handleSubmitClick}
                     type="submit"
                 >

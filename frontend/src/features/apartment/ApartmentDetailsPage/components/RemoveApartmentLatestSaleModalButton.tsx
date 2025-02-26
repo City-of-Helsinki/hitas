@@ -1,4 +1,4 @@
-import {IconTrash} from "hds-react";
+import {ButtonSize, ButtonVariant, IconTrash} from "hds-react";
 import {useContext, useState} from "react";
 import {DeleteButton, GenericActionModal} from "../../../../common/components";
 import {useDeleteSaleMutation} from "../../../../common/services";
@@ -86,8 +86,8 @@ const RemoveApartmentLatestSaleModalButton = () => {
                 onClick={() => setIsModalOpen(true)}
                 isLoading={isLoading}
                 buttonText="Peru kauppa"
-                variant="secondary"
-                size="small"
+                variant={ButtonVariant.Secondary}
+                size={ButtonSize.Small}
                 className="delete-sale-button"
                 disabled={!apartment.prices.current_sale_id}
             />

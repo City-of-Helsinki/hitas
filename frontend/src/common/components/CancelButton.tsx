@@ -1,11 +1,11 @@
-import {Button} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, ButtonVariant, LoadingSpinner} from "hds-react";
 
 interface CancelButtonProps {
     onClick?: (unknown) => unknown;
     isLoading?: boolean;
     disabled?: boolean;
     buttonText?: string;
-    size?: "small" | "default";
+    size?: ButtonSize;
 }
 
 export default function CancelButton({
@@ -13,14 +13,14 @@ export default function CancelButton({
     isLoading = false,
     disabled = false,
     buttonText,
-    size = "default",
+    size = ButtonSize.Medium,
 }: CancelButtonProps) {
     return (
         <Button
             className="cancel-button"
-            theme="black"
-            variant="secondary"
-            isLoading={isLoading}
+            theme={ButtonPresetTheme.Black}
+            variant={ButtonVariant.Secondary}
+            iconStart={isLoading ? <LoadingSpinner small /> : undefined}
             size={size}
             onClick={onClick}
             disabled={disabled}

@@ -1,6 +1,6 @@
 import React, {useContext, useRef} from "react";
 
-import {Fieldset} from "hds-react";
+import {ButtonVariant, Fieldset} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {FormProvider, useForm} from "react-hook-form";
@@ -89,7 +89,7 @@ const LoadedApartmentMaxPricePage = (): React.JSX.Element => {
                     <NavigateBackButton />
                     <FormProvider {...formObject}>
                         <CreateMaximumPriceCalculationButton
-                            buttonVariant="primary"
+                            buttonVariant={ButtonVariant.Primary}
                             getParsedFormData={getParsedFormData}
                         />
                     </FormProvider>

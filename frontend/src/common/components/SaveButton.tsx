@@ -1,11 +1,11 @@
-import {Button, IconSaveDisketteFill} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, IconSaveDisketteFill, LoadingSpinner} from "hds-react";
 import React from "react";
 
 type SaveButtonProps = {
     isLoading?: boolean;
     disabled?: boolean;
     buttonText?: string;
-    size?: "small" | "default";
+    size?: ButtonSize;
 } & (
     | {
           type: "submit";
@@ -23,12 +23,12 @@ export default function SaveButton({
     disabled = false,
     type = "button",
     buttonText,
-    size = "default",
+    size = ButtonSize.Medium,
 }: SaveButtonProps): React.JSX.Element {
     return (
         <Button
-            iconLeft={<IconSaveDisketteFill />}
-            theme="black"
+            iconStart={isLoading ? <LoadingSpinner small /> : <IconSaveDisketteFill />}
+            theme={ButtonPresetTheme.Black}
             onClick={
                 type === "submit" // If the type is set (to "submit"), we don't want another onClick to happen here
                     ? () => {
@@ -36,7 +36,6 @@ export default function SaveButton({
                       }
                     : onClick
             }
-            isLoading={isLoading}
             disabled={disabled}
             type={type}
             size={size}

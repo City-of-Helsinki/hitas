@@ -39,7 +39,7 @@ export default function GenericActionModal({
             <Dialog.Header
                 id={`${id}__title`}
                 title={title}
-                iconLeft={modalIcon}
+                iconStart={modalIcon}
             />
             <Dialog.Content id={`${id}__content`}>{children}</Dialog.Content>
             <Dialog.ActionButtons>

@@ -1,4 +1,4 @@
-import {Button, ErrorSummary, IconCogwheels} from "hds-react";
+import {Button, ButtonPresetTheme, ErrorSummary, IconCogwheels, LoadingSpinner} from "hds-react";
 
 import {useState} from "react";
 import {
@@ -37,10 +37,9 @@ const CalculateSurfaceAreaPriceCeilingButton = ({
 }) => {
     return (
         <Button
-            theme="black"
+            theme={ButtonPresetTheme.Black}
             onClick={handleCalculateButtonOnClick}
-            iconLeft={<IconCogwheels />}
-            isLoading={isLoading}
+            iconStart={isLoading ? <LoadingSpinner small /> : <IconCogwheels />}
         >
             {isCurrentQuarterCalculated ? "Laske rajaneliöhinta uudelleen" : "Laske rajaneliöhinta"}
         </Button>

@@ -1,6 +1,6 @@
 import React, {useRef, useState} from "react";
 
-import {Button, IconPlus, IconSaveDisketteFill, Select} from "hds-react";
+import {Button, ButtonPresetTheme, IconPlus, IconSaveDisketteFill, Select} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
@@ -183,8 +183,8 @@ const IndicesTab = (): React.JSX.Element => {
 
             <div className="index-actions">
                 <Button
-                    theme="black"
-                    iconLeft={<IconPlus />}
+                    theme={ButtonPresetTheme.Black}
+                    iconStart={<IconPlus />}
                     onClick={() => setIsModalOpen(true)}
                 >
                     Lisää/päivitä indeksi

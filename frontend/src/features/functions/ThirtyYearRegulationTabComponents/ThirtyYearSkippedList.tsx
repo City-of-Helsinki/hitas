@@ -1,4 +1,4 @@
-import {Button} from "hds-react";
+import {Button, ButtonPresetTheme} from "hds-react";
 import React from "react";
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {Link} from "react-router-dom";
@@ -147,7 +147,7 @@ const ThirtyYearSkippedList = ({skippedHousingCompanies, calculationDate, reCalc
                     </div>
                     <div className="row row--buttons">
                         <Button
-                            theme="black"
+                            theme={ButtonPresetTheme.Black}
                             type="submit"
                             disabled={skippedCheck !== 0}
                         >
