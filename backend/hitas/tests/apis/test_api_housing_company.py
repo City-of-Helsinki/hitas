@@ -371,6 +371,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "notes": hc1.notes,
         "archive_id": hc1.id,
         "release_date": hc1.legacy_release_date,
+        "legacy_release_date": hc1.legacy_release_date,
         "last_modified": {
             "datetime": log.timestamp.isoformat().replace("+00:00", "Z"),
             "user": {

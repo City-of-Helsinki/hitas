@@ -112,6 +112,7 @@ export const HousingCompanyDetailsSchema = object({
     notes: string().nullable(),
     archive_id: number(),
     release_date: string().nullable(),
+    legacy_release_date: string().nullable(),
     last_modified: object({
         user: object({
             user: string().nullable(),
@@ -140,6 +141,7 @@ export const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     hitas_type: true,
     exclude_from_statistics: true,
     regulation_status: true,
+    legacy_release_date: true,
     address: true,
     acquisition_price: true,
     primary_loan: true,

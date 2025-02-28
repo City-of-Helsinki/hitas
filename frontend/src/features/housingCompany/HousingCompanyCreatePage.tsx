@@ -1,6 +1,6 @@
 import React, {useContext, useRef, useState} from "react";
 
-import {Fieldset, IconQuestionCircle} from "hds-react";
+import {Fieldset, IconQuestionCircle, TextInput as HDSTextInput} from "hds-react";
 import {useNavigate} from "react-router-dom";
 
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -35,7 +35,7 @@ import {
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../common/services";
-import {hdsToast, setAPIErrorsForFormFields, validateBusinessId} from "../../common/utils";
+import {formatDate, hdsToast, setAPIErrorsForFormFields, validateBusinessId} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
@@ -63,6 +63,7 @@ const getInitialFormData = (housingCompany): IHousingCompanyWritable => {
         hitas_type: "new_hitas_1",
         exclude_from_statistics: false,
         regulation_status: "regulated",
+        legacy_release_date: null,
         building_type: {id: ""},
         business_id: "",
         developer: {id: ""},
@@ -137,6 +138,17 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
             });
     };
 
+    const getReleaseDateDisplay = (housingCompany?: IHousingCompanyDetails) => {
+        if (housingCompany) {
+            if (housingCompany.legacy_release_date) {
+                return "Vapautumispäivä korvattu";
+            } else if (housingCompany.release_date) {
+                return formatDate(housingCompany.release_date);
+            }
+        }
+        return "Ei vapautumispäivää";
+    };
+
     return (
         <>
             <FormProviderForm
@@ -205,6 +217,19 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
                                 defaultValue={initialFormData.hitas_type}
                                 setDirectValue
                                 required
+                            />
+                        </div>
+                        <div className="row">
+                            <HDSTextInput
+                                id="release_date"
+                                label="Laskennallinen vapautumispäivä"
+                                readOnly={true}
+                                defaultValue={getReleaseDateDisplay(housingCompany)}
+                            />
+                            <DateInput
+                                label="Korvaava vapautumispäivä"
+                                tooltipText="Tällä kentällä voi korvata automaattisesti lasketun vapautumispäivän. Oletuksena kentän voi jättää tyhjäksi."
+                                name="legacy_release_date"
                             />
                         </div>
                         <div className="row">

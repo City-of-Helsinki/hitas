@@ -356,6 +356,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "notes",
             "archive_id",
             "release_date",
+            "legacy_release_date",
             "last_modified",
             "summary",
             "improvements",

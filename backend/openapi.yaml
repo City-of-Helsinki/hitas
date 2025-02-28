@@ -5769,6 +5769,11 @@ components:
           format: date
           nullable: true
           readOnly: true
+        legacy_release_date:
+          description: Regulation release date for legacy housing companies. Overrides release_date.
+          type: string
+          format: date
+          nullable: true
         archive_id:
           description: Archive ID for this housing company
           type: integer
