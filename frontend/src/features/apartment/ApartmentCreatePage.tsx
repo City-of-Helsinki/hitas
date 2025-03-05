@@ -270,7 +270,9 @@ const LoadedApartmentCreatePage = () => {
         );
 
         // If there are errors, set focus to the first error field
-        const firstError = getFirstError(formObject.formState.errors);
+        const firstError = getFirstError(formObject.formState.errors) as
+            | keyof typeof formObject.formState.errors
+            | null;
         if (firstError && firstError !== "root") {
             formObject.setFocus(firstError);
             return; // Don't submit the form if there are errors

@@ -160,10 +160,12 @@ const IndicesTab = (): React.JSX.Element => {
         <div className="listing">
             <div className="filters">
                 <Select
-                    label="Indeksityyppi"
+                    texts={{
+                        label: "Indeksityyppi",
+                    }}
                     options={indexOptions}
-                    onChange={(selected) => setCurrentIndexType(selected)}
-                    defaultValue={indexOptions[0]}
+                    onChange={(selectedOptions) => setCurrentIndexType(selectedOptions[0])}
+                    value={[currentIndexType]}
                 />
                 <FilterTextInputField
                     label="Vuosi"
