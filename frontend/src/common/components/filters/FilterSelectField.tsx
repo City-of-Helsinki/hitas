@@ -1,10 +1,10 @@
-import {Select} from "hds-react";
-import React from "react";
+import {Option, Select} from "hds-react";
+import React, {useCallback, useState} from "react";
 
 interface FilterComboboxProps {
     label: string;
-    options: {label: string; value: string}[];
-    defaultOption?: {label: string; value: string};
+    options: Partial<Option>[];
+    defaultOption?: Partial<Option>;
     filterFieldName: string;
     filterParams: object;
     setFilterParams: (object) => void;
@@ -18,18 +18,6 @@ export default function FilterSelectField({
     filterParams,
     setFilterParams,
 }: FilterComboboxProps): React.JSX.Element {
-    const onSelectionChange = (value: {label: string; value: string}) => {
-        // Update set filter, or remove key if filter is cleared
-        const filters = {...filterParams};
-        if (!value) {
-            delete filters[filterFieldName];
-            setFilterParams(filters);
-            return;
-        }
-        filters[filterFieldName] = value.value;
-        setFilterParams(filters);
-    };
-
     if (defaultOption === undefined) {
         defaultOption = {
             label: options.find((o) => o.value === filterParams[filterFieldName])?.label ?? "",
@@ -37,12 +25,29 @@ export default function FilterSelectField({
         };
     }
 
+    const [value, setValue] = useState<Partial<Option>[]>(defaultOption ? [defaultOption] : []);
+
+    const onSelectionChange = useCallback((selectedOptions: Option[]) => {
+        const selected = selectedOptions[0];
+        // Update set filter, or remove key if filter is cleared
+        const filters = {...filterParams};
+        if (selected) {
+            filters[filterFieldName] = selected.value;
+        } else {
+            delete filters[filterFieldName];
+        }
+        setFilterParams(filters);
+        setValue(selectedOptions);
+    }, []);
+
     return (
         <Select
             id={`filter__${filterFieldName}`}
-            label={label}
+            texts={{
+                label,
+            }}
             options={options}
-            defaultValue={defaultOption}
+            value={value}
             onChange={onSelectionChange}
             clearable
         />

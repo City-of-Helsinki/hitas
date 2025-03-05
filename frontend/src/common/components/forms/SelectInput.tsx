@@ -1,8 +1,9 @@
-import {Combobox, Select as HDSSelect} from "hds-react";
+import {Option, Select as HDSSelect} from "hds-react";
 
 import {useFormContext} from "react-hook-form";
 import {dotted} from "../../utils";
 import {FormInputProps} from "./";
+import {useCallback, useState} from "react";
 
 interface SelectProps extends FormInputProps {
     label: string;
@@ -49,43 +50,49 @@ const SelectInput = ({
         console.warn(`SelectInput: No default option found for value ${defaultValue}!`);
     }
 
+    const [value, setValue] = useState<Partial<Option>[]>(defaultOption ? [defaultOption] : []);
+
     const inputProps = {
-        label: label,
         required: required,
         clearable: !required,
         options: options,
-        defaultValue: defaultOption,
-        ariaLabelledBy: "",
-        clearButtonAriaLabel: "Tyhjennä",
-        selectedItemRemoveButtonAriaLabel: "Poista",
+        value: value,
+        onChange: () => {},
+        texts: {
+            label,
+        },
         ...rest,
     };
 
-    const handleChange = (newValue: {label?: string; value?: string}) => {
-        if (newValue) {
+    const handleChange = useCallback((selected: Option[]) => {
+        if (selected.length === 1) {
             if (setDirectValue) {
-                formObject.setValue(name, newValue.value);
+                formObject.setValue(name, selected[0].value);
             } else {
-                formObject.setValue(name, newValue);
+                formObject.setValue(name, selected[0]);
             }
-        } else if (!required) formObject.setValue(name, null);
-    };
+        } else if (selected.length > 1) {
+            throw new Error("Not implemented: Multiple selections in SelectInput");
+        } else if (!required) {
+            formObject.setValue(name, null);
+        }
+        setValue(selected);
+    }, []);
 
     return (
         <div className={`input-field input-field--dropdown${required ? " input-field--required" : ""}`}>
             {searchable ? (
-                <Combobox
-                    {...inputProps}
-                    toggleButtonAriaLabel=""
-                />
+                <HDSSelect {...inputProps} />
             ) : (
                 <>
                     <HDSSelect
                         {...inputProps}
-                        label={label}
+                        texts={{
+                            ...inputProps.texts,
+                            error: fieldError ? (fieldError as {message: string}).message : "",
+                        }}
                         onChange={handleChange}
                         invalid={invalid ?? !!errors[name]}
-                        error={fieldError ? (fieldError as {message: string}).message : ""}
                     />
                 </>
             )}
