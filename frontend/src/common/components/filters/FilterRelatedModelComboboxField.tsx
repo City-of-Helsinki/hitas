@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 
-import {Combobox} from "hds-react";
+import {Option, Select} from "hds-react";
+import {useDispatch} from "react-redux";
 
 interface FilterRelatedModelComboboxFieldProps {
     label: string;
-    queryFunction;
+    endpointQuery;
     labelField: string;
     filterFieldName: string;
     filterParams: object;
@@ -13,96 +14,54 @@ interface FilterRelatedModelComboboxFieldProps {
 
 export default function FilterRelatedModelComboboxField({
     label,
-    queryFunction,
+    endpointQuery,
     labelField,
     filterFieldName,
     filterParams,
     setFilterParams,
 }: FilterRelatedModelComboboxFieldProps): React.JSX.Element {
-    const MIN_LENGTH = 2; // Minimum characters before querying more data from the API
-    const [queryFilterValue, setQueryFilterValue] = useState("");
-    const [options, setOptions] = useState([{label: "Loading...", disabled: true}]);
-    const [isQuerySkipped, setIsQuerySkipped] = useState(true);
+    const dispatch = useDispatch();
+    const defaultOption = filterParams && filterParams[filterFieldName] ? {label: filterParams[filterFieldName]} : null;
+    const [value, setValue] = useState<Partial<Option>[]>(defaultOption ? [defaultOption] : []);
 
-    const {data} = queryFunction(
-        {...(queryFilterValue ? {[labelField]: queryFilterValue} : {})},
-        {skip: isQuerySkipped}
-    );
-
-    useEffect(() => {
-        if (data && data.contents) {
-            const tempOptions = data.contents.map((o) => {
-                return {label: o[labelField]};
-            });
-            // Not all data can be loaded to the dropdown, indicate that there's more results available
-            if (data.page.total_pages > 1) {
-                tempOptions.push({label: "Lataa lisää tuloksia hakemalla", disabled: true});
-            } else if (data.contents.length === 0) {
-                tempOptions.push({label: "Ei tuloksia", disabled: true});
-            }
-            setOptions(tempOptions);
-        }
-    }, [data, labelField]);
-
-    const onSelectionChange = (value: {label: string}) => {
+    const onSelectionChange = (selectedOptions: Option[]) => {
+        const selected = selectedOptions[0];
         // Update set filter, or remove key if filter is cleared
         const filters = {...filterParams};
-        if (!value) {
+        if (selected) {
+            filters[filterFieldName] = selected.label;
+        } else {
             delete filters[filterFieldName];
-            setFilterParams(filters);
-            return;
         }
-        filters[filterFieldName] = value.label;
         setFilterParams(filters);
-    };
-
-    const filterFunction = (options, search: string) => {
-        // Method is overwritten only to access raw text input,
-        // which allows fetching more results from the API when typing
-
-        // No need to set the state on every render, if the value hasn't changed
-        if (search !== queryFilterValue) {
-            // As we don't have access to the search value state of the combobox, setting setQueryFilterValue state
-            // here will raise an error:
-            //  Warning: Cannot update a component (`RelatedModelFilterCombobox`) while rendering a different component (`T`). To locate the bad setState() call inside `T`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render
-            // Having the possibility to handle the search value's state outside the Combobox would fix this
-            // issue, but a fix is not possible at this time (unless the HDS Combobox is reimplemented with that fix)
-            // Instead, let's just disable warnings temporarily, as no bad effects caused by this has been noticed
-            /* eslint-disable no-console */
-            const backup = console.error;
-            console.error = () => null;
-            if (queryFilterValue && (!search || search.length < MIN_LENGTH)) {
-                setQueryFilterValue("");
-            } else if (search.length >= 2) {
-                setQueryFilterValue(search);
-            }
-            console.error = backup;
-        }
-
-        // If there's no results (Only one option, which is disabled), display it
-        if (options.length === 1 && options[0].disabled) {
-            return options;
-        }
-
-        // Original filtering functionality
-        return options.filter((option) => {
-            return option["label"].toLowerCase().indexOf(search.toLowerCase()) > -1;
-        });
+        setValue(selectedOptions);
     };
 
     return (
-        <Combobox
+        <Select
             id={`filter__${filterFieldName}`}
             key={`filter__${filterFieldName}`}
-            label={label}
-            options={options}
-            isOptionDisabled={(option) => options.find((o) => o.label === option.label)?.disabled ?? false}
-            toggleButtonAriaLabel="Toggle menu"
+            texts={{
+                label,
+                placeholder: "",
+            }}
+            options={value}
             onChange={onSelectionChange}
-            onFocus={() => setIsQuerySkipped(false)} // Load options only after field is focused to reduce unnecessary api queries
-            onBlur={() => setIsQuerySkipped(true)}
-            filter={filterFunction}
-            defaultValue={filterParams && filterParams[filterFieldName] ? {label: filterParams[filterFieldName]} : null}
+            onSearch={async (searchValue) => {
+                const queryData = {...(searchValue ? {[labelField]: searchValue} : {})};
+                const resultData = await dispatch(endpointQuery.initiate(queryData)).unwrap();
+                const newOptions: Option[] = resultData.contents.map((item) => ({label: item[labelField]}));
+                // NOTE: HDS Select should accept either `Option[]` or option group but as of writing only
+                // option groups are accepted so the `Option[]` is wrapped in a group without a label.
+                return {
+                    groups: [
+                        {
+                            options: newOptions,
+                        },
+                    ],
+                };
+            }}
+            value={value}
             clearable
         />
     );

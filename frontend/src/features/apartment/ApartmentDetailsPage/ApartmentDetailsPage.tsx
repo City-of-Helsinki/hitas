@@ -81,7 +81,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
 
     const adjacentApartmentOptions = apartment.adjacent_apartments.map((adjacentApartment) => ({
         label: `${adjacentApartment.stair}${adjacentApartment.apartment_number}`,
-        value: adjacentApartment.id,
+        value: adjacentApartment.id ?? undefined,
     }));
     const apartmentIndex = apartment.adjacent_apartments.findIndex(
         (adjacentApartment) => apartment.id === adjacentApartment.id
@@ -105,14 +105,18 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
             <h2 className="apartment-stats">
                 <Select
                     className="apartment-stats--apartment-select"
-                    label=""
+                    texts={{
+                        label: "",
+                    }}
                     options={adjacentApartmentOptions}
-                    onChange={(selected) =>
-                        navigate(
-                            `/housing-companies/${apartment.links.housing_company.id}/apartments/${selected.value}`
-                        )
-                    }
-                    value={adjacentApartmentOptions[apartmentIndex]}
+                    onChange={(selected) => {
+                        if (selected.length > 0) {
+                            navigate(
+                                `/housing-companies/${apartment.links.housing_company.id}/apartments/${selected[0].value}`
+                            );
+                        }
+                    }}
+                    value={[adjacentApartmentOptions[apartmentIndex]]}
                 />
                 <span className="apartment-stats--metadata">
                     <span>
