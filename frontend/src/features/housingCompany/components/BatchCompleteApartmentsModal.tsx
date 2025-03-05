@@ -1,4 +1,4 @@
-import {Button, Dialog} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, ButtonVariant, Dialog} from "hds-react";
 import React, {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {CloseButton, SaveDialogModal} from "../../../common/components";
@@ -49,9 +49,9 @@ const BatchCompleteApartmentsModal = ({housingCompany}) => {
     return (
         <>
             <Button
-                theme="black"
-                size="small"
-                variant="secondary"
+                theme={ButtonPresetTheme.Black}
+                size={ButtonSize.Small}
+                variant={ButtonVariant.Secondary}
                 onClick={() => {
                     setIsFormOpen(true);
                 }}

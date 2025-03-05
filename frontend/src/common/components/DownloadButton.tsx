@@ -1,10 +1,10 @@
-import {Button, IconDownload} from "hds-react";
+import {Button, ButtonPresetTheme, IconDownload} from "hds-react";
 
 const DownloadButton = ({buttonText, ...rest}) => {
     return (
         <Button
-            theme="black"
-            iconLeft={<IconDownload />}
+            theme={ButtonPresetTheme.Black}
+            iconStart={<IconDownload />}
             className="download-button"
             {...rest}
         >

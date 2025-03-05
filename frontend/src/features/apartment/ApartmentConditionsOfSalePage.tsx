@@ -1,6 +1,18 @@
 import {useContext, useRef, useState} from "react";
 
-import {Button, IconCrossCircle, IconLock, IconPlus, IconPlusCircleFill, IconTrash, Table} from "hds-react";
+import {
+    Button,
+    ButtonPresetTheme,
+    ButtonSize,
+    ButtonVariant,
+    IconCrossCircle,
+    IconLock,
+    IconPlus,
+    IconPlusCircleFill,
+    IconSize,
+    IconTrash,
+    Table,
+} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
@@ -55,19 +67,18 @@ const HouseholdOwnersList = () => {
                             required
                         />
                         <div className="icon--remove">
-                            <IconCrossCircle
-                                size="m"
-                                onClick={() => remove(index)}
-                            />
+                            <span onClick={() => remove(index)}>
+                                <IconCrossCircle size={IconSize.Medium} />
+                            </span>
                         </div>
                     </li>
                 ))}
             </ul>
             <div className="row row--buttons">
                 <Button
-                    iconLeft={<IconPlus />}
-                    variant={household.length > 0 ? "secondary" : "primary"}
-                    theme="black"
+                    iconStart={<IconPlus />}
+                    variant={household.length > 0 ? ButtonVariant.Secondary : ButtonVariant.Primary}
+                    theme={ButtonPresetTheme.Black}
                     onClick={addEmptyLine}
                 >
                     Lisää omistaja
@@ -153,8 +164,8 @@ const CreateConditionOfSaleButton = () => {
     return (
         <>
             <Button
-                theme="black"
-                iconLeft={<IconPlus />}
+                theme={ButtonPresetTheme.Black}
+                iconStart={<IconPlus />}
                 onClick={() => setIsModalOpen(true)}
             >
                 Lisää uusi
@@ -302,7 +313,7 @@ const DeleteConditionOfSaleButton = ({conditionOfSale}: {conditionOfSale: IApart
             <DeleteButton
                 onClick={() => setIsModalOpen(true)}
                 isLoading={isLoading}
-                size="small"
+                size={ButtonSize.Small}
             />
             <GenericActionModal
                 title="Poista myyntiehto"

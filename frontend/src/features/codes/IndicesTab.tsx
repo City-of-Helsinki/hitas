@@ -1,6 +1,6 @@
 import React, {useRef, useState} from "react";
 
-import {Button, IconPlus, IconSaveDisketteFill, Select} from "hds-react";
+import {Button, ButtonPresetTheme, IconPlus, IconSaveDisketteFill, Select} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
@@ -160,10 +160,12 @@ const IndicesTab = (): React.JSX.Element => {
         <div className="listing">
             <div className="filters">
                 <Select
-                    label="Indeksityyppi"
+                    texts={{
+                        label: "Indeksityyppi",
+                    }}
                     options={indexOptions}
-                    onChange={(selected) => setCurrentIndexType(selected)}
-                    defaultValue={indexOptions[0]}
+                    onChange={(selectedOptions) => setCurrentIndexType(selectedOptions[0])}
+                    value={[currentIndexType]}
                 />
                 <FilterTextInputField
                     label="Vuosi"
@@ -183,8 +185,8 @@ const IndicesTab = (): React.JSX.Element => {
 
             <div className="index-actions">
                 <Button
-                    theme="black"
-                    iconLeft={<IconPlus />}
+                    theme={ButtonPresetTheme.Black}
+                    iconStart={<IconPlus />}
                     onClick={() => setIsModalOpen(true)}
                 >
                     Lisää/päivitä indeksi

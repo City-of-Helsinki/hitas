@@ -1,4 +1,4 @@
-import {Button, IconAngleDown, IconAngleUp, IconPlus, Tabs} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonSize, IconAngleDown, IconAngleUp, IconPlus, IconSize, Tabs} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
@@ -250,9 +250,9 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                         <BatchCompleteApartmentsModal housingCompany={housingCompany} />
                         <Link to="apartments/create">
                             <Button
-                                theme="black"
-                                size="small"
-                                iconLeft={<IconPlus />}
+                                theme={ButtonPresetTheme.Black}
+                                size={ButtonSize.Small}
+                                iconStart={<IconPlus />}
                                 disabled={housingCompany.regulation_status !== "regulated"}
                             >
                                 Lisää asunto
@@ -276,7 +276,11 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                             }}
                         >
                             Omistajat
-                            {isHousingCompanyOwnersTableVisible ? <IconAngleUp size="m" /> : <IconAngleDown size="m" />}
+                            {isHousingCompanyOwnersTableVisible ? (
+                                <IconAngleUp size={IconSize.Medium} />
+                            ) : (
+                                <IconAngleDown size={IconSize.Medium} />
+                            )}
                         </button>
                         <div className="buttons">
                             <DownloadButton
