@@ -27,6 +27,20 @@ input, input + label::before
   &:focus::after
     border-color: $color-black-80 !important
 
+[class*="Select-module_labels"]
+  :is(&, .specificity.up.up)
+    height: auto
+
+.input-field--dropdown
+  [class*="Select-module_root"]
+    max-width: unset
+
+[class*="Checkbox-module_checkbox"] input
+  background-color: white
+
+[class*="Button-module_icon"]
+  --computed-icon-size: 24px
+
 div .disabled
   background-color: var(--input-background-disabled)
   border-color: var(--input-border-color-disabled)
