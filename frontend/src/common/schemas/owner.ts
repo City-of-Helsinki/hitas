@@ -12,7 +12,9 @@ export const OwnerSchema = object({
         .max(256, errorMessages.stringMaxIs + "256"),
     identifier: string({required_error: errorMessages.required})
         .min(1, errorMessages.required)
-        .max(11, errorMessages.stringMaxIs + "11"),
+        .max(11, errorMessages.stringMaxIs + "11")
+        .nullish()
+        .or(z.literal("")),
     email: string().email(errorMessages.emailInvalid).nullish().or(z.literal("")),
     non_disclosure: boolean(),
 });

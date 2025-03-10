@@ -124,7 +124,6 @@ export default function OwnerMutateForm({
                 <TextInput
                     name="identifier"
                     label="Henkilö- tai Y-tunnus"
-                    required
                 />
                 <TextInput
                     name="email"
