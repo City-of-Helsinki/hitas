@@ -49,16 +49,12 @@ $apartment-list-column-width-state: 15%
         .conditions-of-sale-status
           @include flexbox()
           position: relative
-          width: 32px
           margin: 0
-          padding: 0
           transition: width 200ms
           [class*="hds-status-label-icon"]
             position: absolute
-            width: 24px
             transition: opacity 200ms 200ms
           &:hover
-            width: 75px
             [class*="hds-status-label-icon"]
               transition: opacity 200ms
             .sell-by-date

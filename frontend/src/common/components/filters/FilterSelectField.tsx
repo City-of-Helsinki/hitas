@@ -45,6 +45,7 @@ export default function FilterSelectField({
             id={`filter__${filterFieldName}`}
             texts={{
                 label,
+                placeholder: "",
             }}
             options={options}
             value={value}
