@@ -1,4 +1,4 @@
-import {Button, IconCrossCircle, IconPlus} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonVariant, IconCrossCircle, IconPlus, IconSize} from "hds-react";
 import {useFieldArray, useFormContext} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 import {OwnershipsListSchema} from "../schemas";
@@ -60,10 +60,9 @@ const OwnershipList = () => {
                                 <span>%</span>
                             </div>
                             <div className="icon--remove">
-                                <IconCrossCircle
-                                    size="m"
-                                    onClick={() => remove(index)}
-                                />
+                                <span onClick={() => remove(index)}>
+                                    <IconCrossCircle size={IconSize.Medium} />
+                                </span>
                             </div>
                         </li>
                     ))}
@@ -83,9 +82,11 @@ const OwnershipList = () => {
 
             <div className="row row--buttons">
                 <Button
-                    iconLeft={<IconPlus />}
-                    variant={formObject.watch("ownerships").length > 0 ? "secondary" : "primary"}
-                    theme="black"
+                    iconStart={<IconPlus />}
+                    variant={
+                        formObject.watch("ownerships").length > 0 ? ButtonVariant.Secondary : ButtonVariant.Primary
+                    }
+                    theme={ButtonPresetTheme.Black}
                     onClick={() => append(emptyOwnership)}
                 >
                     Lisää uusi omistajuusrivi

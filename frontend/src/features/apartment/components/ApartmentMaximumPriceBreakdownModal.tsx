@@ -1,4 +1,4 @@
-import {Accordion, Button, Dialog, Table, Tabs} from "hds-react";
+import {Accordion, AccordionSize, Button, ButtonPresetTheme, ButtonVariant, Dialog, Table, Tabs} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
 
 import {SaveButton} from "../../../common/components";
@@ -164,7 +164,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 unit="€/m²"
             />
             <Accordion
-                size="s"
+                size={AccordionSize.Small}
                 heading="Huoneistokohtaiset parannukset"
                 initiallyOpen={!calculation.calculation_variables.apartment_improvements.items.length}
             >
@@ -193,7 +193,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 />
             </Accordion>
             <Accordion
-                size="s"
+                size={AccordionSize.Small}
                 heading="Huoneiston osuus yhtiön parannuksista"
                 initiallyOpen={!calculation.calculation_variables.housing_company_improvements.items.length}
             >
@@ -289,7 +289,7 @@ const ConstructionPricePre2011Breakdown = ({
                 unit="€/m²"
             />
             <Accordion
-                size="s"
+                size={AccordionSize.Small}
                 heading="Huoneistokohtaiset parannukset"
             >
                 <MaximumPriceCalculationImprovementsTable
@@ -321,7 +321,7 @@ const ConstructionPricePre2011Breakdown = ({
                 />
             </Accordion>
             <Accordion
-                size="s"
+                size={AccordionSize.Small}
                 heading="Huoneiston osuus yhtiön parannuksista"
             >
                 <MaximumPriceCalculationImprovementsTable
@@ -479,8 +479,8 @@ const MaximumPriceModalContent = ({
             <Dialog.ActionButtons className="align-content-right">
                 <Button
                     onClick={() => setIsModalVisible(false)}
-                    variant="secondary"
-                    theme="black"
+                    variant={ButtonVariant.Secondary}
+                    theme={ButtonPresetTheme.Black}
                 >
                     Peruuta
                 </Button>

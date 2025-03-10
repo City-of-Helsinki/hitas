@@ -49,7 +49,7 @@ const ApartmentHeaderContent = ({
             {apartment.sell_by_date && (
                 <StatusLabel
                     className="conditions-of-sale-status"
-                    iconLeft={<IconLock />}
+                    iconStart={<IconLock />}
                 />
             )}
         </div>

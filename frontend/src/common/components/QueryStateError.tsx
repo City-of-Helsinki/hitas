@@ -1,5 +1,5 @@
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Accordion, Dialog} from "hds-react";
+import {Accordion, AccordionSize, Dialog} from "hds-react";
 import React from "react";
 import {CloseButton} from "./index";
 
@@ -36,7 +36,7 @@ export default function QueryStateError({
                 {nonFieldError !== "" && <code className="query-error-message">Non-field error: {nonFieldError}</code>}
                 {errorFields.length > 0 && (
                     <Accordion
-                        size="s"
+                        size={AccordionSize.Small}
                         heading="Virheelliset kentät"
                         className="query-error-fields"
                     >

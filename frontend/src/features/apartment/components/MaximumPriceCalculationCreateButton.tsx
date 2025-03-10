@@ -1,4 +1,4 @@
-import {Button, Dialog, IconCheck} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonVariant, Dialog, IconCheck} from "hds-react";
 import {useContext, useState} from "react";
 import {useFormContext} from "react-hook-form";
 import {QueryStateHandler} from "../../../common/components";
@@ -23,8 +23,8 @@ const MaximumPriceModalError = ({error, closeModal}) => {
             <Dialog.ActionButtons>
                 <Button
                     onClick={closeModal}
-                    variant="secondary"
-                    theme="black"
+                    variant={ButtonVariant.Secondary}
+                    theme={ButtonPresetTheme.Black}
                 >
                     Sulje
                 </Button>
@@ -37,7 +37,7 @@ const CreateMaximumPriceCalculationButton = ({
     buttonVariant,
     getParsedFormData,
 }: {
-    buttonVariant: "primary" | "secondary";
+    buttonVariant: ButtonVariant;
     getParsedFormData: () => {
         calculation_date: string;
         apartment_share_of_housing_company_loans_date: string;
@@ -91,11 +91,11 @@ const CreateMaximumPriceCalculationButton = ({
     return (
         <>
             <Button
-                theme="black"
+                theme={ButtonPresetTheme.Black}
                 variant={buttonVariant}
                 onClick={handleCreateNewCalculationButton}
                 disabled={!isCalculationFormValid}
-                iconLeft={<IconCheck />}
+                iconStart={<IconCheck />}
             >
                 Luo uusi enimmäishintalaskelma
             </Button>
@@ -112,7 +112,7 @@ const CreateMaximumPriceCalculationButton = ({
                 <Dialog.Header
                     id="maximum-price-confirmation-modal__title"
                     title="Vahvistetaanko enimmäishintalaskelma?"
-                    iconLeft={<IconCheck />}
+                    iconStart={<IconCheck />}
                 />
                 <QueryStateHandler
                     data={maximumPriceCreateData}

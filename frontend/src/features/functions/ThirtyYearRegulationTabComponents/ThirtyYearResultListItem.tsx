@@ -1,4 +1,4 @@
-import {Button, IconLockOpen} from "hds-react";
+import {Button, ButtonPresetTheme, ButtonVariant, IconLockOpen} from "hds-react";
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {ConfirmDialogModal, DownloadButton} from "../../../common/components";
@@ -53,10 +53,10 @@ const ThirtyYearResultListItem = ({housingCompany, calculationDate, category}) =
                 {category !== "freed" && (
                     <Button
                         className="manual-free-button"
-                        theme="black"
-                        variant={isHousingCompanyReleased ? "secondary" : "primary"}
+                        theme={ButtonPresetTheme.Black}
+                        variant={isHousingCompanyReleased ? ButtonVariant.Secondary : ButtonVariant.Primary}
                         onClick={() => setIsModalOpen(true)}
-                        iconLeft={<IconLockOpen />}
+                        iconStart={<IconLockOpen />}
                         disabled={isHousingCompanyReleased}
                     >
                         {isHousingCompanyReleased ? "Vapautettu" : "Vapauta"}
@@ -66,7 +66,7 @@ const ThirtyYearResultListItem = ({housingCompany, calculationDate, category}) =
                     <DownloadButton
                         buttonText="Lataa tiedote"
                         onClick={handleClickDownloadPDFButton}
-                        variant={housingCompany.letter_fetched ? "secondary" : "primary"}
+                        variant={housingCompany.letter_fetched ? ButtonVariant.Secondary : ButtonVariant.Primary}
                     />
                 )}
             </div>

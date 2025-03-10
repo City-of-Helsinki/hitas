@@ -1,4 +1,4 @@
-import {Button, IconCrossCircle, IconPlus, IconSearch, TextInput} from "hds-react";
+import {Button, ButtonPresetTheme, IconCrossCircle, IconPlus, IconSearch, TextInput} from "hds-react";
 import {useCallback, useRef, useState} from "react";
 import {ListPageNumbers, QueryStateHandler} from "../index";
 import {IMutateFormProps, MutateModal} from "./index";
@@ -107,8 +107,8 @@ function ResultList<
                 {isNew && (
                     <div className="list-footer-item">
                         <Button
-                            theme="black"
-                            iconLeft={<IconPlus />}
+                            theme={ButtonPresetTheme.Black}
+                            iconStart={<IconPlus />}
                             onClick={() => setIsMutateModalVisible(true)}
                         >
                             Luo uusi

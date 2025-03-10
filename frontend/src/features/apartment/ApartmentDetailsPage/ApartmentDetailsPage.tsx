@@ -1,4 +1,14 @@
-import {Button, IconAlertCircle, IconAngleLeft, IconAngleRight, Select, Tabs} from "hds-react";
+import {
+    Button,
+    ButtonPresetTheme,
+    ButtonVariant,
+    IconAlertCircle,
+    IconAngleLeft,
+    IconAngleRight,
+    IconSize,
+    Select,
+    Tabs,
+} from "hds-react";
 import React, {useContext, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {DetailField, Divider, DocumentsTable, EditButton, Heading, ImprovementsTable} from "../../../common/components";
@@ -71,7 +81,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
 
     const adjacentApartmentOptions = apartment.adjacent_apartments.map((adjacentApartment) => ({
         label: `${adjacentApartment.stair}${adjacentApartment.apartment_number}`,
-        value: adjacentApartment.id,
+        value: adjacentApartment.id ?? undefined,
     }));
     const apartmentIndex = apartment.adjacent_apartments.findIndex(
         (adjacentApartment) => apartment.id === adjacentApartment.id
@@ -84,7 +94,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
             <div className="alert-icon-background">
                 <IconAlertCircle
                     className="alert-icon"
-                    size="m"
+                    size={IconSize.Medium}
                 />
             </div>
             <span>Asunnossa turvakiellon alaisia omistajia</span>
@@ -95,14 +105,18 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
             <h2 className="apartment-stats">
                 <Select
                     className="apartment-stats--apartment-select"
-                    label=""
+                    texts={{
+                        label: "",
+                    }}
                     options={adjacentApartmentOptions}
-                    onChange={(selected) =>
-                        navigate(
-                            `/housing-companies/${apartment.links.housing_company.id}/apartments/${selected.value}`
-                        )
-                    }
-                    value={adjacentApartmentOptions[apartmentIndex]}
+                    onChange={(selected) => {
+                        if (selected.length > 0) {
+                            navigate(
+                                `/housing-companies/${apartment.links.housing_company.id}/apartments/${selected[0].value}`
+                            );
+                        }
+                    }}
+                    value={[adjacentApartmentOptions[apartmentIndex]]}
                 />
                 <span className="apartment-stats--metadata">
                     <span>
@@ -119,12 +133,11 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                             to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${previousApartment.id}`}
                         >
                             <Button
-                                variant="supplementary"
-                                theme="black"
-                                iconLeft={<IconAngleLeft />}
+                                variant={ButtonVariant.Supplementary}
+                                theme={ButtonPresetTheme.Black}
+                                iconStart={<IconAngleLeft />}
                             >
-                                {previousApartment.stair}
-                                {previousApartment.apartment_number}
+                                {`${previousApartment.stair}${previousApartment.apartment_number}`}
                             </Button>
                         </Link>
                     )}
@@ -133,12 +146,11 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                             to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${nextApartment.id}`}
                         >
                             <Button
-                                variant="supplementary"
-                                theme="black"
-                                iconRight={<IconAngleRight />}
+                                variant={ButtonVariant.Supplementary}
+                                theme={ButtonPresetTheme.Black}
+                                iconEnd={<IconAngleRight />}
                             >
-                                {nextApartment.stair}
-                                {nextApartment.apartment_number}
+                                {`${nextApartment.stair}${nextApartment.apartment_number}`}
                             </Button>
                         </Link>
                     )}

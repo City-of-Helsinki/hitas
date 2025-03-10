@@ -1,4 +1,4 @@
-import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
+import {Button, ButtonPresetTheme, Fieldset, IconCrossCircle, IconPlus, IconSize, Tooltip} from "hds-react";
 import {useState} from "react";
 import {SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {
@@ -49,8 +49,8 @@ const ImprovementAddEmptyLineButton = ({append}) => {
                     ...emptyImprovement,
                 })
             }
-            iconLeft={<IconPlus />}
-            theme="black"
+            iconStart={<IconPlus />}
+            theme={ButtonPresetTheme.Black}
         >
             Lisää parannus
         </Button>
@@ -75,10 +75,9 @@ const ImprovementRemoveLineButton = ({name, index, remove}) => {
 
     return (
         <div className="icon--remove">
-            <IconCrossCircle
-                size="m"
-                onClick={handleRemoveButtonPress}
-            />
+            <span onClick={handleRemoveButtonPress}>
+                <IconCrossCircle size={IconSize.Medium} />
+            </span>
 
             <ConfirmDialogModal
                 modalText="Haluatko varmasti poistaa parannuksen?"

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
+import {Button, ButtonPresetTheme, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link, useNavigate} from "react-router-dom";
 
 import {Heading, ListPageNumbers, QueryStateHandler} from "../../common/components";
@@ -12,7 +12,7 @@ import {
 } from "../../common/components/filters";
 import {getHousingCompanyHitasTypeName} from "../../common/localisation";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
-import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../common/services";
+import {getDevelopers, useGetHousingCompaniesQuery, getPropertyManagers} from "../../common/services";
 import {formatDate} from "../../common/utils";
 
 const HousingCompanyListItem = ({housingCompany}: {housingCompany: IHousingCompany}): React.JSX.Element => {
@@ -125,7 +125,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Eleme
             />
             <FilterRelatedModelComboboxField
                 label="Rakennuttaja"
-                queryFunction={useGetDevelopersQuery}
+                endpointQuery={getDevelopers}
                 labelField="value"
                 filterFieldName="developer"
                 filterParams={filterParams}
@@ -133,7 +133,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Eleme
             />
             <FilterRelatedModelComboboxField
                 label="Isännöitsijä"
-                queryFunction={useGetPropertyManagersQuery}
+                endpointQuery={getPropertyManagers}
                 labelField="name"
                 filterFieldName="property_manager"
                 filterParams={filterParams}
@@ -241,8 +241,8 @@ const HousingCompanyListPage = (): React.JSX.Element => {
                 <span>Kaikki kohteet</span>
                 <Link to="create">
                     <Button
-                        theme="black"
-                        iconLeft={<IconPlus />}
+                        theme={ButtonPresetTheme.Black}
+                        iconStart={<IconPlus />}
                     >
                         Lisää uusi taloyhtiö
                     </Button>

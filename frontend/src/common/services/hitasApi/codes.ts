@@ -82,6 +82,7 @@ const developerApi = hitasApi.injectEndpoints({
 });
 
 export const {useGetDevelopersQuery, useSaveDeveloperMutation} = developerApi;
+export const {getDevelopers} = developerApi.endpoints;
 
 const propertyManagerApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -122,6 +123,7 @@ const propertyManagerApi = hitasApi.injectEndpoints({
 
 export const {useGetPropertyManagersQuery, useSavePropertyManagerMutation, useDeletePropertyManagerMutation} =
     propertyManagerApi;
+export const {getPropertyManagers} = propertyManagerApi.endpoints;
 
 const ownerApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
