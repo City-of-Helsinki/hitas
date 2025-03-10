@@ -1,8 +1,7 @@
 @use "../imports" as *
 
 .input-field
-  height: 100px
-  margin-bottom: $spacing-xs
+  margin-bottom: $spacing-l
   &--invalid
     [class*="text-input_hds-text-input"]
       border-color: $color-error !important
@@ -26,6 +25,20 @@ input, input + label::before
   --toggle-button-unselected-color: var(--color-black-60)
   &:focus::after
     border-color: $color-black-80 !important
+
+[class*="Select-module_labels"]
+  :is(&, .specificity.up.up)
+    height: auto
+
+.input-field--dropdown
+  [class*="Select-module_root"]
+    max-width: unset
+
+[class*="Checkbox-module_checkbox"] input
+  background-color: white
+
+[class*="Button-module_icon"]
+  --computed-icon-size: 24px
 
 div .disabled
   background-color: var(--input-background-disabled)

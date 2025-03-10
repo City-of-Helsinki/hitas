@@ -23,14 +23,14 @@
   [class*="Accordion-module_accordionHeader"]
     padding-top: 0
     padding-bottom: 0
+    button
+      padding: $spacing-m
+      &:hover
+        background: $color-engel
+        font-weight: 700
   [class*="Accordion-module_accordionContent"]
     padding-left: $spacing-m
     padding-right: $spacing-m
-  [class*="Accordion-module_headingContainer"]
-    padding: $spacing-m
-    &:hover
-      background: $color-engel
-      font-weight: 700
 
   div.report-container
     @include flexbox()
@@ -40,6 +40,7 @@
     background: white
     padding: $spacing-s $spacing-m
     gap: 1rem
+    width: 100%
     h3
       width: 100%
       margin-top: 0
