@@ -84,6 +84,7 @@ const ThirtyYearErrorTest = () => {
                     options={testOptions}
                     defaultValue="result_noProblems"
                     setDirectValue
+                    required
                 />
             </FormProviderForm>
             <ThirtyYearErrorTestResult
