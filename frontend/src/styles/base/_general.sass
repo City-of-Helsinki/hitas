@@ -59,6 +59,26 @@ ul, ol
       color: $color-engel-medium-light
       --spinner-color: $color-engel-medium-light
 
+[class*="HeaderActionBar-module_title_"]
+  :is(&, .specificity.up)
+    font-size: var(--fontsize-body-l)
+
+[class*="HeaderNavigationMenu-module_headerNavigationMenuLink_"]
+  :is(&, .specificity.up)
+    font-size: var(--fontsize-body-m)
+
+[class*="HeaderActionBarItemButton-module_actionBarItemButtonLabel_"]
+  :is(&, .specificity.up)
+    font-size: var(--fontsize-body-s)
+
+[class*="HeaderActionBar-module_headerActionBar_"]
+  :is(&, .specificity.up)
+    height: auto
+
+[class*="HeaderNavigationMenu-module_headerNavigationMenu_"]
+  :is(&, .specificity.up)
+    min-height: auto
+
 .query-handler-error
   @include flexbox()
   @include flex-flow(column)

@@ -85,6 +85,7 @@ const App = (): React.JSX.Element => {
                         logo={
                             <Logo
                                 src={logoFi}
+                                size={LogoSize.Medium}
                                 alt="Helsingin kaupunki"
                             />
                         }
