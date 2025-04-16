@@ -56,10 +56,11 @@ def create_max_price_calculation(
     apartment_share_of_housing_company_loans_date: datetime.date,
     additional_info: Optional[str],
 ) -> Dict[str, Any]:
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     housing_company = HousingCompany.objects.annotate(
         _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-        _last_apartment_completion_date=Max("real_estates__buildings__apartments__completion_date"),
-        sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
+        _last_apartment_completion_date=Max("real_estates__buildings__apartments__completion_date", filter=non_deleted),
+        sum_surface_area=Sum("real_estates__buildings__apartments__surface_area", filter=non_deleted),
     ).get(uuid=housing_company_uuid)
 
     # For RR_NEW_HITAS housing companies (Ryhmärakentamiskohde kohde), the completion date is the date of the last

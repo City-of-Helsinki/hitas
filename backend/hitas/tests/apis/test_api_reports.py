@@ -612,6 +612,13 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
         apartment__building__real_estate__housing_company=housing_company_2,
     )
 
+    # Soft-deleted apartments should not be included in the report
+    soft_delete_apartment = ApartmentFactory.create(
+        building=sale_2.apartment.building,
+        sales=[],
+    )
+    soft_delete_apartment.delete()
+
     url = reverse("hitas:regulated-housing-companies-report-list")
     response: HttpResponse = api_client.get(url)
 
@@ -679,6 +686,13 @@ def test__api__half_hitas_housing_companies_report__multiple_housing_companies(a
         apartment__completion_date=datetime.date(2021, 1, 1),
         apartment__building__real_estate__housing_company=housing_company_2,
     )
+
+    # Soft-deleted apartments should not be included in the report
+    soft_delete_apartment = ApartmentFactory.create(
+        building=sale_2.apartment.building,
+        sales=[],
+    )
+    soft_delete_apartment.delete()
 
     url = reverse("hitas:half-hitas-housing-companies-report-list")
     response: HttpResponse = api_client.get(url)
@@ -813,6 +827,12 @@ def test__api__unregulated_housing_companies_report__legacy_release_date(api_cli
         completion_date=datetime.date(2021, 1, 1),
         building__real_estate__housing_company=housing_company,
     )
+
+    # Soft-deleted apartments should not be included in the report
+    soft_delete_apartment = ApartmentFactory.create(
+        building=apartment_2.building,
+    )
+    soft_delete_apartment.delete()
 
     url = reverse("hitas:unregulated-housing-companies-report-list")
     response: HttpResponse = api_client.get(url)
@@ -1083,6 +1103,12 @@ def test__api__housing_company_states_report__not_completed(api_client: HitasAPI
         completion_date=None,
         building__real_estate__housing_company=housing_company,
     )
+
+    # Soft-deleted apartments should not be included in the report
+    soft_delete_apartment = ApartmentFactory.create(
+        building__real_estate__housing_company=housing_company,
+    )
+    soft_delete_apartment.delete()
 
     url = reverse("hitas:housing-company-states-report-list")
     response: HttpResponse = api_client.get(url)

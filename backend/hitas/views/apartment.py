@@ -907,11 +907,14 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
 
     def get_detail_queryset(self):
+        non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
         housing_company = (
             HousingCompany.objects.filter(uuid=self.kwargs["housing_company_uuid"])
             .annotate(
                 _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-                _last_apartment_completion_date=Max("real_estates__buildings__apartments__completion_date"),  # For RR
+                _last_apartment_completion_date=Max(
+                    "real_estates__buildings__apartments__completion_date", filter=non_deleted
+                ),  # For RR
             )
             .first()
         )

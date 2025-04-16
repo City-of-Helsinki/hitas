@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound, ModelConflict
@@ -90,7 +90,7 @@ class BuildingViewSet(HitasModelViewSet):
             Building.objects.filter(real_estate__id=re_id)
             .select_related("real_estate__housing_company__postal_code")
             .annotate(
-                apartment_count=Count("apartments"),
+                apartment_count=Count("apartments", filter=Q(apartments__deleted__isnull=True)),
             )
             .only(
                 "uuid",

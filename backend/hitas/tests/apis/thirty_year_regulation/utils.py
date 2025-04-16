@@ -61,6 +61,15 @@ def create_thirty_year_old_housing_company(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         **apartment_kwargs,
     )
+
+    # Soft-deleted apartments should not be included
+    soft_delete_apartment = ApartmentFactory.create(
+        surface_area=10,
+        completion_date=regulation_month,
+        sales=[],
+        building=apartment.building,
+    )
+    soft_delete_apartment.delete()
     return apartment.housing_company
 
 

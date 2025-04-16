@@ -5,7 +5,7 @@ from uuid import UUID
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMessage
-from django.db.models import Max, Prefetch
+from django.db.models import Max, Prefetch, Q
 from django.utils import timezone
 
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
@@ -93,11 +93,14 @@ def get_apartment_for_unconfirmed_max_price_calculation(
     apartment_id: UUID,
     calculation_date: datetime.date,
 ) -> ApartmentWithAnnotations:
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     housing_company = (
         HousingCompany.objects.filter(real_estates__buildings__apartments__uuid=apartment_id)
         .annotate(
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-            _last_apartment_completion_date=Max("real_estates__buildings__apartments__completion_date"),  # For RR
+            _last_apartment_completion_date=Max(
+                "real_estates__buildings__apartments__completion_date", filter=non_deleted
+            ),  # For RR
         )
         .first()
     )
