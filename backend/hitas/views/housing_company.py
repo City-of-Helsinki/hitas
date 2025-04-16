@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Dict, Optional
 
 from dateutil.relativedelta import relativedelta
-from django.db.models import F, Prefetch, Sum
+from django.db.models import F, Prefetch, Q, Sum
 from django.db.models.functions import Round
 from django.utils import timezone
 from django_filters.rest_framework import BooleanFilter
@@ -419,6 +419,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
         )
 
     def get_detail_queryset(self):
+        non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
         return (
             HousingCompany.objects.prefetch_related(
                 Prefetch(
@@ -453,7 +454,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
             )
             .annotate(
                 _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-                sum_surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
+                sum_surface_area=Round(Sum("real_estates__buildings__apartments__surface_area", filter=non_deleted)),
                 sum_acquisition_price=Sum("_acquisition_price"),
                 avg_price_per_square_meter=Round(
                     F("sum_acquisition_price") / F("sum_surface_area"),
@@ -462,7 +463,8 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 sum_total_shares=Sum(
                     F("real_estates__buildings__apartments__share_number_end")
                     - F("real_estates__buildings__apartments__share_number_start")
-                    + 1
+                    + 1,
+                    filter=non_deleted,
                 ),
                 _release_date=get_regulation_release_date("id"),
             )

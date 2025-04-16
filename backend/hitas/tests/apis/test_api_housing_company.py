@@ -232,6 +232,16 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         sales__purchase_price=300.5,
         sales__apartment_share_of_housing_company_loans=400.0,
     )
+    # Soft-deleted apartments should not be included
+    ApartmentFactory.create(
+        building=hc1_re1_bu1,
+        completion_date=date(2020, 1, 1),
+        surface_area=20.5,
+        share_number_end=200,
+        share_number_start=101,
+        sales=[],
+    ).delete()
+
     hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1)
     ApartmentFactory.create(
         building=hc1_re1_bu2,

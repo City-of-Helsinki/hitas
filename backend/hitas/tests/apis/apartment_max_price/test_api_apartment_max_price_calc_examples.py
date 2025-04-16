@@ -53,6 +53,12 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         completion_date=datetime.date(2019, 11, 27),
         surface_area=4302,
     )
+    # Soft-deleted apartments should not be included in the calculation
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=datetime.date(2020, 11, 27),
+        surface_area=4302,
+    ).delete()
 
     # Construction price improvement is not used, since this apartment's housing company is using new hitas rules!
     HousingCompanyConstructionPriceImprovementFactory.create(

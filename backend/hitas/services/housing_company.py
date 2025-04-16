@@ -52,6 +52,7 @@ def get_completed_housing_companies(
     :param include_rental_hitas: Whether to include rental Hitas housing companies.
     :param select_half_hitas: Whether to include only Half-Hitas companies or completely exclude them
     """
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     housing_company_queryset: QuerySet[HousingCompanyWithAnnotations] = (
         HousingCompany.objects.select_related(
             "postal_code",
@@ -71,7 +72,7 @@ def get_completed_housing_companies(
                 Coalesce(Sum("_first_sale_prices"), 0) + F("_catalog_prices"),
                 output_field=HitasModelDecimalField(),
             ),
-            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
+            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area", filter=non_deleted)),
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
             completion_month=TruncMonth("_completion_date"),
             avg_price_per_square_meter=(
@@ -307,6 +308,7 @@ def get_number_of_unsold_apartments(housing_company: HousingCompany) -> int:
 
 
 def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithRegulatedReportAnnotations]:
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     return list(
         HousingCompany.objects.select_related("postal_code")
         .prefetch_related(
@@ -323,13 +325,13 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
         )
         .annotate(
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
+            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area", filter=non_deleted)),
             realized_acquisition_price=Sum("_acquisition_price"),
             avg_price_per_square_meter=Round(
                 F("realized_acquisition_price") / F("surface_area"),
                 precision=2,
             ),
-            apartment_count=Count("real_estates__buildings__apartments"),
+            apartment_count=Count("real_estates__buildings__apartments", filter=non_deleted),
         )
         .order_by(
             "postal_code__value",
@@ -339,6 +341,7 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
 
 
 def find_half_hitas_housing_companies_for_reporting() -> list[HousingCompanyWithRegulatedReportAnnotations]:
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     return list(
         HousingCompany.objects.select_related("postal_code")
         .prefetch_related(
@@ -352,13 +355,13 @@ def find_half_hitas_housing_companies_for_reporting() -> list[HousingCompanyWith
         )
         .annotate(
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
+            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area", filter=non_deleted)),
             realized_acquisition_price=Sum("_acquisition_price"),
             avg_price_per_square_meter=Round(
                 F("realized_acquisition_price") / F("surface_area"),
                 precision=2,
             ),
-            apartment_count=Count("real_estates__buildings__apartments"),
+            apartment_count=Count("real_estates__buildings__apartments", filter=non_deleted),
         )
         .order_by(
             "postal_code__value",
@@ -368,6 +371,7 @@ def find_half_hitas_housing_companies_for_reporting() -> list[HousingCompanyWith
 
 
 def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWithUnregulatedReportAnnotations]:
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     return list(
         HousingCompany.objects.select_related("postal_code")
         .prefetch_related("real_estates__buildings__apartments")
@@ -375,7 +379,7 @@ def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWit
         .exclude(hitas_type=HitasType.HALF_HITAS)
         .annotate(
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-            apartment_count=Count("real_estates__buildings__apartments"),
+            apartment_count=Count("real_estates__buildings__apartments", filter=non_deleted),
             _release_date=get_regulation_release_date("id"),
         )
         .order_by("-_completion_date")
@@ -383,9 +387,10 @@ def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWit
 
 
 def find_housing_companies_for_state_reporting() -> list[HousingCompanyWithStateReportAnnotations]:
+    non_deleted = Q(real_estates__buildings__apartments__deleted__isnull=True)
     return list(
         HousingCompany.objects.annotate(
             _completion_date=max_date_if_all_not_null(ref="real_estates__buildings__apartments__completion_date"),
-            apartment_count=Count("real_estates__buildings__apartments"),
+            apartment_count=Count("real_estates__buildings__apartments", filter=non_deleted),
         )
     )

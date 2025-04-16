@@ -728,6 +728,7 @@ def _save_regulation_results(  # NOSONAR
 
 
 def get_thirty_year_regulation_results(calculation_date: datetime.date) -> ThirtyYearRegulationResults:
+    non_deleted = Q(housing_company__real_estates__buildings__apartments__deleted__isnull=True)
     try:
         return ThirtyYearRegulationResults.objects.prefetch_related(
             Prefetch(
@@ -738,7 +739,7 @@ def get_thirty_year_regulation_results(calculation_date: datetime.date) -> Thirt
                     "housing_company__property_manager",
                 )
                 .annotate(
-                    apartment_count=Count("housing_company__real_estates__buildings__apartments"),
+                    apartment_count=Count("housing_company__real_estates__buildings__apartments", filter=non_deleted),
                     last_modified=last_modified(
                         model=HousingCompany,
                         model_id="housing_company__id",
@@ -756,6 +757,7 @@ def get_thirty_year_regulation_results_for_housing_company(
     housing_company_uuid: UUID,
     calculation_date: datetime.date,
 ) -> ThirtyYearRegulationResultsRowWithAnnotations:
+    non_deleted = Q(housing_company__real_estates__buildings__apartments__deleted__isnull=True)
     hitas_quarter = hitas_calculation_quarter(calculation_date)
     results = (
         ThirtyYearRegulationResultsRow.objects.select_related(
@@ -776,10 +778,12 @@ def get_thirty_year_regulation_results_for_housing_company(
                 "housing_company__uuid",
                 parent__calculation_month__lte=hitas_quarter,
             ),
-            min_share=Min("housing_company__real_estates__buildings__apartments__share_number_start"),
-            max_share=Max("housing_company__real_estates__buildings__apartments__share_number_end"),
+            min_share=Min(
+                "housing_company__real_estates__buildings__apartments__share_number_start", filter=non_deleted
+            ),
+            max_share=Max("housing_company__real_estates__buildings__apartments__share_number_end", filter=non_deleted),
             share_count=F("max_share") - F("min_share") + 1,
-            apartment_count=Count("housing_company__real_estates__buildings__apartments"),
+            apartment_count=Count("housing_company__real_estates__buildings__apartments", filter=non_deleted),
             completion_month=TruncMonth("completion_date"),
             completion_month_index_cpi=subquery_appropriate_cpi(
                 outer_ref="completion_month",

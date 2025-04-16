@@ -92,6 +92,12 @@ def create_apartment_max_price_calculation(create_indices=True, **kwargs) -> Apa
             building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         )
 
+    # Soft-deleted apartments should not be included in the calculation
+    ApartmentFactory.create(
+        completion_date=FuzzyDate(date(2011, 1, 1), date(2020, 1, 1)).fuzz(),
+        building=kwargs["apartment"].building,
+    ).delete()
+
     if "calculation_date" not in kwargs:
         kwargs["calculation_date"] = FuzzyDate(date(2015, 1, 1)).fuzz()
 
