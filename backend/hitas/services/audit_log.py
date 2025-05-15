@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Iterable, Literal, Optional, TypeAlias, overlo
 
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import DateTimeField, OuterRef, Q, Subquery
+from django.db.models import DateTimeField, OuterRef, Subquery
 from django.utils.encoding import smart_str
 
 if TYPE_CHECKING:
@@ -51,16 +51,6 @@ def bulk_create_log_entries(
                 additional_data=additional_data,
             )
         )
-
-    # Delete log entries with the same pk as a newly created model.
-    if action is LogEntry.Action.CREATE and log_entries:
-        condition = Q()
-        for log_entry in log_entries:
-            condition |= Q(content_type=log_entry.content_type) & (
-                Q(object_pk=log_entry.object_pk) | Q(object_id=log_entry.object_id)
-            )
-
-        LogEntry.objects.filter(condition).delete()
 
     return LogEntry.objects.bulk_create(log_entries, ignore_conflicts=True)
 
