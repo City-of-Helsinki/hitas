@@ -53,7 +53,7 @@ def bulk_create_log_entries(
         )
 
     # Delete log entries with the same pk as a newly created model.
-    if action is LogEntry.Action.CREATE:
+    if action is LogEntry.Action.CREATE and log_entries:
         condition = Q()
         for log_entry in log_entries:
             condition |= Q(content_type=log_entry.content_type) & (
