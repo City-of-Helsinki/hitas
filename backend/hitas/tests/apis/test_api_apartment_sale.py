@@ -1200,12 +1200,15 @@ def test__api__apartment_sale__create__cannot_sell_unregulated_apartment(api_cli
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__half_hitas__last_apartment_sold(api_client: HitasAPIClient):
+    more_than_two_years_ago = timezone.now().date() - relativedelta(years=2) - relativedelta(months=1)
     apartment_1: Apartment = ApartmentFactory.create(
+        completion_date=more_than_two_years_ago,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
         sales=[],
     )
     apartment_2: Apartment = ApartmentFactory.create(
+        completion_date=more_than_two_years_ago,
         building__real_estate__housing_company=apartment_1.housing_company,
         sales=[],
     )
@@ -1244,7 +1247,7 @@ def test__api__apartment_sale__create__half_hitas__last_apartment_sold(api_clien
     apartment_1.housing_company.refresh_from_db()
     assert apartment_1.housing_company.regulation_status == RegulationStatus.REGULATED
 
-    # First apartment is sold
+    # Second apartment is sold
     url_2 = reverse(
         "hitas:apartment-sale-list",
         kwargs={
@@ -1259,6 +1262,72 @@ def test__api__apartment_sale__create__half_hitas__last_apartment_sold(api_clien
     # Apartment housing company is now released from regulation
     apartment_1.housing_company.refresh_from_db()
     assert apartment_1.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__half_hitas__last_apartment_sold_while_regulated(api_client: HitasAPIClient):
+    less_than_two_years_ago = timezone.now().date() - relativedelta(years=2) + relativedelta(months=1)
+    apartment_1: Apartment = ApartmentFactory.create(
+        completion_date=less_than_two_years_ago,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        sales=[],
+    )
+    apartment_2: Apartment = ApartmentFactory.create(
+        completion_date=less_than_two_years_ago,
+        building__real_estate__housing_company=apartment_1.housing_company,
+        sales=[],
+    )
+
+    owner: Owner = OwnerFactory.create()
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    # First apartment is sold
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment_1.housing_company.uuid.hex,
+            "apartment_uuid": apartment_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    # Apartment housing company is still regulated
+    apartment_1.housing_company.refresh_from_db()
+    assert apartment_1.housing_company.regulation_status == RegulationStatus.REGULATED
+
+    # Second apartment is sold
+    url_2 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment_2.housing_company.uuid.hex,
+            "apartment_uuid": apartment_2.uuid.hex,
+        },
+    )
+    response_2 = api_client.post(url_2, data=data, format="json")
+
+    assert response_2.status_code == status.HTTP_201_CREATED, response_2.json()
+
+    # Apartment housing company is still regulated
+    apartment_1.housing_company.refresh_from_db()
+    assert apartment_1.housing_company.regulation_status == RegulationStatus.REGULATED
 
 
 @pytest.mark.django_db
