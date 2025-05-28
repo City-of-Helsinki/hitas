@@ -138,8 +138,13 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
                 ],
             )
 
-            # Half hitas housing companies are released from regulation when their last apartment is sold.
-            if apartment.housing_company.hitas_type == HitasType.HALF_HITAS:
+            # Half hitas housing companies are released from regulation when their last apartment is sold
+            # and they are past the 2-year regulation period.
+            if (
+                apartment.housing_company.hitas_type == HitasType.HALF_HITAS
+                and apartment.housing_company.completion_date is not None
+                and apartment.housing_company.completion_date <= timezone.now().date() - relativedelta(years=2)
+            ):
                 unsold_apartments = get_number_of_unsold_apartments(apartment.housing_company)
                 if unsold_apartments == 0:
                     apartment.housing_company.regulation_status = RegulationStatus.RELEASED_BY_HITAS
