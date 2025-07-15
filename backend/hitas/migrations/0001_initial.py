@@ -1005,19 +1005,19 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="maximumpriceindex",
             constraint=models.CheckConstraint(
-                check=models.Q(("value__gt", 0)), name="maximum_price_index_value_positive"
+                condition=models.Q(("value__gt", 0)), name="maximum_price_index_value_positive"
             ),
         ),
         migrations.AddConstraint(
             model_name="marketpriceindex2005equal100",
             constraint=models.CheckConstraint(
-                check=models.Q(("value__gt", 0)), name="market_price_2005_index_value_positive"
+                condition=models.Q(("value__gt", 0)), name="market_price_2005_index_value_positive"
             ),
         ),
         migrations.AddConstraint(
             model_name="marketpriceindex",
             constraint=models.CheckConstraint(
-                check=models.Q(("value__gt", 0)), name="market_price_index_value_positive"
+                condition=models.Q(("value__gt", 0)), name="market_price_index_value_positive"
             ),
         ),
         migrations.AddField(
@@ -1093,13 +1093,13 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="constructionpriceindex2005equal100",
             constraint=models.CheckConstraint(
-                check=models.Q(("value__gt", 0)), name="construction_price_2005_index_value_positive"
+                condition=models.Q(("value__gt", 0)), name="construction_price_2005_index_value_positive"
             ),
         ),
         migrations.AddConstraint(
             model_name="constructionpriceindex",
             constraint=models.CheckConstraint(
-                check=models.Q(("value__gt", 0)), name="construction_price_index_value_positive"
+                condition=models.Q(("value__gt", 0)), name="construction_price_index_value_positive"
             ),
         ),
         migrations.AddField(
@@ -1189,13 +1189,13 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="housingcompany",
             constraint=models.CheckConstraint(
-                check=models.Q(("acquisition_price__gte", 0)), name="acquisition_price_positive"
+                condition=models.Q(("acquisition_price__gte", 0)), name="acquisition_price_positive"
             ),
         ),
         migrations.AddConstraint(
             model_name="conditionofsale",
             constraint=models.CheckConstraint(
-                check=models.Q(("new_ownership", django.db.models.expressions.F("old_ownership")), _negated=True),
+                condition=models.Q(("new_ownership", django.db.models.expressions.F("old_ownership")), _negated=True),
                 name="hitas_conditionofsale_no_circular_reference",
             ),
         ),
@@ -1210,19 +1210,19 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="apartment",
             constraint=models.CheckConstraint(
-                check=models.Q(("share_number_start__gte", 1)), name="hitas_apartment_share_number_start_gte_1"
+                condition=models.Q(("share_number_start__gte", 1)), name="hitas_apartment_share_number_start_gte_1"
             ),
         ),
         migrations.AddConstraint(
             model_name="apartment",
             constraint=models.CheckConstraint(
-                check=models.Q(("share_number_end__gte", 1)), name="hitas_apartment_share_number_end_gte_1"
+                condition=models.Q(("share_number_end__gte", 1)), name="hitas_apartment_share_number_end_gte_1"
             ),
         ),
         migrations.AddConstraint(
             model_name="apartment",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("share_number_end__isnull", False), ("share_number_start__isnull", False)),
                     models.Q(("share_number_end__isnull", True), ("share_number_start__isnull", True)),
                     _connector="OR",
@@ -1233,14 +1233,14 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="apartment",
             constraint=models.CheckConstraint(
-                check=models.Q(("share_number_end__gte", django.db.models.expressions.F("share_number_start"))),
+                condition=models.Q(("share_number_end__gte", django.db.models.expressions.F("share_number_start"))),
                 name="hitas_apartment_share_number_start_lte_share_number_end",
             ),
         ),
         migrations.AddConstraint(
             model_name="apartment",
             constraint=models.CheckConstraint(
-                check=models.Q(("surface_area__gte", 0)), name="hitas_apartment_surface_area_gte_0"
+                condition=models.Q(("surface_area__gte", 0)), name="hitas_apartment_surface_area_gte_0"
             ),
         ),
     ]

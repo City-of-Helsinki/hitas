@@ -303,7 +303,7 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
         ordering = ["id"]
 
         constraints = [
-            models.CheckConstraint(name="acquisition_price_positive", check=models.Q(acquisition_price__gte=0)),
+            models.CheckConstraint(name="acquisition_price_positive", condition=models.Q(acquisition_price__gte=0)),
         ]
 
     def __str__(self):
