@@ -44,7 +44,7 @@ class ConditionOfSale(ExternalSafeDeleteHitasModel):
         constraints = [
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_no_circular_reference",
-                check=~models.Q(new_ownership=models.F("old_ownership")),
+                condition=~models.Q(new_ownership=models.F("old_ownership")),
             ),
             models.UniqueConstraint(
                 name="%(app_label)s_%(class)s_only_one_valid_condition_of_sale",
