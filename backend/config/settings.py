@@ -293,8 +293,6 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/admin/login/"
 
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
-
 
 class BearerAuthentication(TokenAuthentication):
     keyword = "Bearer"
