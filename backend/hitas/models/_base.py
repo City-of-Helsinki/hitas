@@ -1,5 +1,4 @@
 import datetime
-import json
 from decimal import Decimal
 from typing import Any, Iterable, Optional, TypeAlias, TypedDict, TypeVar
 from uuid import UUID, uuid4
@@ -143,7 +142,7 @@ class AuditableMaskedModelMixin:
                                 changes[field][i] = "None"
                             else:
                                 changes[field][i] = "*" * len(changes[field][i])
-                last_log.changes = json.dumps(changes)
+                last_log.changes = changes
                 last_log.save()
 
     def save(self, **kwargs):

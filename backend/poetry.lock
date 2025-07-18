@@ -651,18 +651,18 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-auditlog"
-version = "2.3.0"
+version = "3.2.0"
 description = "Audit log app for Django"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "django-auditlog-2.3.0.tar.gz", hash = "sha256:b9d3acebb64f3f2785157efe3f2f802e0929aafc579d85bbfb9827db4adab532"},
-    {file = "django_auditlog-2.3.0-py3-none-any.whl", hash = "sha256:7bc2c87e4aff62dec9785d1b2359a2b27148f8c286f8a52b9114fc7876c5a9f7"},
+    {file = "django_auditlog-3.2.0-py3-none-any.whl", hash = "sha256:63d02326c5b069cd5ae390c4729076f1d935c3a9cefc27893e79a01c42cd1a78"},
+    {file = "django_auditlog-3.2.0.tar.gz", hash = "sha256:66cf3945977ba60e0687fc264ac178f0c7b0eee013f25e1c63561d8ceb6a5c41"},
 ]
 
 [package.dependencies]
-Django = ">=3.2"
+Django = ">=4.2"
 python-dateutil = ">=2.7.0"
 
 [[package]]
@@ -3609,4 +3609,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "2c4f0134263b9e1cd820b87332477e31f51e7935f1d18244ebc7d9debbe77af0"
+content-hash = "02e6c792783306351ccfcb15b0d648e7c97c65e7978299ee9acfdffddd7553dd"

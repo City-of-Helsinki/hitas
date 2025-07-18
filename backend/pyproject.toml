@@ -6,7 +6,7 @@ authors = []
 
 [tool.poetry.dependencies]
 Django = "^5.2.4"
-django-auditlog = "^2.3.0"
+django-auditlog = "3.2.0"
 django-cors-headers = "^4.7.0"
 django-crum = "^0.7.9"
 django-enumfields2 = "^3.0.2" # Drop-in replacement for django-enumfields, which is not compatible with Python 3.11+
