@@ -743,7 +743,7 @@ def get_thirty_year_regulation_results(calculation_date: datetime.date) -> Thirt
                     last_modified=last_modified(
                         model=HousingCompany,
                         model_id="housing_company__id",
-                        hint='"property_manager": ',
+                        changes__has_key="property_manager",
                     ),
                 )
                 .order_by("regulation_result", "completion_date"),
