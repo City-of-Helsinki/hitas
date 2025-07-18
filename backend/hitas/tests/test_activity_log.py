@@ -128,7 +128,7 @@ def test_activity_log__delete():
     assert activity_log[0].action == LogEntry.Action.DELETE
     assert activity_log[0].changes == {
         "calculation_month": ["2021-01-01", "None"],
-        "data": ['{"foo": "1"}', "null"],
+        "data": ['{"foo": "1"}', "None"],
     }
 
 
