@@ -1,5 +1,4 @@
 import datetime
-import json
 
 import pytest
 from auditlog.models import LogEntry
@@ -22,7 +21,7 @@ def test_activity_log__create():
     assert activity_log[0].content_type == ContentType.objects.get_for_model(Owner)
     assert activity_log[0].object_pk == str(owner.pk)
     assert activity_log[0].action == LogEntry.Action.CREATE
-    assert json.loads(activity_log[0].changes) == {
+    assert activity_log[0].changes == {
         "id": ["None", str(owner.id)],
         "valid_identifier": ["None", str(owner.valid_identifier)],
         "ownerships": ["None", "hitas.Ownership.None"],
@@ -50,7 +49,7 @@ def test_activity_log__update():
     assert activity_log[0].content_type == ContentType.objects.get_for_model(Owner)
     assert activity_log[0].object_pk == str(owner.pk)
     assert activity_log[0].action == LogEntry.Action.UPDATE
-    assert json.loads(activity_log[0].changes) == {
+    assert activity_log[0].changes == {
         "name": ["*" * len("Testi Testinen 1"), "*" * len("Testi Testinen 2")],
     }
 
@@ -72,31 +71,42 @@ def test_activity_log__soft_delete(freezer):
     assert activity_log[0].action == LogEntry.Action.DELETE
     # Soft delete doesn't actually delete the object, but due to how the auditlog works,
     # the changes are recorded like this.
-    assert json.loads(activity_log[0].changes) == {
-        "id": [str(owner.id), "None"],
-        "valid_identifier": [str(owner.valid_identifier), "None"],
-        "deleted": ["2023-01-01 00:00:00", "None"],
-        "ownerships": ["hitas.Ownership.None", "None"],
-        "deleted_by_cascade": [str(owner.deleted_by_cascade), "None"],
-        "email": ["*" * len(owner.email), "None"],
-        "name": ["*" * len(owner.name), "None"],
-        "uuid": [str(owner.uuid), "None"],
-        "identifier": ["*" * len(owner.identifier), "None"],
-        "bypass_conditions_of_sale": [str(owner.bypass_conditions_of_sale), "None"],
-        "non_disclosure": [str(owner.non_disclosure), "None"],
-    }
+    changes = activity_log[0].changes
+    assert changes["id"] == [str(owner.id), "None"]
+    assert changes["valid_identifier"] == [str(owner.valid_identifier), "None"]
+    assert changes["deleted"] == ["2023-01-01 00:00:00", "None"]
+    assert changes["ownerships"] == ["hitas.Ownership.None", "None"]
+    assert changes["deleted_by_cascade"] == [str(owner.deleted_by_cascade), "None"]
+    assert changes["email"] == ["*" * len(owner.email), "None"]
+    assert changes["name"] == ["*" * len(owner.name), "None"]
+    assert changes["uuid"] == [str(owner.uuid), "None"]
+    assert changes["identifier"] == ["*" * len(owner.identifier), "None"]
+    assert changes["bypass_conditions_of_sale"] == [str(owner.bypass_conditions_of_sale), "None"]
+    assert changes["non_disclosure"] == [str(owner.non_disclosure), "None"]
 
     # Create logs for undeletes
     owner.undelete()
-    activity_log: list[LogEntry] = list(LogEntry.objects.filter(action=LogEntry.Action.UPDATE).all())
-    assert len(activity_log) == 1
-    assert activity_log[0].content_type == ContentType.objects.get_for_model(Owner)
-    assert activity_log[0].object_pk == str(owner.pk)
-    assert activity_log[0].action == LogEntry.Action.UPDATE
+    activity_log_1, activity_log_2 = list(LogEntry.objects.filter(action=LogEntry.Action.UPDATE).all().order_by("id"))
+    assert activity_log_1.content_type == ContentType.objects.get_for_model(Owner)
+    assert activity_log_1.object_pk == str(owner.pk)
+    assert activity_log_1.action == LogEntry.Action.UPDATE
+    assert activity_log_2.content_type == ContentType.objects.get_for_model(Owner)
+    assert activity_log_2.object_pk == str(owner.pk)
+    assert activity_log_2.action == LogEntry.Action.UPDATE
     # Changes here are also not recorded correctly due to how auditlog works.
-    assert json.loads(activity_log[0].changes) == {
-        "deleted": ["None", "2023-01-01 00:00:00"],
-    }
+    changes = activity_log_1.changes
+    assert changes["deleted"] == ["None", "2023-01-01 00:00:00"]
+    changes = activity_log_2.changes
+    assert changes["id"] == ["None", str(owner.id)]
+    assert changes["valid_identifier"] == ["None", str(owner.valid_identifier)]
+    assert changes["ownerships"] == ["None", "hitas.Ownership.None"]
+    assert changes["deleted_by_cascade"] == ["None", str(owner.deleted_by_cascade)]
+    assert changes["email"] == ["None", "*" * len(owner.email)]
+    assert changes["name"] == ["None", "*" * len(owner.name)]
+    assert changes["uuid"] == ["None", str(owner.uuid)]
+    assert changes["identifier"] == ["None", "*" * len(owner.identifier)]
+    assert changes["bypass_conditions_of_sale"] == ["None", str(owner.bypass_conditions_of_sale)]
+    assert changes["non_disclosure"] == ["None", str(owner.non_disclosure)]
 
 
 @pytest.mark.django_db
@@ -116,9 +126,9 @@ def test_activity_log__delete():
     assert activity_log[0].content_type == ContentType.objects.get_for_model(SurfaceAreaPriceCeilingCalculationData)
     assert activity_log[0].object_pk == data_pk
     assert activity_log[0].action == LogEntry.Action.DELETE
-    assert json.loads(activity_log[0].changes) == {
+    assert activity_log[0].changes == {
         "calculation_month": ["2021-01-01", "None"],
-        "data": ["{'foo': '1'}", "None"],
+        "data": ['{"foo": "1"}', "null"],
     }
 
 

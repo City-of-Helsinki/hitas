@@ -62,7 +62,9 @@ class ConstructionPriceIndex2005Equal100(AbstractIndex):
         verbose_name = _("Construction price index year for apartments constructed in January 2005 onwards")
         verbose_name_plural = _("Construction price indices for apartments constructed in January 2005 onwards")
         constraints = [
-            models.CheckConstraint(name="construction_price_2005_index_value_positive", condition=models.Q(value__gt=0)),
+            models.CheckConstraint(
+                name="construction_price_2005_index_value_positive", condition=models.Q(value__gt=0)
+            ),
         ]
 
 
