@@ -5,7 +5,7 @@ from testcontainers.postgres import PostgresContainer
 
 class HitasTestContainer:
     def __init__(self):
-        self.container = PostgresContainer(image="postgres:13")
+        self.container = PostgresContainer(image="postgres:14")
 
     def start(self):
         self.container.start()
