@@ -54,7 +54,7 @@ pytest-django = "^4.11.1"
 pytest-freezer = "^0.4.9"
 pytest-xdist = "^3.8.0"
 sqlparse = "^0.5.3"
-testcontainers = "^4.10.0"
+testcontainers = {extras = ["postgresql"], version = "^4.10.0"}
 
 [tool.poetry.group.migration]
 optional = true
