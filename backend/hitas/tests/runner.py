@@ -14,11 +14,11 @@ class HitasTestContainer:
             if db["ENGINE"] != "django.db.backends.postgresql":
                 continue
 
-            db["USER"] = self.container.POSTGRES_USER
-            db["PASSWORD"] = self.container.POSTGRES_PASSWORD
-            db["NAME"] = self.container.POSTGRES_DB
+            db["USER"] = self.container.username
+            db["PASSWORD"] = self.container.password
+            db["NAME"] = self.container.dbname
             db["HOST"] = self.container.get_container_host_ip()
-            db["PORT"] = self.container.get_exposed_port(self.container.port_to_expose)
+            db["PORT"] = self.container.get_exposed_port(self.container.port)
 
     def stop(self):
         self.container.stop()
