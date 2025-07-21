@@ -78,7 +78,7 @@ class SalesAndMaximumPricesReportView(ViewSet):
         start: datetime.date = serializer.validated_data["start_date"]
         end: datetime.date = serializer.validated_data["end_date"]
 
-        sales = find_sales_on_interval_for_reporting(start_date=start, end_date=end)
+        sales = find_sales_on_interval_for_reporting(start_date=start, end_date=end, sales_filter="resale")
         workbook = build_sales_and_maximum_prices_report_excel(sales)
         filename = f"Hitas kauppa- ja enimmäishinnat aikavälillä {start.isoformat()} - {end.isoformat()}.xlsx"
         return get_excel_response(filename=filename, excel=workbook)

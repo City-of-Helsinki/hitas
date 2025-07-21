@@ -438,6 +438,13 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__postal_code__cost_area=1,
     )
+    # Re-create sale as only resales are included in the report
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment=sale_1.apartment,
+    )
     sale_2: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=datetime.date(2020, 2, 15),
         purchase_price=130_000,
@@ -445,6 +452,13 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
         apartment__surface_area=100,
         apartment__building__real_estate__housing_company__postal_code__value="00002",
         apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+    # Re-create sale as only resales are included in the report
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 2, 15),
+        purchase_price=130_000,
+        apartment_share_of_housing_company_loans=100,
+        apartment=sale_2.apartment,
     )
     # Valid calculation
     ApartmentMaximumPriceCalculationFactory.create(
