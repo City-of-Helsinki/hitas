@@ -2,7 +2,12 @@ from django.contrib import admin
 from nested_inline.admin import NestedTabularInline
 
 from hitas.admin.audit_log import AuditLogHistoryAdminMixin
-from hitas.models import Apartment, ApartmentConstructionPriceImprovement, ApartmentMarketPriceImprovement
+from hitas.models import (
+    Apartment,
+    ApartmentConstructionPriceImprovement,
+    ApartmentMarketPriceImprovement,
+    ApartmentMaximumPriceCalculation,
+)
 
 
 class ApartmentMarketPriceImprovementAdmin(NestedTabularInline):
@@ -39,3 +44,22 @@ class ApartmentAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
 
     def housing_company(self, obj):
         return obj.building.real_estate.housing_company
+
+
+@admin.register(ApartmentMaximumPriceCalculation)
+class ApartmentMaximumPriceCalculationAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "apartment",
+        "maximum_price",
+        "calculation_date",
+        "valid_until",
+        "confirmed_at",
+    ]
+    search_fields = ["apartment__street_address", "apartment__apartment_number"]
+    list_filter = ["calculation_date", "confirmed_at"]
+
+    readonly_fields = ("uuid",)
+
+    def apartment(self, obj):
+        return obj.apartment
