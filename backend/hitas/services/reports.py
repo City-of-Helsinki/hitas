@@ -396,6 +396,9 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
             if surface_area_price_ceiling is not None:
                 maximum_price = sale.apartment.surface_area * surface_area_price_ceiling
                 is_maximum_price_fallback = True
+        if maximum_price is not None:
+            # Debt free maximum price
+            maximum_price = maximum_price + sale.apartment_share_of_housing_company_loans
 
         worksheet.append(
             SalesAndMaximumPricesReportColumns(
