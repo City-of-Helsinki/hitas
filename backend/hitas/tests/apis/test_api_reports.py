@@ -1,15 +1,19 @@
 import datetime
+from decimal import Decimal
 from io import BytesIO
 from urllib.parse import urlencode
 
 import pytest
 from django.http import HttpResponse
 from django.urls import reverse
+from django.utils import timezone
 from openpyxl.reader.excel import load_workbook
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
+from hitas.calculations.depreciation_percentage import depreciation_multiplier
+from hitas.calculations.helpers import months_between_dates
 from hitas.models import (
     Apartment,
     ApartmentSale,
@@ -2007,6 +2011,69 @@ def test__api__download_ownerships_by_housing_company(api_client: HitasAPIClient
             " ",
         ),
     ]
+
+
+@pytest.mark.django_db
+def test__api__download_apartments_by_housing_company(api_client: HitasAPIClient):
+    housing_company = HousingCompanyFactory(
+        display_name="HCompany1",
+    )
+    apartment_1 = ApartmentFactory(
+        apartment_number=20,
+        surface_area=50.2,
+        building__real_estate__housing_company=housing_company,
+    )
+    apartment_2 = ApartmentFactory(
+        apartment_number=10,
+        surface_area=150.2,
+        share_number_start=10,
+        share_number_end=100,
+        building__real_estate__housing_company=housing_company,
+    )
+    url = reverse("hitas:download-apartment-by-housing-company-report-detail", kwargs={"pk": housing_company.uuid})
+    response: HttpResponse = api_client.get(url)
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+    rows = list(worksheet.values)
+    assert len(rows[0][0]) > 0, "Row 1 column 1 should have a title"
+    assert len(rows[0][1]) > 0, "Row 1 column 2 should have a title"
+    assert len(rows[0][2]) > 0, "Row 1 column 3 should have a title"
+    assert len(rows[0][3]) > 0, "Row 1 column 4 should have a title"
+    assert len(rows[0][4]) > 0, "Row 1 column 5 should have a title"
+    assert len(rows[0][5]) > 0, "Row 1 column 6 should have a title"
+    assert len(rows[0][6]) > 0, "Row 1 column 7 should have a title"
+    assert len(rows[0][7]) > 0, "Row 1 column 8 should have a title"
+    assert len(rows[0][8]) > 0, "Row 1 column 9 should have a title"
+    assert len(rows[0][9]) > 0, "Row 1 column 10 should have a title"
+    assert len(rows[0][10]) > 0, "Row 1 column 11 should have a title"
+    # Apartment row 1
+    assert rows[1][0] == apartment_2.stair
+    assert rows[1][1] == apartment_2.apartment_number
+    assert rows[1][2] == apartment_2.surface_area
+    assert rows[1][3] == f"{apartment_2.share_number_start}-{apartment_2.share_number_end}"
+    assert rows[1][4].date() == apartment_2.completion_date
+    assert rows[1][5].date() == apartment_2.first_purchase_date
+    assert Decimal(str(rows[1][6])) == apartment_2.first_sale_acquisition_price
+    assert Decimal(str(rows[1][7])) == apartment_2.additional_work_during_construction
+    assert Decimal(str(rows[1][8])) == apartment_2.interest_during_construction_mpi
+    assert Decimal(str(rows[1][9])) == apartment_2.interest_during_construction_cpi
+    assert Decimal(str(rows[1][10])) == depreciation_multiplier(
+        months_between_dates(apartment_2.completion_date, timezone.now().date())
+    )
+    # Apartment row 2
+    assert rows[2][0] == apartment_1.stair
+    assert rows[2][1] == apartment_1.apartment_number
+    assert rows[2][2] == apartment_1.surface_area
+    assert rows[2][3] == f"{apartment_1.share_number_start}-{apartment_1.share_number_end}"
+    assert rows[2][4].date() == apartment_1.completion_date
+    assert rows[2][5].date() == apartment_1.first_purchase_date
+    assert Decimal(str(rows[2][6])) == apartment_1.first_sale_acquisition_price
+    assert Decimal(str(rows[2][7])) == apartment_1.additional_work_during_construction
+    assert Decimal(str(rows[2][8])) == apartment_1.interest_during_construction_mpi
+    assert Decimal(str(rows[2][9])) == apartment_1.interest_during_construction_cpi
+    assert Decimal(str(rows[2][10])) == depreciation_multiplier(
+        months_between_dates(apartment_1.completion_date, timezone.now().date())
+    )
 
 
 @pytest.mark.parametrize("regulated", [False, True])

@@ -162,6 +162,13 @@ router.register(
     basename="download-ownership-by-housing-company-report",
 )
 
+# /api/v1/reports/download-apartment-by-housing-company/<pk>
+router.register(
+    r"reports/download-apartment-by-housing-company-report",
+    views.ApartmentsByHousingCompanyReport,
+    basename="download-apartment-by-housing-company-report",
+)
+
 
 # /api/v1/job-performance/{source}
 router.register(

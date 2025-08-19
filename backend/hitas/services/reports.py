@@ -6,12 +6,15 @@ from functools import cache
 from statistics import mean
 from typing import Any, Callable, Iterable, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar, Union
 
+from django.utils import timezone
 from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
+from hitas.calculations.depreciation_percentage import depreciation_multiplier
+from hitas.calculations.helpers import months_between_dates
 from hitas.models import ApartmentSale, Owner
 from hitas.models.housing_company import (
     HitasType,
@@ -139,6 +142,20 @@ class OwnersByHousingCompanyReportColumns(NamedTuple):
     purchase_date: str
     owner_name: str
     owner_ssn: str
+
+
+class ApartmentsByHousingCompanyReportColumns(NamedTuple):
+    stair: str
+    number: str | int
+    surface_area: str | Decimal
+    share_numbers: str
+    completion_date: str
+    first_sale_date: str
+    first_sale_acquisition_price: str | Decimal
+    additional_work_during_construction: str | Decimal
+    interest_during_construction_mpi: str | Decimal
+    interest_during_construction_cpi: str | Decimal
+    depreciation_multiplier: str | Decimal
 
 
 SalesInfoByRoomCount = TypedDict(
@@ -1125,8 +1142,52 @@ def build_owners_by_housing_companies_report_excel(entries) -> Workbook:
     return workbook
 
 
+def build_apartments_by_housing_companies_report_excel(apartments) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+    column_headers = ApartmentsByHousingCompanyReportColumns(
+        stair="Rappu",
+        number="Asunnon nro",
+        surface_area="Asunnon pinta-ala",
+        share_numbers="Osakenumerot",
+        completion_date="Valmistumispäivä",
+        first_sale_date="Ensimmäinen kauppapäivä",
+        first_sale_acquisition_price="Asunnon hankinta-arvo",
+        additional_work_during_construction="Rakennusaikaiset lisätyöt",
+        interest_during_construction_mpi="Rakennusaikaiset korot MH",
+        interest_during_construction_cpi="Rakennusaikaiset korot RK",
+        depreciation_multiplier="Poistokerroin",
+    )
+
+    worksheet.append(column_headers)
+    for apartment in apartments:
+        worksheet.append(
+            ApartmentsByHousingCompanyReportColumns(
+                stair=apartment.stair,
+                number=apartment.apartment_number,
+                surface_area=apartment.surface_area,
+                share_numbers=f"{apartment.share_number_start}-{apartment.share_number_end}",
+                completion_date=apartment.completion_date,
+                first_sale_date=apartment.first_purchase_date,
+                first_sale_acquisition_price=apartment.first_sale_acquisition_price,
+                additional_work_during_construction=apartment.additional_work_during_construction,
+                interest_during_construction_mpi=apartment.interest_during_construction_mpi,
+                interest_during_construction_cpi=apartment.interest_during_construction_cpi,
+                depreciation_multiplier=depreciation_multiplier(
+                    months_between_dates(apartment.completion_date, timezone.now().date())
+                ),
+            )
+        )
+
+    _basic_format_sheet(column_headers, worksheet)
+    return workbook
+
+
 def _basic_format_sheet(
-    column_headers: Union[OwnersByHousingCompanyReportColumns, MultipleOwnershipReportColumns], worksheet: Worksheet
+    column_headers: Union[
+        OwnersByHousingCompanyReportColumns, MultipleOwnershipReportColumns, ApartmentsByHousingCompanyReportColumns
+    ],
+    worksheet: Worksheet,
 ) -> None:
     column_letters = string.ascii_uppercase[: len(column_headers)]
     last_row = worksheet.max_row

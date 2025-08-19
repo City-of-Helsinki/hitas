@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from hitas.models import HousingCompany, Owner, Ownership
+from hitas.models.apartment import Apartment
 from hitas.models.housing_company import RegulationStatus
 from hitas.models.property_manager import PropertyManager
 from hitas.services.apartment_sale import find_sales_on_interval_for_reporting
@@ -18,11 +19,12 @@ from hitas.services.housing_company import (
     find_unregulated_housing_companies_for_reporting,
 )
 from hitas.services.owner import (
-    find_apartments_by_housing_company,
     find_owners_with_multiple_ownerships,
+    find_ownerships_by_housing_company,
     find_regulated_ownerships,
 )
 from hitas.services.reports import (
+    build_apartments_by_housing_companies_report_excel,
     build_housing_company_state_report_excel,
     build_multiple_ownerships_report_excel,
     build_owners_by_housing_companies_report_excel,
@@ -235,7 +237,7 @@ class OwnershipsByCompanyJSONReportView(ViewSet):
         housing_company_obj: HousingCompany = lookup_model_by_uuid(kwargs.get("pk"), HousingCompany)
 
         serializer = OwnershipsByHousingCompanyReportSerializer(
-            data=find_apartments_by_housing_company(housing_company_obj.id), many=True
+            data=find_ownerships_by_housing_company(housing_company_obj.id), many=True
         )
         serializer.is_valid()
         return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -246,7 +248,20 @@ class OwnershipsByHousingCompanyReport(ViewSet):
 
     def retrieve(self, request: Request, *args, **kwargs) -> HttpResponse:
         housing_company_obj: HousingCompany = lookup_model_by_uuid(kwargs.get("pk"), HousingCompany)
-        owners_by_companies = find_apartments_by_housing_company(housing_company_obj.id)
+        owners_by_companies = find_ownerships_by_housing_company(housing_company_obj.id)
         workbook = build_owners_by_housing_companies_report_excel(owners_by_companies)
         filename = f"Omistajat yhtiölle {housing_company_obj.display_name}.xlsx"
+        return get_excel_response(filename=filename, excel=workbook)
+
+
+class ApartmentsByHousingCompanyReport(ViewSet):
+    renderer_classes = [HitasJSONRenderer, ExcelRenderer]
+
+    def retrieve(self, request: Request, *args, **kwargs) -> HttpResponse:
+        housing_company_obj: HousingCompany = lookup_model_by_uuid(kwargs.get("pk"), HousingCompany)
+        apartments = Apartment.objects.filter(
+            building__real_estate__housing_company_id=housing_company_obj.id,
+        ).order_by("apartment_number")
+        workbook = build_apartments_by_housing_companies_report_excel(apartments)
+        filename = f"Yhtiön {housing_company_obj.display_name} asunnot.xlsx"
         return get_excel_response(filename=filename, excel=workbook)

@@ -4839,6 +4839,34 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/reports/download-apartment-by-housing-company-report/{housing_company_id}:
+    get:
+      description: Download excel report for one regulated housing company
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      tags:
+        - Reports
+      responses:
+        '200':
+            description: Successfully downloaded excel report for housing company apartments ordered by apartment number
+            content:
+              application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+                schema:
+                  type: string
+                  format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/job-performance/confirmed-maximum-price:
     get:
