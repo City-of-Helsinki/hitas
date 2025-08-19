@@ -146,7 +146,7 @@ def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
     )
 
 
-def find_apartments_by_housing_company(housing_company_id: int) -> list[Ownership]:
+def find_ownerships_by_housing_company(housing_company_id: int) -> list[Ownership]:
     return (
         Ownership.objects.filter(
             sale__apartment__building__real_estate__housing_company_id=housing_company_id,

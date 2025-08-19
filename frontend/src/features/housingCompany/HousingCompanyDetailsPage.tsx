@@ -1,4 +1,14 @@
-import {Button, ButtonPresetTheme, ButtonSize, IconAngleDown, IconAngleUp, IconPlus, IconSize, Tabs} from "hds-react";
+import {
+    Button,
+    ButtonPresetTheme,
+    ButtonSize,
+    ButtonVariant,
+    IconAngleDown,
+    IconAngleUp,
+    IconPlus,
+    IconSize,
+    Tabs,
+} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
@@ -20,7 +30,7 @@ import {
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 import SalesCatalogImport from "./components/SalesCatalogImport";
-import {downloadHousingCompanyWithOwnersExcel} from "../../common/services";
+import {downloadHousingCompanyApartmentsExcel, downloadHousingCompanyWithOwnersExcel} from "../../common/services";
 import HousingCompanyOwnersTable from "../../common/components/HousingCompanyOwnersTable";
 
 const LoadedHousingCompanyDetails = (): React.JSX.Element => {
@@ -247,6 +257,12 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                 <Heading type="list">
                     <span>Asunnot</span>
                     <div className="buttons">
+                        <DownloadButton
+                            buttonText="Lataa raportti"
+                            onClick={() => downloadHousingCompanyApartmentsExcel(housingCompany.id)}
+                            size="small"
+                            variant={ButtonVariant.Secondary}
+                        />
                         <BatchCompleteApartmentsModal housingCompany={housingCompany} />
                         <Link to="apartments/create">
                             <Button
