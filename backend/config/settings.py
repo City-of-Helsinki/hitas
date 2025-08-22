@@ -158,6 +158,16 @@ TEMPLATES = [
     },
 ]
 
+# ----- Storages ---------------------------------------------------------------------------------------
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 # ----- Static files -----------------------------------------------------------------------------------
 
 STATIC_ROOT = BASE_DIR / "static"
@@ -179,7 +189,9 @@ AZURE_CONNECTION_STRING = (
     f"EndpointSuffix=core.windows.net"
 )
 if AZURE_ACCOUNT_NAME is not None:
-    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+    }
 
 # ----- Email ------------------------------------------------------------------------------------------
 
