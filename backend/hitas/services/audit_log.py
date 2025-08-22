@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 from typing import TYPE_CHECKING, Iterable, Literal, Optional, TypeAlias, overload
 
@@ -46,7 +45,7 @@ def bulk_create_log_entries(
                 object_id=pk if isinstance(pk, int) else None,
                 object_repr=smart_str(obj),
                 action=action,
-                changes=json.dumps(changes[obj.pk]),
+                changes=changes[obj.pk],
                 serialized_data=serialized_data,
                 additional_data=additional_data,
             )
@@ -60,7 +59,7 @@ def get_last_modified(
     model: type["HitasModel"] | type["HitasSafeDeleteModel"],
     *,
     model_id: str,
-    hint: str,
+    **kwargs: dict,
 ) -> Subquery: ...
 
 
@@ -69,7 +68,7 @@ def get_last_modified(
     model: type["HitasModel"] | type["HitasSafeDeleteModel"],
     *,
     model_id: int,
-    hint: str,
+    **kwargs: dict,
 ) -> Optional[datetime.date]: ...
 
 
@@ -77,18 +76,22 @@ def last_modified(
     model: type["HitasModel"] | type["HitasSafeDeleteModel"],
     *,
     model_id: str | int,
-    hint: str = "",
+    **kwargs: dict,
 ):
     """
     Return the timestamp for the last audit log for the given model object
-    (where its changes contain the hinted string).
+    (optionally filtered by `changes__*`).
     """
+    changes_filters = {}
+    for key, value in kwargs.items():
+        if key.startswith("changes__"):
+            changes_filters[key] = value
     subquery = isinstance(model_id, str)
     queryset = (
         LogEntry.objects.filter(
             content_type=ContentType.objects.get_for_model(model),
             object_id=OuterRef(model_id) if subquery else model_id,
-            changes__contains=hint,
+            **changes_filters,
         )
         .order_by("-timestamp")
         .values_list("timestamp", flat=True)
@@ -102,15 +105,19 @@ def last_log(
     model: type["HitasModel"] | type["HitasSafeDeleteModel"],
     *,
     model_id: int,
-    hint: str = "",
+    **kwargs: dict,
 ) -> Optional[LogEntry]:
-    """Return the last audit log for the given model object (where its changes contain the hinted string)."""
+    """Return the last audit log for the given model object (optionally filtered by `changes__*`)."""
+    changes_filters = {}
+    for key, value in kwargs.items():
+        if key.startswith("changes__"):
+            changes_filters[key] = value
     return (
         LogEntry.objects.select_related("actor")
         .filter(
             content_type=ContentType.objects.get_for_model(model),
             object_id=model_id,
-            changes__contains=hint,
+            **changes_filters,
         )
         .order_by("-timestamp")
         .first()

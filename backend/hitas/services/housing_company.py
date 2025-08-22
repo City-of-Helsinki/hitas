@@ -83,7 +83,7 @@ def get_completed_housing_companies(
             property_manager_last_edited=last_modified(
                 model=HousingCompany,
                 model_id="id",
-                hint='"property_manager": ',
+                changes__has_key="property_manager",
             ),
         )
         .filter(

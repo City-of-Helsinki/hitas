@@ -317,28 +317,28 @@ class Apartment(ExternalSafeDeleteHitasModel):
         constraints = [
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_share_number_start_gte_1",
-                check=models.Q(share_number_start__gte=1),
+                condition=models.Q(share_number_start__gte=1),
             ),
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_share_number_end_gte_1",
-                check=models.Q(share_number_end__gte=1),
+                condition=models.Q(share_number_end__gte=1),
             ),
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_share_number_both_set",
                 # Don't know if there's a better way to say (share_number_start IS NULL) == (share_number_end IS NULL)
                 # at least Q(share_number_start__isnull=Q(share_number_end__isnull=True)) seems not to work
-                check=(
+                condition=(
                     models.Q(share_number_start__isnull=False, share_number_end__isnull=False)
                     | models.Q(share_number_start__isnull=True, share_number_end__isnull=True)
                 ),
             ),
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_share_number_start_lte_share_number_end",
-                check=models.Q(share_number_end__gte=models.F("share_number_start")),
+                condition=models.Q(share_number_end__gte=models.F("share_number_start")),
             ),
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_surface_area_gte_0",
-                check=models.Q(surface_area__gte=0),
+                condition=models.Q(surface_area__gte=0),
             ),
         ]
 
