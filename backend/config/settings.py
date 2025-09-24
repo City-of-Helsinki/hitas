@@ -20,6 +20,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, None),
     ALLOWED_HOSTS=(list, []),
+    DATABASE_PASSWORD=(str, ""),
     DATABASE_URL=(str, "postgres:///hitas"),
     CORS_ALLOWED_ORIGINS=(list, []),
     UWSGI_WARMUP=(bool, True),
@@ -130,6 +131,8 @@ MIDDLEWARE = [
 
 DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+if env("DATABASE_PASSWORD"):
+    DATABASES["default"]["PASSWORD"] = env("DATABASE_PASSWORD")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ----- Templates --------------------------------------------------------------------------------------
