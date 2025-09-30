@@ -374,7 +374,7 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
         total_price="Toteutunut kauppahinta",
         total_price_per_square_meter="Kaupan neliöhinta",
         maximum_price="Enimmäishinta",
-        maximum_price_per_square_meter="Enimmäishinnan neiöhinta",
+        maximum_price_per_square_meter="Enimmäishinnan neliöhinta",
     )
     worksheet.append(column_headers)
 
@@ -440,8 +440,8 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
         )
 
         if is_maximum_price_fallback:
-            maximum_price_cell = worksheet.cell(row=worksheet.max_row, column=8)
-            maximum_price_per_square_meter_cell = worksheet.cell(row=worksheet.max_row, column=9)
+            maximum_price_cell = worksheet.cell(row=worksheet.max_row, column=10)
+            maximum_price_per_square_meter_cell = worksheet.cell(row=worksheet.max_row, column=11)
             maximum_price_cell.font = Font(italic=True)
             maximum_price_per_square_meter_cell.font = Font(italic=True)
 
