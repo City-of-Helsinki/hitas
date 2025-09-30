@@ -515,41 +515,47 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
     assert len(rows[0][4]) > 0, "Row 1 column 5 should have a title"
     assert len(rows[0][5]) > 0, "Row 1 column 6 should have a title"
     assert len(rows[0][6]) > 0, "Row 1 column 7 should have a title"
+    assert len(rows[0][7]) > 0, "Row 1 column 8 should have a title"
+    assert len(rows[0][8]) > 0, "Row 1 column 9 should have a title"
     # Sale row 1
     assert rows[1][0] == sale_1.apartment.postal_code.cost_area
     assert rows[1][1] == sale_1.apartment.postal_code.value
     assert rows[1][2] == sale_1.apartment.address
     assert rows[1][3] == sale_1.apartment.surface_area
-    assert rows[1][4] == datetime.datetime.fromisoformat(sale_1.purchase_date.isoformat())
+    assert rows[1][4] == datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat())
     assert rows[1][5] == 60_000  # 50_000 € + 10_000 €
-    assert rows[1][6] == 600  # (50_000 € + 10_000 €) / 100 m²
-    assert rows[1][7] == 160_000  # 150_000 € + 10_000 € (maximum price + loans)
-    assert rows[1][8] == 1_600  # 160_000 € / 100 m²
+    assert rows[1][6] == datetime.datetime.fromisoformat(sale_1.purchase_date.isoformat())
+    assert rows[1][7] == 60_000  # 50_000 € + 10_000 €
+    assert rows[1][8] == 600  # (50_000 € + 10_000 €) / 100 m²
+    assert rows[1][9] == 160_000  # 150_000 € + 10_000 € (maximum price + loans)
+    assert rows[1][10] == 1_600  # 160_000 € / 100 m²
     # Sale row 2
     assert rows[2][0] == sale_2.apartment.postal_code.cost_area
     assert rows[2][1] == sale_2.apartment.postal_code.value
     assert rows[2][2] == sale_2.apartment.address
     assert rows[2][3] == sale_2.apartment.surface_area
-    assert rows[2][4] == datetime.datetime.fromisoformat(sale_2.purchase_date.isoformat())
+    assert rows[2][4] == datetime.datetime.fromisoformat(sale_2.apartment.completion_date.isoformat())
     assert rows[2][5] == 130_100
-    assert rows[2][6] == 1_301  # (130_000 + 100) / 100 m²
-    assert rows[2][7] == 200_100  # 2000 € * 100 m² + 100 € (surface area ceiling price + loans)
-    assert rows[2][8] == 2_001  # 200_100 € / 100 m²
+    assert rows[2][6] == datetime.datetime.fromisoformat(sale_2.purchase_date.isoformat())
+    assert rows[2][7] == 130_100
+    assert rows[2][8] == 1_301  # (130_000 + 100) / 100 m²
+    assert rows[2][9] == 200_100  # 2000 € * 100 m² + 100 € (surface area ceiling price + loans)
+    assert rows[2][10] == 2_001  # 200_100 € / 100 m²
     # Totals - all sales
-    assert rows[4][5] == 2, "Total amount of sales should be 2"
-    assert rows[5][5] == 95_050, "Mean should be 95_050"
-    assert rows[6][5] == 130_100, "Maximum should be 130_100"
-    assert rows[7][5] == 60_000, "Minimum should be 60_000"
+    assert rows[4][7] == 2, "Total amount of sales should be 2"
+    assert rows[5][7] == 95_050, "Mean should be 95_050"
+    assert rows[6][7] == 130_100, "Maximum should be 130_100"
+    assert rows[7][7] == 60_000, "Minimum should be 60_000"
     # Totals - cost area 1
-    assert rows[9][5] == 2, "Total amount of sales in cost area 1 should be 2"
-    assert rows[10][5] == 95_050, "Mean should be 95_050"
-    assert rows[11][5] == 130_100, "Maximum should be 130_100"
-    assert rows[12][5] == 60_000, "Minimum should be 60_000"
+    assert rows[9][7] == 2, "Total amount of sales in cost area 1 should be 2"
+    assert rows[10][7] == 95_050, "Mean should be 95_050"
+    assert rows[11][7] == 130_100, "Maximum should be 130_100"
+    assert rows[12][7] == 60_000, "Minimum should be 60_000"
     # Totals - cost area 2
-    assert rows[14][5] == 0, "Total amount of sales in cost area 2 should be 0"
-    assert rows[15][5] == 0, "Mean should be 0"
-    assert rows[16][5] == 0, "Maximum should be 0"
-    assert rows[17][5] == 0, "Minimum should be 0"
+    assert rows[14][7] == 0, "Total amount of sales in cost area 2 should be 0"
+    assert rows[15][7] == 0, "Mean should be 0"
+    assert rows[16][7] == 0, "Maximum should be 0"
+    assert rows[17][7] == 0, "Minimum should be 0"
 
 
 # Regulated housing companies report
