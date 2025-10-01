@@ -196,7 +196,7 @@ export const getSignInUrl = (callBackUrl: string): string => {
 export const getLogOutUrl = (): string => {
     const baseUrl = new URL(window.location.href).origin;
     const callBackUrl = baseUrl + `/logout`;
-    return Config.api_auth_url + "/logout?next=" + callBackUrl;
+    return Config.api_auth_url + "/logout/?next=" + callBackUrl;
 };
 
 // Returns apartment's maximum unconfirmed prices, whether they are pre-2011 or onwards-2011
