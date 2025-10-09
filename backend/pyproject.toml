@@ -33,6 +33,7 @@ sentry-sdk = "^2.32.0"
 social-auth-app-django = "^5.5.1"
 tomli = "^2.2.1"
 xhtml2pdf = "^0.2.17"
+svglib = "~1.5.1"  # svglib 1.6.0 requires pycairo. To upgrade, pycairo installation must be solved.
 
 [tool.poetry.dependencies.uWSGI]
 version = "^2.0.30"
