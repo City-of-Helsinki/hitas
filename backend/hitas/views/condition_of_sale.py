@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
 from safedelete import HARD_DELETE
 
 from hitas.models.apartment import Apartment
@@ -51,13 +50,14 @@ class MinimalOwnerSerializer(HitasModelSerializer):
         ]
 
 
-class ConditionOfSaleOwnershipSerializer(ModelSerializer):
+class ConditionOfSaleOwnershipSerializer(HitasModelSerializer):
     apartment = MinimalApartmentSerializer()
     owner = MinimalOwnerSerializer()
 
     class Meta:
         model = Ownership
         fields = [
+            "id",
             "percentage",
             "apartment",
             "owner",

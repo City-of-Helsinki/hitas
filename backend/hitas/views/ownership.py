@@ -1,8 +1,10 @@
-from rest_framework import serializers
+from rest_framework import mixins, serializers
+from rest_framework.viewsets import GenericViewSet
 
 from hitas.models import NonObfuscatedOwner, Owner, Ownership
 from hitas.views.utils import HitasDecimalField, UUIDRelatedField
-from hitas.views.utils.serializers import ReadOnlySerializer
+from hitas.views.utils.serializers import HitasModelSerializer, ReadOnlySerializer
+from hitas.views.utils.viewsets import HitasModelMixin
 
 
 class OwnerSerializer(ReadOnlySerializer):
@@ -30,13 +32,14 @@ class NonObfuscatedOwnerSerializer(OwnerSerializer):
         return NonObfuscatedOwner
 
 
-class OwnershipSerializer(serializers.ModelSerializer):
-    owner = OwnerSerializer()
+class OwnershipSerializer(HitasModelSerializer):
+    owner = OwnerSerializer(read_only=True)
     percentage = HitasDecimalField(required=True)
 
     class Meta:
         model = Ownership
         fields = [
+            "id",
             "owner",
             "percentage",
         ]
@@ -44,3 +47,20 @@ class OwnershipSerializer(serializers.ModelSerializer):
 
 class NonObfuscatedOwnerShipSerializer(OwnershipSerializer):
     owner = NonObfuscatedOwnerSerializer()
+
+
+class OwnershipUpdateSerializer(HitasModelSerializer):
+    class Meta:
+        model = Ownership
+        fields = [
+            "id",
+            "percentage",
+        ]
+        read_only_fields = ["id"]
+
+
+class OwnershipViewSet(HitasModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
+    serializer_class = OwnershipSerializer
+    update_serializer_class = OwnershipUpdateSerializer
+    model_class = Ownership
+    http_method_names = ["get", "patch"]

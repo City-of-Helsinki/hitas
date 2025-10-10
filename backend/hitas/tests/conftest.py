@@ -2,6 +2,7 @@ import os
 
 import pytest
 from django.utils.translation import activate
+from rest_framework.test import APIClient
 
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import UserFactory
@@ -31,5 +32,12 @@ def init_test() -> None:
 @pytest.fixture()
 def api_client():
     api_client = HitasAPIClient()
+    api_client.force_authenticate(UserFactory.create(is_staff=True))
+    return api_client
+
+
+@pytest.fixture()
+def api_client_novalidate():
+    api_client = APIClient()
     api_client.force_authenticate(UserFactory.create(is_staff=True))
     return api_client
