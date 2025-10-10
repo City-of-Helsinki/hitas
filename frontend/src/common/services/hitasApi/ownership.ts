@@ -14,9 +14,7 @@ const ownershipApi = hitasApi.injectEndpoints({
                 body: data,
             }),
             invalidatesTags: (result, error, {apartmentId}) =>
-                safeInvalidate(error, [
-                    {type: "Apartment", id: apartmentId},
-                ]),
+                safeInvalidate(error, [{type: "Apartment", id: apartmentId}]),
         }),
     }),
 });
