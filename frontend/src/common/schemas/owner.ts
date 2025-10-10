@@ -25,6 +25,7 @@ export type IOwner = z.infer<typeof OwnerSchema>;
 // ********************************
 
 export const OwnershipSchema = object({
+    id: APIIdString,
     key: z.any().optional(),
     owner: OwnerSchema,
     percentage: z
@@ -33,6 +34,15 @@ export const OwnershipSchema = object({
         .max(100, errorMessages.numberMax),
 });
 export type IOwnership = z.infer<typeof OwnershipSchema>;
+
+export const OwnershipUpdateSchema = object({
+    percentage: z
+        .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+        .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
+        .min(0, errorMessages.numberMin)
+        .max(100, errorMessages.numberMax),
+});
+export type IOwnershipUpdate = z.infer<typeof OwnershipUpdateSchema>;
 
 // Writable list of ownerships
 export const OwnershipsListSchema = object({
