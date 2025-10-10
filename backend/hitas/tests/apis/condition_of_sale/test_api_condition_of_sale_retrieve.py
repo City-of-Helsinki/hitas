@@ -20,6 +20,7 @@ def format_condition_of_sale(cos: ConditionOfSale) -> dict:
         "grace_period": str(cos.grace_period.value),
         "fulfilled": cos.fulfilled,
         "new_ownership": {
+            "id": cos.new_ownership.uuid.hex,
             "percentage": float(cos.new_ownership.percentage),
             "apartment": {
                 "id": cos.new_ownership.apartment.uuid.hex,
@@ -45,6 +46,7 @@ def format_condition_of_sale(cos: ConditionOfSale) -> dict:
             },
         },
         "old_ownership": {
+            "id": cos.old_ownership.uuid.hex,
             "percentage": float(cos.old_ownership.percentage),
             "apartment": {
                 "id": cos.old_ownership.apartment.uuid.hex,

@@ -24,6 +24,7 @@ import {ApartmentViewContext, ApartmentViewContextProvider} from "../components/
 import {
     ApartmentConditionsOfSaleCard,
     ApartmentMaximumPricesCard,
+    OwnershipMutateForm,
     RemoveApartmentLatestSaleModalButton,
 } from "./components";
 
@@ -43,6 +44,38 @@ const OwnerEditModalButton = ({owner}: {owner: IOwner}): React.JSX.Element => {
                 isVisible={isModalOpen}
                 closeModalAction={() => setIsModalOpen(false)}
                 MutateFormComponent={OwnerMutateForm}
+            />
+        </>
+    );
+};
+
+const OwnershipEditModalButton = ({ownership}: {ownership: IOwnership}): React.JSX.Element => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Check if ownership percentages sum to 100%
+    // within 1% margin of error allowing for 1/3 ownerships.
+    const {apartment} = useContext(ApartmentViewContext);
+    const ownershipPercentageSum = apartment
+        ? apartment.ownerships.reduce((sum, currentOwnership) => sum + currentOwnership.percentage, 0)
+        : null;
+    const hasValidOwnershipPercentages = ownershipPercentageSum === null || Math.abs(ownershipPercentageSum - 100) <= 1;
+
+    return (
+        <>
+            <button
+                className="text-button"
+                style={hasValidOwnershipPercentages ? undefined : {color: "var(--color-error)"}}
+                title={hasValidOwnershipPercentages ? undefined : "Omistusosuudet eivät täsmää 100%"}
+                onClick={() => setIsModalOpen(true)}
+            >
+                {`${ownership.percentage}%`}
+            </button>
+            <MutateModal
+                defaultObject={ownership}
+                dialogTitles={{modify: "Muokkaa omistusosuutta"}}
+                isVisible={isModalOpen}
+                closeModalAction={() => setIsModalOpen(false)}
+                MutateFormComponent={OwnershipMutateForm}
             />
         </>
     );
@@ -199,11 +232,11 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                             <label className="detail-field-label">Omistajat</label>
                                             {apartment.ownerships.map((ownership: IOwnership) => (
                                                 <div
-                                                    key={ownership.owner.id}
+                                                    key={ownership.id}
                                                     className="detail-field-value"
                                                 >
-                                                    <OwnerEditModalButton owner={ownership.owner} />
-                                                    <span> {ownership.percentage}%</span>
+                                                    <OwnerEditModalButton owner={ownership.owner} />{" "}
+                                                    <OwnershipEditModalButton ownership={ownership} />
                                                 </div>
                                             ))}
                                         </div>

@@ -14904,6 +14904,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "9fccf166-dd4b-4178-a259-354a9cd33f3e",
       "owner": 1,
       "sale": 1,
       "percentage": "100.00"
@@ -14915,6 +14916,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "39289656-0a41-4696-b508-5d8d356cc0b2",
       "owner": 2,
       "sale": 2,
       "percentage": "100.00"
@@ -14926,6 +14928,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "c0faf312-8ac6-4956-9b34-b8797345edc5",
       "owner": 3,
       "sale": 3,
       "percentage": "50.00"
@@ -14937,6 +14940,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "67652603-7bb9-4566-ae47-be7b8404999e",
       "owner": 4,
       "sale": 3,
       "percentage": "50.00"
@@ -14948,6 +14952,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "8164c8ad-0960-4d6f-8e37-904be91e9c34",
       "owner": 5,
       "sale": 4,
       "percentage": "30.00"
@@ -14959,6 +14964,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "99903e63-e670-4f0b-bca1-82fb92348c47",
       "owner": 6,
       "sale": 4,
       "percentage": "30.00"
@@ -14970,6 +14976,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "70849055-ee10-4db2-abd5-e62f9d9ea0ae",
       "owner": 7,
       "sale": 4,
       "percentage": "40.00"
@@ -14981,6 +14988,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "b5e3dd54-fb38-4bcc-aa95-5472c2600cfc",
       "owner": 8,
       "sale": 5,
       "percentage": "50.00"
@@ -14992,6 +15000,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "01e34f37-a2c0-4b31-8a90-6aebbdcc595e",
       "owner": 9,
       "sale": 5,
       "percentage": "50.00"
@@ -15003,6 +15012,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "c22f51b3-94e1-4f91-b306-0031a633dad1",
       "owner": 9,
       "sale": 6,
       "percentage": "100.00"
@@ -15014,6 +15024,7 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
+      "uuid": "bee5676d-1b68-482c-8803-841e2a66e237",
       "owner": 8,
       "sale": 7,
       "percentage": "100.00"

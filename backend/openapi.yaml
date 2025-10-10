@@ -1651,9 +1651,21 @@ paths:
                         stair: A
                         street_address: Example street
                       ownerships:
-                        - name: Erkki Esimerkki
+                        - id: 9d3e01f0b9684f7b8a6d0f8c4c1c2d3e
+                          owner:
+                            id: 6a9d01f0b9684f7b8a6d0f8c4c1c2d3e
+                            name: Erkki Esimerkki
+                            identifier: 010101-0101
+                            email: erkki.esimerkki@example.com
+                            non_disclosure: false
                           percentage: 50.0
-                        - name: Eija Esimerkki
+                        - id: 1a2b03f0b9684f7b8a6d0f8c4c1c2d3e
+                          owner:
+                            id: 7b9e02f0b9684f7b8a6d0f8c4c1c2d3e
+                            name: Eija Esimerkki
+                            identifier: 020202-0202
+                            email: eija.esimerkki@example.com
+                            non_disclosure: false
                           percentage: 50.0
                       rooms: 2
                       shares:
@@ -1766,9 +1778,21 @@ paths:
                         stair: A
                         street_address: Example street
                       ownerships:
-                        - name: Erkki Esimerkki
+                        - id: 9d3e01f0b9684f7b8a6d0f8c4c1c2d3e
+                          owner:
+                            id: 6a9d01f0b9684f7b8a6d0f8c4c1c2d3e
+                            name: Erkki Esimerkki
+                            identifier: 010101-0101
+                            email: erkki.esimerkki@example.com
+                            non_disclosure: false
                           percentage: 50.0
-                        - name: Eija Esimerkki
+                        - id: 1a2b03f0b9684f7b8a6d0f8c4c1c2d3e
+                          owner:
+                            id: 7b9e02f0b9684f7b8a6d0f8c4c1c2d3e
+                            name: Eija Esimerkki
+                            identifier: 020202-0202
+                            email: eija.esimerkki@example.com
+                            non_disclosure: false
                           percentage: 50.0
                       rooms: 2
                       shares:
@@ -2888,6 +2912,59 @@ paths:
           $ref: "#/components/responses/NotAcceptable"
         "409":
           $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # Ownerships
+
+  /api/v1/ownerships/{ownership_id}:
+    patch:
+      description: Update an ownership's percentage
+      operationId: update-ownership
+      tags:
+        - Ownerships
+      parameters:
+        - name: ownership_id
+          required: true
+          in: path
+          description: Ownership ID
+          schema:
+            type: string
+            example: dc1072975bab4ba69f64814f021c6785
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - percentage
+              properties:
+                percentage:
+                  description: Updated ownership percentage
+                  type: number
+                  minimum: 0
+                  maximum: 100
+            examples:
+              Update ownership percentage:
+                value:
+                  percentage: 75.0
+      responses:
+        "200":
+          description: Successfully updated ownership
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnershipUpdate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -8134,11 +8211,37 @@ components:
       type: object
       additionalProperties: false
       required:
+        - id
         - owner
         - percentage
       properties:
+        id:
+          description: ID of this ownership
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
         owner:
           $ref: "#/components/schemas/ReadOnlyOwner"
+        percentage:
+          description: Percentage that the owner owns of the apartment
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 100
+
+    OwnershipUpdate:
+      description: Ownership information for updates
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - percentage
+      properties:
+        id:
+          description: ID of this ownership
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
         percentage:
           description: Percentage that the owner owns of the apartment
           type: number
@@ -9007,10 +9110,16 @@ components:
       type: object
       additionalProperties: false
       required:
+        - id
         - percentage
         - apartment
         - owner
       properties:
+        id:
+          description: ID of this ownership
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
         percentage:
           description: Percentage that the owner owns of the apartment
           type: number

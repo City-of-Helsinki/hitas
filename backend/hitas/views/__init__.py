@@ -25,6 +25,7 @@ from hitas.views.indices import (
 )
 from hitas.views.job_performance import JobPerformanceView
 from hitas.views.owner import DeObfuscatedOwnerView, OwnerViewSet
+from hitas.views.ownership import OwnershipViewSet
 from hitas.views.pdf_body import PDFBodyViewSet
 from hitas.views.postal_code import HitasPostalCodeViewSet
 from hitas.views.property_manager import PropertyManagerViewSet
