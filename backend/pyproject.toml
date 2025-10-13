@@ -72,6 +72,8 @@ addopts = "--nomigrations"
 filterwarnings = [
     # ignore DeprecationWarning for ast.NameConstant in reportlab <= 4.2
     "ignore:^ast\\.NameConstant is deprecated and will be removed in Python 3\\.14\\; use ast\\.Constant instead$:DeprecationWarning:reportlab\\..*:0",
+    # ignore self-referencing DeprecationWarning from testcontainers extras
+    "ignore:.*@wait_container_is_ready.*:DeprecationWarning:testcontainers\\..*",
 ]
 norecursedirs = [
     "node_modules",

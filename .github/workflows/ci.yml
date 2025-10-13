@@ -84,7 +84,7 @@ jobs:
     # Majority of the tests require database
     services:
       postgres:
-        image: postgres:14
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres

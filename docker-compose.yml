@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   hitas-postgres:
-    image: postgres:14
+    image: postgres:17
     command: ["postgres", "-c", "log_statement=all"]
     ports:
       - "5432:5432"
