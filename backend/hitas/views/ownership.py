@@ -33,8 +33,8 @@ class NonObfuscatedOwnerSerializer(OwnerSerializer):
 
 
 class OwnershipSerializer(HitasModelSerializer):
-    owner = OwnerSerializer(read_only=True)
-    percentage = HitasDecimalField(required=True)
+    owner = OwnerSerializer()
+    percentage = HitasDecimalField()
 
     class Meta:
         model = Ownership
@@ -43,6 +43,7 @@ class OwnershipSerializer(HitasModelSerializer):
             "owner",
             "percentage",
         ]
+        read_only_fields = ["id", "owner", "percentage"]
 
 
 class NonObfuscatedOwnerShipSerializer(OwnershipSerializer):
