@@ -45,7 +45,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
         "apartments": [
             {
                 "acquisition_price": 275000.0,
-                "apartment_number": 1,
+                "apartment_number": "1",
                 "apartment_type": {
                     "id": apartment_type_1.uuid.hex,
                     "value": "h+k+s",
@@ -62,7 +62,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 175000.0,
-                "apartment_number": 2,
+                "apartment_number": "2",
                 "apartment_type": {
                     "id": apartment_type_1.uuid.hex,
                     "value": "h+k+s",
@@ -79,7 +79,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 225000.0,
-                "apartment_number": 3,
+                "apartment_number": "3",
                 "apartment_type": {
                     "id": apartment_type_2.uuid.hex,
                     "value": "h+kt",
@@ -96,7 +96,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 350000.0,
-                "apartment_number": 4,
+                "apartment_number": "4",
                 "apartment_type": {
                     "id": apartment_type_1.uuid.hex,
                     "value": "h+k+s",
@@ -113,7 +113,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 170000.0,
-                "apartment_number": 1,
+                "apartment_number": "1",
                 "apartment_type": {
                     "id": apartment_type_1.uuid.hex,
                     "value": "h+k+s",
@@ -130,7 +130,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 350000.0,
-                "apartment_number": 2,
+                "apartment_number": "2",
                 "apartment_type": {
                     "id": apartment_type_1.uuid.hex,
                     "value": "h+k+s",
@@ -147,7 +147,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 275000.0,
-                "apartment_number": 3,
+                "apartment_number": "3",
                 "apartment_type": {
                     "id": apartment_type_1.uuid.hex,
                     "value": "h+k+s",
@@ -164,7 +164,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
             {
                 "acquisition_price": 235000.0,
-                "apartment_number": 4,
+                "apartment_number": "4",
                 "apartment_type": {
                     "id": apartment_type_2.uuid.hex,
                     "value": "h+kt",
@@ -526,7 +526,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
 
     data = [
         {
-            "apartment_number": 1,
+            "apartment_number": "1",
             "apartment_type": apartment_type_1.uuid.hex,
             "catalog_purchase_price": 200000.0,
             "floor": "1",
@@ -538,7 +538,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 75.0,
         },
         {
-            "apartment_number": 2,
+            "apartment_number": "2",
             "apartment_type": apartment_type_1.uuid.hex,
             "catalog_purchase_price": 100000.0,
             "floor": "2",
@@ -550,7 +550,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 40.0,
         },
         {
-            "apartment_number": 3,
+            "apartment_number": "3",
             "apartment_type": apartment_type_2.uuid.hex,
             "catalog_purchase_price": 150000.0,
             "floor": "3",
@@ -562,7 +562,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 65.0,
         },
         {
-            "apartment_number": 4,
+            "apartment_number": "4",
             "apartment_type": apartment_type_1.uuid.hex,
             "catalog_purchase_price": 250000.0,
             "floor": "4",
@@ -574,7 +574,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 100.0,
         },
         {
-            "apartment_number": 1,
+            "apartment_number": "1",
             "apartment_type": apartment_type_1.uuid.hex,
             "catalog_purchase_price": 95000.0,
             "floor": "5",
@@ -586,7 +586,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 40.0,
         },
         {
-            "apartment_number": 2,
+            "apartment_number": "2",
             "apartment_type": apartment_type_1.uuid.hex,
             "catalog_purchase_price": 250000.0,
             "floor": "6",
@@ -598,7 +598,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 100.0,
         },
         {
-            "apartment_number": 3,
+            "apartment_number": "3",
             "apartment_type": apartment_type_1.uuid.hex,
             "catalog_purchase_price": 200000.0,
             "floor": "7",
@@ -610,7 +610,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
             "surface_area": 75.0,
         },
         {
-            "apartment_number": 4,
+            "apartment_number": "4",
             "apartment_type": apartment_type_2.uuid.hex,
             "catalog_purchase_price": 160000.0,
             "floor": "8",
@@ -630,21 +630,21 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
     apartments: list[Apartment] = list(Apartment.objects.all())
     assert len(apartments) == 8
     assert apartments[0].stair == "A"
-    assert apartments[0].apartment_number == 1
+    assert apartments[0].apartment_number == "1"
     assert apartments[1].stair == "A"
-    assert apartments[1].apartment_number == 2
+    assert apartments[1].apartment_number == "2"
     assert apartments[2].stair == "A"
-    assert apartments[2].apartment_number == 3
+    assert apartments[2].apartment_number == "3"
     assert apartments[3].stair == "A"
-    assert apartments[3].apartment_number == 4
+    assert apartments[3].apartment_number == "4"
     assert apartments[4].stair == "B"
-    assert apartments[4].apartment_number == 1
+    assert apartments[4].apartment_number == "1"
     assert apartments[5].stair == "B"
-    assert apartments[5].apartment_number == 2
+    assert apartments[5].apartment_number == "2"
     assert apartments[6].stair == "B"
-    assert apartments[6].apartment_number == 3
+    assert apartments[6].apartment_number == "3"
     assert apartments[7].stair == "B"
-    assert apartments[7].apartment_number == 4
+    assert apartments[7].apartment_number == "4"
 
     # Real estate and building created automatically
     real_estates: list[RealEstate] = list(housing_company.real_estates.all())
@@ -671,7 +671,7 @@ def test__api__sales_catalog__create__real_estate_and_building_exist(api_client:
 
     data = [
         {
-            "apartment_number": 1,
+            "apartment_number": "1",
             "apartment_type": apartment_type.uuid.hex,
             "catalog_purchase_price": 200000.0,
             "floor": "1",
@@ -743,7 +743,7 @@ def test__api__sales_catalog__create__invalid_data(api_client: HitasAPIClient, i
     )
 
     data = {
-        "apartment_number": 1,
+        "apartment_number": "1",
         "apartment_type": apartment_type.uuid.hex,
         "catalog_purchase_price": 200000.0,
         "floor": "1",
@@ -791,7 +791,7 @@ def test__api__sales_catalog__create__invalid_data__some_in_list(api_client: Hit
     }
 
     data_1: dict[str, Any] = {
-        "apartment_number": 1,
+        "apartment_number": "1",
         "apartment_type": apartment_type.uuid.hex,
         "catalog_purchase_price": 200000.0,
         "floor": "1",

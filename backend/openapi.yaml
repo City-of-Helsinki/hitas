@@ -1644,7 +1644,7 @@ paths:
                     additional_info: This is an example additional info string
                     apartment:
                       address:
-                        apartment_number: 1
+                        apartment_number: "1"
                         city: Oulu
                         floor: "1"
                         postal_code: "90100"
@@ -1771,7 +1771,7 @@ paths:
                     additional_info: This is an example additional info string
                     apartment:
                       address:
-                        apartment_number: 1
+                        apartment_number: "1"
                         city: Oulu
                         floor: "1"
                         postal_code: "90100"
@@ -6555,8 +6555,8 @@ components:
                 example: dc1072975bab4ba69f64814f021c6785
               apartment_number:
                 description: Apartment number of the adjacent apartment
-                type: integer
-                example: 2
+                type: string
+                example: "2"
               stair:
                 description: Stair number of the adjacent apartment
                 type: string
@@ -7809,9 +7809,8 @@ components:
                   example: B
                 apartment_number:
                   description: Apartment number
-                  type: integer
-                  minimum: 0
-                  example: 18
+                  type: string
+                  example: "18"
                 postal_code:
                   description: Apartment's postal code
                   type: string
@@ -8451,9 +8450,8 @@ components:
           example: Helsinki
         apartment_number:
           description: Apartment number
-          type: number
-          minimum: 0
-          example: 14
+          type: string
+          example: "14"
         floor:
           description: Apartment floor
           type: string
@@ -9249,9 +9247,8 @@ components:
           example: "5"
         apartment_number:
           description: Apartment number
-          type: number
-          minimum: 0
-          example: 14
+          type: string
+          example: "14"
         rooms:
           description: Number of rooms for this apartment
           type: integer
@@ -9332,9 +9329,8 @@ components:
           example: "5"
         apartment_number:
           description: Apartment number
-          type: number
-          minimum: 0
-          example: 14
+          type: string
+          example: "14"
         rooms:
           description: Number of rooms for this apartment
           type: integer

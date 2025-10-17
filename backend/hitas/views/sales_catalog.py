@@ -25,7 +25,7 @@ class SalesCatalogApartment(TypedDict):
     row: int
     stair: str
     floor: str
-    apartment_number: int
+    apartment_number: str
     rooms: Union[int, str]
     apartment_type: Union[str, MinimalApartmentType]
     surface_area: Decimal
@@ -39,7 +39,7 @@ class SalesCatalogApartment(TypedDict):
 class SalesCatalogApartmentCreate(TypedDict):
     stair: str
     floor: str
-    apartment_number: int
+    apartment_number: str
     rooms: Union[int, str]
     apartment_type: ApartmentType
     surface_area: Decimal
@@ -53,7 +53,7 @@ class SalesCatalogApartmentSerializer(serializers.Serializer):
     row = serializers.IntegerField(min_value=1)
     stair = serializers.CharField(max_length=16)
     floor = serializers.CharField(max_length=50)
-    apartment_number = serializers.IntegerField(min_value=0)
+    apartment_number = serializers.CharField(validators=[*Apartment._meta.get_field("apartment_number").validators])
     rooms = NumberOrRangeField(min_value=1)
     apartment_type = serializers.CharField(max_length=1024)
     surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
@@ -83,7 +83,7 @@ class SalesCatalogDataSerializer(serializers.Serializer):
 class SalesCatalogApartmentCreateSerializer(serializers.Serializer):
     stair = serializers.CharField(max_length=16)
     floor = serializers.CharField(max_length=50)
-    apartment_number = serializers.IntegerField(min_value=0)
+    apartment_number = serializers.CharField(validators=[*Apartment._meta.get_field("apartment_number").validators])
     rooms = NumberOrRangeField(min_value=1)
     apartment_type = UUIDRelatedField(queryset=ApartmentType.objects)
     surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)

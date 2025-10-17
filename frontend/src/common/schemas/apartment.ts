@@ -9,7 +9,6 @@ import {
     nullishNumber,
     nullishPositiveNumber,
     PageInfoSchema,
-    writableRequiredNumber,
 } from "./common";
 import {indexNames} from "./enums";
 import {HousingCompanyRegulationStatusSchema} from "./housingCompany";
@@ -260,7 +259,7 @@ export type SurfaceAreaPriceCeilingCalculation = z.infer<typeof SurfaceAreaPrice
 // ********************************
 
 export const ApartmentAddressSchema = AddressSchema.extend({
-    apartment_number: writableRequiredNumber,
+    apartment_number: string().min(1, "Pakollinen kenttä!"),
     floor: string().nullable(),
     stair: string().min(1, "Pakollinen kenttä!"),
 });
@@ -387,7 +386,7 @@ export type IApartment = z.infer<typeof ApartmentSchema>;
 
 export const AdjacentApartmentSchema = object({
     id: string().nullable(),
-    apartment_number: number(),
+    apartment_number: string(),
     stair: string(),
 });
 export type IAdjacentApartment = z.infer<typeof AdjacentApartmentSchema>;

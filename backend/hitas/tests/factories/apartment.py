@@ -40,7 +40,7 @@ class ApartmentFactory(DjangoModelFactory):
     share_number_end = factory.LazyAttribute(lambda self: (self.share_number_start + 50))
     street_address = factory.Faker("street_address")
     completion_date = fuzzy.FuzzyDate(date(2011, 1, 1))
-    apartment_number = fuzzy.FuzzyInteger(1, 99)
+    apartment_number = fuzzy.FuzzyChoice([str(i) for i in range(1, 100)])
     floor = factory.Faker("numerify", text="%")
     stair = factory.Faker("bothify", text="?")  # Random letter
     catalog_purchase_price = fuzzy.FuzzyDecimal(100000, 200000)

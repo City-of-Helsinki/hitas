@@ -3,6 +3,7 @@ from uuid import UUID
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
+from hitas.models import Apartment
 from hitas.models._base import ExternalSafeDeleteHitasModel
 from hitas.views.utils import HitasPostalCodeField
 
@@ -64,6 +65,6 @@ class ApartmentHitasAddressSerializer(serializers.Serializer):
     street_address = serializers.CharField()
     postal_code = serializers.CharField(source="building.real_estate.housing_company.postal_code.value", read_only=True)
     city = serializers.CharField(source="building.real_estate.housing_company.postal_code.city", read_only=True)
-    apartment_number = serializers.IntegerField(min_value=0)
+    apartment_number = serializers.CharField(validators=[*Apartment._meta.get_field("apartment_number").validators])
     floor = serializers.CharField(max_length=50, required=False, allow_null=True, allow_blank=True)
     stair = serializers.CharField(max_length=16)

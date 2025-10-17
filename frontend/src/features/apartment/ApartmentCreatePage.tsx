@@ -91,7 +91,7 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
             rooms: null,
             shares: {start: undefined, end: undefined},
             address: {
-                apartment_number: undefined,
+                apartment_number: "",
                 floor: null,
                 stair: "",
             },
@@ -323,7 +323,7 @@ const LoadedApartmentCreatePage = () => {
                                 label="Rappu"
                                 required
                             />
-                            <NumberInput
+                            <TextInput
                                 name="address.apartment_number"
                                 label="Asunnon numero"
                                 required
