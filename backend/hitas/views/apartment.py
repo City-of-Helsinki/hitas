@@ -652,7 +652,9 @@ class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModel
 
 
 class AdjacentApartmentSerializer(HitasModelSerializer):
-    apartment_number = serializers.IntegerField(read_only=True)
+    apartment_number = serializers.CharField(
+        read_only=True, validators=[*Apartment._meta.get_field("apartment_number").validators]
+    )
     stair = serializers.CharField(read_only=True)
 
     class Meta:
@@ -714,7 +716,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     def get_adjacent_apartments(instance: ApartmentWithAnnotations) -> list[dict[str, Any]]:
         adjacent_apartments = Apartment.objects.filter(
             building__real_estate__housing_company=instance.housing_company
-        ).order_by("apartment_number", "id")
+        ).order_by("apartment_number_integer", "id")
         return AdjacentApartmentSerializer(adjacent_apartments, many=True).data
 
     @staticmethod
@@ -899,7 +901,7 @@ class ApartmentViewSet(HitasModelViewSet):
                     output_field=models.BooleanField(),
                 ),
             )
-            .order_by("-has_conditions_of_sale", "apartment_number", "id")
+            .order_by("-has_conditions_of_sale", "apartment_number_integer", "id")
         )
 
     def get_list_queryset(self):

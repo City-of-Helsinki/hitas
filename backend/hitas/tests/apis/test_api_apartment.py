@@ -86,8 +86,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     b: Building = BuildingFactory.create(real_estate=re)
-    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1, sales=[])
-    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number=2, sales=[])
+    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number="1", sales=[])
+    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number="2", sales=[])
 
     sale_1: ApartmentSale = ApartmentSaleFactory.create(apartment=ap1, ownerships=[])
     o1: Ownership = OwnershipFactory.create(percentage=50, sale=sale_1)
@@ -250,9 +250,9 @@ def test__api__apartment__list__those_with_conditions_of_sale_come_first(api_cli
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     b: Building = BuildingFactory.create(real_estate=re)
-    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1, sales=[])
-    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number=2, sales=[])
-    ap3: Apartment = ApartmentFactory.create(building=b, apartment_number=3, sales=[])
+    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number="1", sales=[])
+    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number="2", sales=[])
+    ap3: Apartment = ApartmentFactory.create(building=b, apartment_number="3", sales=[])
 
     sale_1: ApartmentSale = ApartmentSaleFactory.create(apartment=ap1, ownerships=[])
     sale_2: ApartmentSale = ApartmentSaleFactory.create(apartment=ap3, ownerships=[])
@@ -289,7 +289,7 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
         share_number_end=None,
         completion_date=None,
         street_address="Fakestreet 1",
-        apartment_number=1,
+        apartment_number="1",
         floor=None,
         stair="A",
         additional_work_during_construction=None,
@@ -1215,7 +1215,7 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         },
         "address": {
             "street_address": "TestStreet 3",
-            "apartment_number": 58,
+            "apartment_number": "58",
             "floor": "1",
             "stair": "A",
         },
@@ -1526,7 +1526,7 @@ def test__api__apartment__create__new_hitas_no_apartment_improvements(api_client
                 },
                 fields=[
                     {"field": "address.street_address", "message": "This field is mandatory and cannot be blank."},
-                    {"field": "address.apartment_number", "message": "A valid integer is required."},
+                    {"field": "address.apartment_number", "message": "This field is mandatory and cannot be blank."},
                     {"field": "address.stair", "message": "This field is mandatory and cannot be blank."},
                 ],
             ),
@@ -1539,22 +1539,10 @@ def test__api__apartment__create__new_hitas_no_apartment_improvements(api_client
                     }
                 },
                 fields=[
-                    {"field": "address.apartment_number", "message": "A valid integer is required."},
-                ],
-            ),
-            "apartment number less than 0": InvalidInput(
-                invalid_data={
-                    "address": {
-                        "street_address": "test",
-                        "apartment_number": -1,
-                        "stair": "1",
-                    }
-                },
-                fields=[
                     {
                         "field": "address.apartment_number",
-                        "message": "Ensure this value is greater than or equal to 0.",
-                    }
+                        "message": "Sallittuja ovat vain numerot, ja numeroiden perässä kirjaimet.",
+                    },
                 ],
             ),
             "construction loan amount less than 0": InvalidInput(
@@ -1912,7 +1900,7 @@ def test__api__apartment__create__overlapping_shares(
         building=b1,
         street_address="foo",
         stair="a",
-        apartment_number=1,
+        apartment_number="1",
         share_number_start=start_1,
         share_number_end=end_1,
     )
@@ -1920,7 +1908,7 @@ def test__api__apartment__create__overlapping_shares(
         building=b1,
         street_address="bar",
         stair="b",
-        apartment_number=2,
+        apartment_number="2",
         share_number_start=start_2,
         share_number_end=end_2,
     )
@@ -2079,7 +2067,7 @@ def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient)
         },
         "address": {
             "street_address": "TestStreet 3",
-            "apartment_number": 9,
+            "apartment_number": "9",
             "floor": "5",
             "stair": "X",
         },

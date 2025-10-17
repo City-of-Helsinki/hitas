@@ -166,7 +166,7 @@ export const SalesCatalogApartmentSchema = object({
     row: number(),
     stair: string(),
     floor: string(),
-    apartment_number: number(),
+    apartment_number: string(),
     rooms: number(),
     apartment_type: string().or(
         object({

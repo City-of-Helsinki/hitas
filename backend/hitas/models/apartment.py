@@ -1,4 +1,5 @@
 import datetime
+import re
 import uuid
 from datetime import date
 from decimal import Decimal
@@ -6,8 +7,10 @@ from itertools import chain
 from typing import Optional
 
 from auditlog.registry import auditlog
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.db.models import F, Func, IntegerField, Value
+from django.db.models.functions import Cast, NullIf
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
@@ -49,7 +52,38 @@ class Apartment(ExternalSafeDeleteHitasModel):
     # 'Rappu'
     stair: str = models.CharField(max_length=16)
     # 'Asunnon numero'
-    apartment_number: int = models.PositiveSmallIntegerField()
+    apartment_number: str = models.CharField(
+        max_length=16,
+        validators=[
+            RegexValidator(
+                regex=r"^\d+[a-z]*$",
+                flags=re.IGNORECASE,
+                message="Sallittuja ovat vain numerot, ja numeroiden perässä kirjaimet.",
+            ),
+        ],
+    )
+    # `apartment_number` as integer for sorting and to support batch operations on ranges of apartments
+    apartment_number_integer: int = models.GeneratedField(
+        expression=Cast(
+            NullIf(
+                Func(
+                    F("apartment_number"),
+                    # Replace non-numbers...
+                    Value(r"\D+"),
+                    # ...with an empty string.
+                    Value(""),
+                    # Replace all matches
+                    Value("g"),
+                    function="REGEXP_REPLACE",
+                ),
+                # Avoid CAST('' AS integer) errors
+                Value(""),
+            ),
+            output_field=IntegerField(),
+        ),
+        output_field=IntegerField(),
+        db_persist=True,
+    )
     # 'Kerros'
     floor: Optional[str] = models.CharField(max_length=50, blank=True, null=True)
     # 'Pinta-ala'

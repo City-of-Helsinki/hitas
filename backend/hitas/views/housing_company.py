@@ -488,11 +488,11 @@ class HousingCompanyViewSet(HitasModelViewSet):
         )
         if data["apartment_number_start"] is not None:
             query_set = query_set.filter(
-                apartment_number__gte=data["apartment_number_start"],
+                apartment_number_integer__gte=data["apartment_number_start"],
             )
         if data["apartment_number_end"] is not None:
             query_set = query_set.filter(
-                apartment_number__lte=data["apartment_number_end"],
+                apartment_number_integer__lte=data["apartment_number_end"],
             )
 
         completed_apartment_count = query_set.update(completion_date=data["completion_date"])

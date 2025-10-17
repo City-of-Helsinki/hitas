@@ -208,7 +208,9 @@ class MultipleOwnershipsReportView(ViewSet):
 
 class OwnershipsByHousingCompanyReportSerializer(serializers.ModelSerializer):
     owner_id = serializers.SerializerMethodField()
-    number = serializers.IntegerField(source="sale.apartment.apartment_number")
+    number = serializers.CharField(
+        source="sale.apartment.apartment_number", validators=[*Apartment._meta.get_field("apartment_number").validators]
+    )
     surface_area = HitasDecimalField(source="sale.apartment.surface_area")
     share_numbers = serializers.SerializerMethodField()
     purchase_date = serializers.DateField(source="sale.purchase_date")
@@ -261,7 +263,7 @@ class ApartmentsByHousingCompanyReport(ViewSet):
         housing_company_obj: HousingCompany = lookup_model_by_uuid(kwargs.get("pk"), HousingCompany)
         apartments = Apartment.objects.filter(
             building__real_estate__housing_company_id=housing_company_obj.id,
-        ).order_by("apartment_number")
+        ).order_by("apartment_number_integer")
         workbook = build_apartments_by_housing_companies_report_excel(apartments)
         filename = f"Yhtiön {housing_company_obj.display_name} asunnot.xlsx"
         return get_excel_response(filename=filename, excel=workbook)

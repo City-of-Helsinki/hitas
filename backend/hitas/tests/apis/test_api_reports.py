@@ -1993,7 +1993,7 @@ def test__api__download_ownerships_by_housing_company(api_client: HitasAPIClient
     assert list(worksheet.values) == [
         ("Asunnon nro", "Asunnon pinta-ala", "Osakenumerot", "Kauppakirjapäivä", "Omistajan nimi", "Henkilötunnus"),
         (
-            10,
+            "10",
             150.2,
             "10-100",
             datetime.datetime.fromisoformat("2023-09-09"),
@@ -2001,7 +2001,7 @@ def test__api__download_ownerships_by_housing_company(api_client: HitasAPIClient
             ownership_2.owner.identifier,
         ),
         (
-            20,
+            "20",
             50.2,
             f"{ownership_1.sale.apartment.share_number_start}-{ownership_1.sale.apartment.share_number_end}",
             datetime.datetime.fromisoformat(ownership_1.sale.purchase_date.isoformat()),
@@ -2009,7 +2009,7 @@ def test__api__download_ownerships_by_housing_company(api_client: HitasAPIClient
             ownership_1.owner.identifier,
         ),
         (
-            20,
+            "20",
             50.2,
             f"{ownership_1.sale.apartment.share_number_start}-{ownership_1.sale.apartment.share_number_end}",
             datetime.datetime.fromisoformat("2023-10-10"),
@@ -2025,12 +2025,12 @@ def test__api__download_apartments_by_housing_company(api_client: HitasAPIClient
         display_name="HCompany1",
     )
     apartment_1 = ApartmentFactory(
-        apartment_number=20,
+        apartment_number="20",
         surface_area=50.2,
         building__real_estate__housing_company=housing_company,
     )
     apartment_2 = ApartmentFactory(
-        apartment_number=10,
+        apartment_number="10",
         surface_area=150.2,
         share_number_start=10,
         share_number_end=100,
@@ -2123,7 +2123,7 @@ def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulat
         assert response.json() == [
             {
                 "owner_id": ownership_2.owner.uuid.hex,
-                "number": 10,
+                "number": "10",
                 "owner_name": ownership_2.owner.name,
                 "owner_ssn": ownership_2.owner.identifier,
                 "purchase_date": "2023-09-09",
@@ -2132,7 +2132,7 @@ def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulat
             },
             {
                 "owner_id": ownership_1.owner.uuid.hex,
-                "number": 20,
+                "number": "20",
                 "owner_name": ownership_1.owner.name,
                 "owner_ssn": ownership_1.owner.identifier,
                 "purchase_date": str(ownership_1.sale.purchase_date),
@@ -2141,7 +2141,7 @@ def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulat
             },
             {
                 "owner_id": ownership_1_2.owner.uuid.hex,
-                "number": 20,
+                "number": "20",
                 "owner_name": "***",
                 "owner_ssn": "",
                 "purchase_date": "2023-10-10",
