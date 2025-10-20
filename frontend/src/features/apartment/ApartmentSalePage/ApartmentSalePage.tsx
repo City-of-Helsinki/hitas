@@ -207,8 +207,15 @@ const LoadedApartmentSalePage = () => {
     const createApartmentSale = (data, apartment) => {
         if (isWarningModalVisible) closeWarningsModal();
 
+        // New ownerships should always be created when creating a new sale
+        // Remove id so that backend knows to create a new ownership and not try to update an existing one
+        const ownershipsWithoutId = (data.ownerships ?? []).map(({id: _id, ...rest}) => rest);
+
         createSale({
-            data: data,
+            data: {
+                ...data,
+                ownerships: ownershipsWithoutId,
+            },
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
         })
