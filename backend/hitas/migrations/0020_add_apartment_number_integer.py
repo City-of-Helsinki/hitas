@@ -39,10 +39,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='apartment',
             name='apartment_number',
-            field=models.CharField(max_length=16, validators=[django.core.validators.RegexValidator(flags=re.RegexFlag['IGNORECASE'], message='Sallittuja ovat vain numerot, ja numeroiden perässä kirjaimet.', regex='^\\d+[a-z]*$')]),
+            field=models.CharField(null=True, max_length=16, validators=[django.core.validators.RegexValidator(flags=re.RegexFlag['IGNORECASE'], message='Sallittuja ovat vain numerot, ja numeroiden perässä kirjaimet.', regex='^\\d+[a-z]*$')]),
             preserve_default=False,
         ),
         migrations.RunPython(copy_apartment_numbers, reverse_code=copy_apartment_numbers_reverse),
+        # Remove null=True from apartment_number
+        migrations.AlterField(
+            model_name='apartment',
+            name='apartment_number',
+            field=models.CharField(max_length=16, validators=[django.core.validators.RegexValidator(flags=re.RegexFlag['IGNORECASE'], message='Sallittuja ovat vain numerot, ja numeroiden perässä kirjaimet.', regex='^\\d+[a-z]*$')]),
+        ),
         # GeneratedField cannot be altered, so we need to drop and recreate it
         migrations.RemoveField(
             model_name='apartment',
