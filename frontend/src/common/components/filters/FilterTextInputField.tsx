@@ -39,7 +39,10 @@ export default function FilterTextInputField({
         }
     };
 
-    const handleOnBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleOnBlur = (e: React.FocusEvent<HTMLInputElement | HTMLDivElement>) => {
+        if (!(e.target instanceof HTMLInputElement)) {
+            return;
+        }
         if (e.target.value.length && e.target.value.length < minLength) {
             setIsInvalid(true);
         }

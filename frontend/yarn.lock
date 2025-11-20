@@ -1136,19 +1136,17 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime@7.17.9":
-  version "7.17.9"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.17.9.tgz#d19fbf802d01a8cb6cf053a64e472d42c434ba72"
-  integrity sha512-lSiBBvodq29uShpWGNbgFdKYNiFDo5/HIYsaCEY9ff4sb10x9jizo2+pRrSyF4jKZCXqgzuqBOQKbUm90gQwJg==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.20.7", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
   version "7.22.11"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.11.tgz#7a9ba3bbe406ad6f9e8dd4da2ece453eb23a77a4"
   integrity sha512-ee7jVNlWN09+KftVOu9n7S8gQzD/Z6hN/I8VBRXW4P1+Xe7kJGXMwu8vds4aGIMHZnNbdpSWCfZZtinytpcAvA==
   dependencies:
     regenerator-runtime "^0.14.0"
+
+"@babel/runtime@^7.26.10":
+  version "7.28.4"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.28.4.tgz#a70226016fabe25c5783b2f22d3e1c9bc5ca3326"
+  integrity sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==
 
 "@babel/template@^7.22.5", "@babel/template@^7.3.3":
   version "7.22.5"
@@ -5648,23 +5646,23 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
-hds-core@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-4.2.0.tgz#2b7bbd94b48a5246c1abdc109d0c4dfdbfed7f32"
-  integrity sha512-D9GqQ/CdIrJp2ypQRB2FEbkfT/D4s/ehjwSWVQ/7pc5bZ8plOEvUTaIf2Kfl46/7U8QrQ6+N9BUd8nSl9TE0hA==
+hds-core@4.8.1:
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-4.8.1.tgz#58b977c1dcd36171ab309604fefbe76679aa8931"
+  integrity sha512-7szkf/T6oWaaT4FIdl5KMrln+gScUjsccCQJaRxAHyZlxK7y1UUKSX9g9/vyj/euvrRTNb/Y8Dn7zJPmoCxaug==
 
-hds-design-tokens@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-4.2.0.tgz#ed750ca6cd4ea5c90f1034c7921b17f0ee0fa3f2"
-  integrity sha512-rcYFYkVdoThf53pQANnSrif+4y9IW19aSY5q60lf6odhOD24SjB5LKSaJJzd2HXdWQApd3QaIp5HTicSPDmaYQ==
+hds-design-tokens@4.8.1:
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-4.8.1.tgz#f0179bb52d68d50d6cbf5c81bc11735d5e31fbce"
+  integrity sha512-d1aAAH7vHuxHtJxmIL5zE/FPIh/sKo7TizeaKdL5FIWeHM3RfHp4QYFotyWA2Ogsc/KxY3wV8BwEGoCH1TC+ig==
 
-hds-react@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-4.2.0.tgz#5d8318f5883ea528bc8c30163ccfa0593fa93393"
-  integrity sha512-Tj1TzAb2Ov+JO/WSllcEvD3vlxEkSjJznTBcF1ScrAV/ZNwPDsIix+cs7bVFY/uNB8Kl2qoESf9vcd88cN0HSQ==
+hds-react@4.8.1:
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-4.8.1.tgz#c71694c8ce3fd64a5076d519b896cf53f4affc8f"
+  integrity sha512-Er7ZLMsdsmY/GEPPMvz5k5c1dxXfoydcQaoUHZdiSX2cpocTr6j59WLs/4KpGweFwkTUI/G2AVyym6ye3OsLdQ==
   dependencies:
     "@apollo/client" "^3.10.1"
-    "@babel/runtime" "7.17.9"
+    "@babel/runtime" "^7.26.10"
     "@emotion/styled-base" "^11.0.0"
     "@hookform/resolvers" "^2.9.11"
     "@juggle/resize-observer" "3.2.0"
@@ -5679,7 +5677,7 @@ hds-react@^4.2.0:
     date-fns "2.16.1"
     downshift "6.0.6"
     graphql "^16.8.1"
-    hds-core "4.2.0"
+    hds-core "4.8.1"
     jwt-decode "^3.1.2"
     kashe "1.0.4"
     lodash "^4.17.21"
@@ -8853,7 +8851,7 @@ regenerate@^1.4.2:
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.2.tgz#b9346d8827e8f5a32f7ba29637d398b69014848a"
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
 
-regenerator-runtime@^0.13.4, regenerator-runtime@^0.13.9:
+regenerator-runtime@^0.13.9:
   version "0.13.11"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
   integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
