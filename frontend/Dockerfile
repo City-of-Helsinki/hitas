@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:18-alpine AS build
+FROM public.ecr.aws/docker/library/node:22-alpine AS build
 
 RUN mkdir /hitas
 WORKDIR /hitas
