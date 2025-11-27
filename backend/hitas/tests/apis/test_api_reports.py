@@ -439,6 +439,7 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
         apartment__surface_area=100,
+        apartment__additional_work_during_construction=5_000,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__postal_code__cost_area=1,
     )
@@ -454,6 +455,7 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
         purchase_price=130_000,
         apartment_share_of_housing_company_loans=100,
         apartment__surface_area=100,
+        apartment__additional_work_during_construction=1_000,
         apartment__building__real_estate__housing_company__postal_code__value="00002",
         apartment__building__real_estate__housing_company__postal_code__cost_area=1,
     )
@@ -524,11 +526,12 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
     assert rows[1][3] == sale_1.apartment.surface_area
     assert rows[1][4] == datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat())
     assert rows[1][5] == 60_000  # 50_000 € + 10_000 €
-    assert rows[1][6] == datetime.datetime.fromisoformat(sale_1.purchase_date.isoformat())
-    assert rows[1][7] == 60_000  # 50_000 € + 10_000 €
-    assert rows[1][8] == 600  # (50_000 € + 10_000 €) / 100 m²
-    assert rows[1][9] == 160_000  # 150_000 € + 10_000 € (maximum price + loans)
-    assert rows[1][10] == 1_600  # 160_000 € / 100 m²
+    assert rows[1][6] == 5_000
+    assert rows[1][7] == datetime.datetime.fromisoformat(sale_1.purchase_date.isoformat())
+    assert rows[1][8] == 60_000  # 50_000 € + 10_000 €
+    assert rows[1][9] == 600  # (50_000 € + 10_000 €) / 100 m²
+    assert rows[1][10] == 160_000  # 150_000 € + 10_000 € (maximum price + loans)
+    assert rows[1][11] == 1_600  # 160_000 € / 100 m²
     # Sale row 2
     assert rows[2][0] == sale_2.apartment.postal_code.cost_area
     assert rows[2][1] == sale_2.apartment.postal_code.value
@@ -536,26 +539,27 @@ def test__api__sales_and_maximum_prices_report(api_client: HitasAPIClient):
     assert rows[2][3] == sale_2.apartment.surface_area
     assert rows[2][4] == datetime.datetime.fromisoformat(sale_2.apartment.completion_date.isoformat())
     assert rows[2][5] == 130_100
-    assert rows[2][6] == datetime.datetime.fromisoformat(sale_2.purchase_date.isoformat())
-    assert rows[2][7] == 130_100
-    assert rows[2][8] == 1_301  # (130_000 + 100) / 100 m²
-    assert rows[2][9] == 200_100  # 2000 € * 100 m² + 100 € (surface area ceiling price + loans)
-    assert rows[2][10] == 2_001  # 200_100 € / 100 m²
+    assert rows[2][6] == 1_000
+    assert rows[2][7] == datetime.datetime.fromisoformat(sale_2.purchase_date.isoformat())
+    assert rows[2][8] == 130_100
+    assert rows[2][9] == 1_301  # (130_000 + 100) / 100 m²
+    assert rows[2][10] == 200_100  # 2000 € * 100 m² + 100 € (surface area ceiling price + loans)
+    assert rows[2][11] == 2_001  # 200_100 € / 100 m²
     # Totals - all sales
-    assert rows[4][7] == 2, "Total amount of sales should be 2"
-    assert rows[5][7] == 95_050, "Mean should be 95_050"
-    assert rows[6][7] == 130_100, "Maximum should be 130_100"
-    assert rows[7][7] == 60_000, "Minimum should be 60_000"
+    assert rows[4][8] == 2, "Total amount of sales should be 2"
+    assert rows[5][8] == 95_050, "Mean should be 95_050"
+    assert rows[6][8] == 130_100, "Maximum should be 130_100"
+    assert rows[7][8] == 60_000, "Minimum should be 60_000"
     # Totals - cost area 1
-    assert rows[9][7] == 2, "Total amount of sales in cost area 1 should be 2"
-    assert rows[10][7] == 95_050, "Mean should be 95_050"
-    assert rows[11][7] == 130_100, "Maximum should be 130_100"
-    assert rows[12][7] == 60_000, "Minimum should be 60_000"
+    assert rows[9][8] == 2, "Total amount of sales in cost area 1 should be 2"
+    assert rows[10][8] == 95_050, "Mean should be 95_050"
+    assert rows[11][8] == 130_100, "Maximum should be 130_100"
+    assert rows[12][8] == 60_000, "Minimum should be 60_000"
     # Totals - cost area 2
-    assert rows[14][7] == 0, "Total amount of sales in cost area 2 should be 0"
-    assert rows[15][7] == 0, "Mean should be 0"
-    assert rows[16][7] == 0, "Maximum should be 0"
-    assert rows[17][7] == 0, "Minimum should be 0"
+    assert rows[14][8] == 0, "Total amount of sales in cost area 2 should be 0"
+    assert rows[15][8] == 0, "Mean should be 0"
+    assert rows[16][8] == 0, "Maximum should be 0"
+    assert rows[17][8] == 0, "Minimum should be 0"
 
 
 # Regulated housing companies report
