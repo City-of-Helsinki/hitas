@@ -52,6 +52,7 @@ class SalesAndMaximumPricesReportColumns(NamedTuple):
     surface_area_square_meter: Decimal | str
     completion_date: datetime.date | str
     acquisition_price: Decimal | str
+    additional_work_during_construction: Decimal | str
     purchase_date: datetime.date | str
     total_price: Decimal | str
     total_price_per_square_meter: Decimal | str
@@ -370,6 +371,7 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
         surface_area_square_meter="m2",
         completion_date="Valmistumispäivä",
         acquisition_price="Hankintahinta",
+        additional_work_during_construction="Lisätyöt",
         purchase_date="Kauppapäivä",
         total_price="Toteutunut kauppahinta",
         total_price_per_square_meter="Kaupan neliöhinta",
@@ -429,6 +431,7 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
                 surface_area_square_meter=sale.apartment.surface_area,
                 completion_date=sale.apartment.completion_date,
                 acquisition_price=sale.apartment.first_sale_acquisition_price,
+                additional_work_during_construction=sale.apartment.additional_work_during_construction,
                 purchase_date=sale.purchase_date,
                 total_price=sale.total_price,
                 total_price_per_square_meter=sale.total_price / sale.apartment.surface_area,
@@ -455,6 +458,7 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
         surface_area_square_meter="",
         completion_date="",
         acquisition_price="",
+        additional_work_during_construction="",
         purchase_date="",
         total_price="",
         total_price_per_square_meter="",
@@ -545,10 +549,11 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
                 apartment_address="",
                 surface_area_square_meter="",
                 completion_date="",
-                acquisition_price=definition.title,
+                acquisition_price="",
+                additional_work_during_construction=definition.title,
                 purchase_date=definition.subtitle,
-                total_price=definition.func(f"H2:H{last_row}"),
-                total_price_per_square_meter=definition.func(f"I2:I{last_row}"),
+                total_price=definition.func(f"I2:I{last_row}"),
+                total_price_per_square_meter=definition.func(f"J2:J{last_row}"),
                 maximum_price="",
                 maximum_price_per_square_meter="",
             ),
@@ -573,13 +578,13 @@ def build_sales_and_maximum_prices_report_excel(sales: list[ApartmentSale]) -> W
             },
             "B": {"alignment": Alignment(horizontal="right")},
             "E": {"number_format": date_format},
-            "G": {"number_format": date_format},
-            "H": {"number_format": euro_format},
-            "I": {"number_format": euro_per_square_meter_format},
-            "J": {"number_format": euro_format},
-            "K": {"number_format": euro_per_square_meter_format},
+            "H": {"number_format": date_format},
+            "I": {"number_format": euro_format},
+            "J": {"number_format": euro_per_square_meter_format},
+            "K": {"number_format": euro_format},
+            "L": {"number_format": euro_per_square_meter_format},
             # Reset number format for sales count cells
-            **{f"{letter}{row}": {"number_format": "General"} for row in sales_count_rows for letter in "HI"},
+            **{f"{letter}{row}": {"number_format": "General"} for row in sales_count_rows for letter in "IJ"},
         },
     )
 
