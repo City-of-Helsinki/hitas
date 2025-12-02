@@ -50,6 +50,11 @@ env = environ.Env(
     AZURE_ACCOUNT_NAME=(str, None),
     AZURE_ACCOUNT_KEY=(str, None),
     AZURE_CONTAINER=(str, None),
+    AUDIT_LOG_ENV=(str, "local"),
+    AUDIT_LOG_ES_URL=(str, None),
+    AUDIT_LOG_ES_USERNAME=(str, None),
+    AUDIT_LOG_ES_PASSWORD=(str, None),
+    AUDIT_LOG_ES_INDEX=(str, None),
 )
 env.read_env(BASE_DIR / ".env")
 
@@ -100,6 +105,8 @@ INSTALLED_APPS = [
     "helusers.apps.HelusersAdminConfig",
     "social_django",
     "auditlog",
+    "logger_extra",
+    "resilient_logger",
     "users",
     "hitas",
     "nested_inline",
@@ -115,6 +122,7 @@ INSTALLED_APPS = [
 # ----- Middleware -------------------------------------------------------------------------------------
 
 MIDDLEWARE = [
+    "logger_extra.middleware.XRequestIdMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -208,19 +216,66 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "filters": DEFAULT_LOGGING["filters"],
-    "formatters": DEFAULT_LOGGING["formatters"],
-    "handlers": DEFAULT_LOGGING["handlers"]
-    | {
-        "default": {
-            "class": "logging.StreamHandler",
-        }
+    "filters": {
+        **DEFAULT_LOGGING["filters"],
+        "context": {
+            "()": "logger_extra.filter.LoggerContextFilter",
+        },
     },
-    "loggers": DEFAULT_LOGGING["loggers"],
+    "formatters": {
+        **DEFAULT_LOGGING["formatters"],
+        "json": {
+            "()": "logger_extra.formatter.JSONFormatter",
+        },
+    },
+    "handlers": {
+        **DEFAULT_LOGGING["handlers"],
+        "console": {
+            "class": "logging.StreamHandler",
+            "filters": ["context"],
+            **({"formatter": "json"} if not DEBUG else {}),
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": env("DJANGO_LOG_LEVEL"),
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": env("DJANGO_LOG_LEVEL"),
+            "propagate": False,
+        },
+    },
     "root": {
-        "handlers": ["default"],
+        "handlers": ["console"],
         "level": env("DJANGO_LOG_LEVEL"),
     },
+}
+
+LOGGER_EXTRA_AUGMENT_DJANGO_AUDITLOG = True
+
+RESILIENT_LOGGER = {
+    "origin": "Hitas",
+    "environment": env("AUDIT_LOG_ENV"),
+    "sources": [
+        {"class": "resilient_logger.sources.DjangoAuditLogSource"},
+    ],
+    "targets": [
+        {
+            "class": "resilient_logger.targets.ElasticsearchLogTarget",
+            "es_url": env("AUDIT_LOG_ES_URL"),
+            "es_username": env("AUDIT_LOG_ES_USERNAME"),
+            "es_password": env("AUDIT_LOG_ES_PASSWORD"),
+            "es_index": env("AUDIT_LOG_ES_INDEX"),
+            "required": True,
+        }
+    ],
+    "batch_limit": 5000,
+    "chunk_size": 500,
+    "submit_unsent_entries": True,
+    "clear_sent_entries": True,
 }
 
 if env("SENTRY_DSN"):
