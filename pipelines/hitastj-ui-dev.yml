@@ -35,7 +35,6 @@ resources:
       type: git
       # Azure DevOps project/repository
       name: hitastj/hitastj-pipelines
-      ref: refs/heads/ansible_automation_update # TEMPORARY CHANGE FOR TESTING
 
 extends:
   # Filename in Azure DevOps Repository
