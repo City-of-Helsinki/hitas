@@ -16,7 +16,7 @@ trigger: none
 # of the pull request.
 #
 # Opt out of pull request validation 
-#pr:
+pr: none
   # PR target branch
   #branches:
     #include:
