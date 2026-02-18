@@ -4,7 +4,7 @@ trigger:
   batch: true
   tags:
     include:
-      - hitas-v*
+      - *
 
 # Pull request (PR) triggers cause a pipeline to run whenever a pull request is
 # opened with one of the specified target branches, or when updates are made to
@@ -27,7 +27,6 @@ resources:
       type: git
       # Azure DevOps project/repository
       name: hitastj/hitastj-pipelines
-      ref: refs/heads/ansible_automation_update # TEMPORARY CHANGE FOR TESTING
 
 extends:
   # Filename in Azure DevOps Repository
