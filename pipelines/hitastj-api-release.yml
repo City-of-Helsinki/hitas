@@ -5,7 +5,6 @@ trigger:
   tags:
     include:
       - *
-
 # Pull request (PR) triggers cause a pipeline to run whenever a pull request is
 # opened with one of the specified target branches, or when updates are made to
 # such a pull request.
@@ -16,10 +15,8 @@ trigger:
 #
 # Opt out of pull request validation
 pr: none
-
 # By default, use self-hosted agents
 pool: Default
-
 resources:
   repositories:
     # Azure DevOps repository
@@ -27,7 +24,6 @@ resources:
       type: git
       # Azure DevOps project/repository
       name: hitastj/hitastj-pipelines
-
 extends:
   # Filename in Azure DevOps Repository
   template: components/hitastj-api/pipelines/hitastj-api-release.yml@hitastj-pipelines
