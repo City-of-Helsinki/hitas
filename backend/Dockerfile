@@ -88,6 +88,9 @@ FROM base AS production
 USER hitas
 WORKDIR /hitas/backend/
 
+ENV PATH=/hitas/venv/bin:$PATH
+ENV VIRTUAL_ENV=/hitas/venv
+
 # Copy project files, virtualenv, static files, and translations.
 COPY --chown=hitas:hitas . .
 COPY --chown=hitas:hitas --from=builder /hitas/venv /hitas/venv
