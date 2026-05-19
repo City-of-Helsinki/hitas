@@ -49,7 +49,21 @@ const baseQuery = fetchBaseQuery({
     ...(!Config.token && {credentials: "include"}),
 });
 
-const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+const authQuery = fetchBaseQuery({
+    baseUrl: Config.api_auth_url,
+    credentials: "include",
+});
+
+export const isCsrfFailure = (error?: FetchBaseQueryError): boolean => {
+    if (!error || error.status !== 403) {
+        return false;
+    }
+
+    const errorMessage = (error.data as {detail?: string})?.detail;
+    return errorMessage?.startsWith("CSRF Failed:") ?? false;
+};
+
+export const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
     args,
     api,
     extraOptions
@@ -62,18 +76,29 @@ const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
     // Since we have access to both `api.extra` and `extraOptions` here, we can emulate that behavior by applying the `extraOptions`.
     api.extra = {...(api.extra ?? {}), ...extraOptions};
 
-    const result = await baseQuery(args, api, extraOptions);
+    let result = await baseQuery(args, api, extraOptions);
 
-    // Handle CSRF errors by redirecting to login page
-    if (result.error && result.error.status === 403) {
-        const errorMessage = (result.error?.data as {detail: string})?.detail;
-        if (errorMessage?.startsWith("CSRF Failed:")) {
-            hdsToast.error("CSRF Virhe. Uudelleenohjataan kirjautumissivulle.");
-            setTimeout(() => {
-                // Open login in a new window/tab to avoid losing form data
-                const callBackUrl = new URL("/window-close", window.location.origin).toString();
-                window.open(getSignInUrl(callBackUrl), "_blank");
-            }, 1000);
+    if (api.type === "mutation" && isCsrfFailure(result.error)) {
+        const csrfRefreshResult = await authQuery({url: "csrf/"}, api, extraOptions);
+
+        if (!csrfRefreshResult.error) {
+            result = await baseQuery(args, api, extraOptions);
+        }
+    }
+
+    // If refreshing the CSRF cookie was not enough, fall back to the login popup.
+    if (isCsrfFailure(result.error)) {
+        const loginWindow = window.open(
+            getSignInUrl(new URL("/window-close", window.location.origin).toString()),
+            "_blank"
+        );
+
+        if (loginWindow) {
+            hdsToast.error("CSRF Virhe. Kirjautumisikkuna avattiin.");
+        } else {
+            hdsToast.error(
+                "CSRF Virhe. Kirjautumisikkunan avaaminen estyi. Salli ponnahdusikkunat ja yritä uudelleen."
+            );
         }
     }
     return result;

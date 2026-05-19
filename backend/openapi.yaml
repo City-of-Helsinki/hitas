@@ -4525,6 +4525,16 @@ paths:
 
   # Helsinki profile authentication
 
+  /helauth/csrf/:
+    get:
+      description: Refresh CSRF cookie for the current browser session
+      operationId: refresh-csrf-cookie
+      tags:
+        - Helauth
+      responses:
+        "204":
+          description: Successfully refreshed CSRF cookie
+
   /helauth/userinfo/:
     get:
       description: Get user info for the currently logged in user
