@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 
 from hitas.views.health import HealthCheckView
-from users.views import UserInfoView
+from users.views import CsrfTokenView, UserInfoView
 
 
 class HitasLogoutView(helusers.views.LogoutView):
@@ -36,6 +36,7 @@ urlpatterns = [
     path("healthz", HealthCheckView.as_view(), name="health_check"),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include(helusers_pattern)),
+    path("helauth/csrf/", CsrfTokenView.as_view(), name="csrf"),
     path("helauth/userinfo/", UserInfoView.as_view(), name="userinfo"),
     # Static files can be served using django's built in static file server
     # since they are only used to serve admin panel assets.
