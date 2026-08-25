@@ -40,7 +40,7 @@ const baseQuery = fetchBaseQuery({
                 // The header must be set by the browser so that it includes the correct boundary string.
                 headers.delete("Content-type");
             }
-            const csrfToken = getCookie("csrftoken");
+            const csrfToken = getCookie("hitas_csrftoken");
             csrfToken && headers.set("X-CSRFToken", csrfToken);
         }
 

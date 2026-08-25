@@ -10,4 +10,4 @@ def test__api__csrf__refreshes_csrf_cookie(api_client: HitasAPIClient):
     response = api_client.get(reverse("csrf"))
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    assert "csrftoken" in response.cookies
+    assert "hitas_csrftoken" in response.cookies

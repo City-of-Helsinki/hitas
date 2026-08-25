@@ -91,6 +91,9 @@ if CORS_ALLOWED_ORIGINS:
         # This allow 'csrftoken' cookie to be read/used by all subdomains, e.g. the frontend
         CSRF_COOKIE_DOMAIN = "." + ".".join(CORS_ALLOWED_ORIGINS[0].split(".")[1:])
 
+# Custom cookie name to prevent conflict with other Django apps on the same domain
+CSRF_COOKIE_NAME = "hitas_csrftoken"
+
 # ----- Installed apps ---------------------------------------------------------------------------------
 
 INSTALLED_APPS = [

@@ -41,7 +41,7 @@ const isCsrfResponse = async (response: Response): Promise<boolean> => {
 };
 
 const createPDFRequestInit = (method: "GET" | "POST", data?: object): RequestInit => {
-    const csrfToken = getCookie("csrftoken");
+    const csrfToken = getCookie("hitas_csrftoken");
 
     return {
         method: method,
