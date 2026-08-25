@@ -25,7 +25,7 @@ export default function useAuthentication() {
         const input = document.createElement("input");
         input.type = "hidden";
         input.name = "csrfmiddlewaretoken";
-        input.value = getCookie("csrftoken") || "";
+        input.value = getCookie("hitas_csrftoken") || "";
         form.appendChild(input);
 
         document.body.appendChild(form);
