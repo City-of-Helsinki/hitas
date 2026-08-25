@@ -49,18 +49,40 @@ const baseQuery = fetchBaseQuery({
     ...(!Config.token && {credentials: "include"}),
 });
 
-const authQuery = fetchBaseQuery({
-    baseUrl: Config.api_auth_url,
-    credentials: "include",
-});
+let csrfRefreshPromise: Promise<boolean> | undefined;
+
+export const refreshCsrfCookie = (): Promise<boolean> => {
+    // Coalesce concurrent CSRF failures so one refresh cannot invalidate another request's retry token.
+    if (!csrfRefreshPromise) {
+        csrfRefreshPromise = fetch(`${Config.api_auth_url}/csrf/`, {credentials: "include"})
+            .then((response) => response.ok)
+            .catch(() => false)
+            .finally(() => {
+                csrfRefreshPromise = undefined;
+            });
+    }
+
+    return csrfRefreshPromise;
+};
 
 export const isCsrfFailure = (error?: FetchBaseQueryError): boolean => {
-    if (!error || error.status !== 403) {
+    if (!error) {
         return false;
     }
 
-    const errorMessage = (error.data as {detail?: string})?.detail;
-    return errorMessage?.startsWith("CSRF Failed:") ?? false;
+    // If Django's CSRF middleware returns its HTML 403 page, fetchBaseQuery reports a PARSING_ERROR
+    // because it tries to parse the response as JSON.
+    if (error.status === "PARSING_ERROR") {
+        return error.originalStatus === 403 && error.data.includes("CSRF verification failed");
+    }
+
+    if (error.status !== 403) {
+        return false;
+    }
+
+    const errorData = error.data;
+    const errorMessage = typeof errorData === "string" ? errorData : (errorData as {detail?: string})?.detail;
+    return errorMessage?.startsWith("CSRF Failed:") || errorMessage?.includes("CSRF verification failed") || false;
 };
 
 export const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
@@ -78,12 +100,8 @@ export const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, Fetch
 
     let result = await baseQuery(args, api, extraOptions);
 
-    if (api.type === "mutation" && isCsrfFailure(result.error)) {
-        const csrfRefreshResult = await authQuery({url: "csrf/"}, api, extraOptions);
-
-        if (!csrfRefreshResult.error) {
-            result = await baseQuery(args, api, extraOptions);
-        }
+    if (api.type === "mutation" && isCsrfFailure(result.error) && (await refreshCsrfCookie())) {
+        result = await baseQuery(args, api, extraOptions);
     }
 
     // If refreshing the CSRF cookie was not enough, fall back to the login popup.
