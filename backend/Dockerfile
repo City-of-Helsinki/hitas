@@ -19,6 +19,12 @@ RUN mkdir -p /hitas/backend \
       --shell /bin/false \
       --uid 1000 hitas \
     && chown hitas:hitas /hitas \
+    # Bullseye security packages have moved off the live security mirror.
+    && for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do \
+      if [ -f "$source" ]; then \
+        sed -i 's|https\?://deb.debian.org/debian-security|https://archive.debian.org/debian-security|g' "$source"; \
+      fi; \
+    done \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       libpq5 \
