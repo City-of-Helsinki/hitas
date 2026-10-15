@@ -3,7 +3,7 @@ from typing import Collection, Optional, overload
 from uuid import UUID
 
 from django.db import models
-from django.db.models import F, OuterRef, Prefetch, QuerySet, Subquery, Sum, Value
+from django.db.models import Exists, F, OuterRef, Prefetch, QuerySet, Subquery, Sum, Value
 from django.db.models.functions import Cast, Coalesce, TruncMonth
 
 from hitas.exceptions import HitasModelNotFound
@@ -206,12 +206,14 @@ def get_latest_sale_purchase_date(apartment_id: str | int, *, include_first_sale
 
 
 def aggregate_catalog_prices_where_no_sales() -> Coalesce:
-    """Add up catalog prices for apartments which do not have any sales."""
+    """Add up catalog prices for apartments without an updated price or active sales."""
+    active_sales = ApartmentSale.objects.filter(apartment_id=OuterRef("pk"))
     return Coalesce(
         SQSum(
             Apartment.objects.filter(
+                ~Exists(active_sales),
                 building__real_estate__housing_company=OuterRef("id"),
-                sales__isnull=True,
+                updated_acquisition_price__isnull=True,
             )
             .annotate(_catalog_price=Sum(F("catalog_purchase_price") + F("catalog_primary_loan_amount")))
             .values_list("_catalog_price"),

@@ -25,7 +25,10 @@ def unsold_apartment(db) -> Apartment:
 
 
 @pytest.mark.django_db
-def test_get_completed_housing_companies__cancelled_sale_uses_catalog_price(unsold_apartment: Apartment):
+@pytest.mark.parametrize("has_active_sale,expected_price", [(False, "258177"), (True, "240000")])
+def test_get_completed_housing_companies__ignores_cancelled_sales(
+    unsold_apartment: Apartment, has_active_sale: bool, expected_price: str
+):
     sale = ApartmentSaleFactory.create(
         apartment=unsold_apartment,
         purchase_date=datetime.date(2026, 1, 1),
@@ -39,6 +42,15 @@ def test_get_completed_housing_companies__cancelled_sale_uses_catalog_price(unso
     assert not unsold_apartment.sales.exists()
     assert ApartmentSale.deleted_objects.filter(pk=sale.pk).exists()
 
+    if has_active_sale:
+        ApartmentSaleFactory.create(
+            apartment=unsold_apartment,
+            purchase_date=datetime.date(2026, 2, 1),
+            purchase_price=Decimal("140000"),
+            apartment_share_of_housing_company_loans=Decimal("100000"),
+            ownerships=[],
+        )
+
     housing_companies = get_completed_housing_companies(
         completion_month=datetime.date(2026, 8, 1),
         include_excluded_from_statistics=False,
@@ -48,13 +60,20 @@ def test_get_completed_housing_companies__cancelled_sale_uses_catalog_price(unso
 
     assert len(housing_companies) == 1
     assert housing_companies[0].pk == unsold_apartment.housing_company.pk
-    assert housing_companies[0].realized_acquisition_price == Decimal("258177")
+    assert housing_companies[0].realized_acquisition_price == Decimal(expected_price)
 
 
 @pytest.mark.django_db
-def test_get_completed_housing_companies__unsold_updated_price_is_counted_once(unsold_apartment: Apartment):
+@pytest.mark.parametrize("updated_price", ["260000", "0"])
+@pytest.mark.parametrize("has_cancelled_sale", [False, True])
+def test_get_completed_housing_companies__unsold_updated_price_is_counted_once(
+    unsold_apartment: Apartment, updated_price: str, has_cancelled_sale: bool
+):
+    if has_cancelled_sale:
+        ApartmentSaleFactory.create(apartment=unsold_apartment, ownerships=[]).delete()
+
     # Use an override different from the catalogue price to verify precedence.
-    unsold_apartment.updated_acquisition_price = Decimal("260000")
+    unsold_apartment.updated_acquisition_price = Decimal(updated_price)
     unsold_apartment.save(update_fields=["updated_acquisition_price"])
     assert not unsold_apartment.sales.exists()
 
@@ -67,4 +86,4 @@ def test_get_completed_housing_companies__unsold_updated_price_is_counted_once(u
 
     assert len(housing_companies) == 1
     assert housing_companies[0].pk == unsold_apartment.housing_company.pk
-    assert housing_companies[0].realized_acquisition_price == Decimal("260000")
+    assert housing_companies[0].realized_acquisition_price == Decimal(updated_price)
