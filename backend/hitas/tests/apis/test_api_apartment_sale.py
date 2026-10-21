@@ -1773,14 +1773,18 @@ def test__api__apartment_sale__delete__later_sale(api_client: HitasAPIClient, fr
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__under_three_months(api_client: HitasAPIClient, freezer):
+@pytest.mark.parametrize(
+    ("purchase_months_ago", "completion_months_ago"),
+    [(3, 3), (13, 13), (60, 60), (61, 61), (120, 240), (240, 120)],
+)
+def test__api__apartment_sale__delete__regardless_of_age(
+    api_client: HitasAPIClient, freezer, purchase_months_ago: int, completion_months_ago: int
+):
     freezer.move_to("2023-01-01")
 
-    three_months = timezone.now().date() - relativedelta(months=3)
-
     sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=three_months,
-        apartment__completion_date=three_months,
+        purchase_date=timezone.now().date() - relativedelta(months=purchase_months_ago),
+        apartment__completion_date=timezone.now().date() - relativedelta(months=completion_months_ago),
     )
 
     url = reverse(
@@ -1796,14 +1800,14 @@ def test__api__apartment_sale__delete__under_three_months(api_client: HitasAPICl
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__over_threshold(api_client: HitasAPIClient, freezer):
+def test__api__apartment_sale__delete__old_sale(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 
-    under_three_months = timezone.now().date() - relativedelta(months=12) - relativedelta(days=1)
+    old_sale_date = timezone.now().date() - relativedelta(years=10)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=under_three_months,
-        apartment__completion_date=under_three_months,
+        purchase_date=old_sale_date,
+        apartment__completion_date=old_sale_date,
     )
 
     url = reverse(
@@ -1815,25 +1819,18 @@ def test__api__apartment_sale__delete__over_threshold(api_client: HitasAPIClient
         },
     )
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
-
-    assert response.json() == {
-        "error": "invalid",
-        "message": "This sale can no longer be cancelled",
-        "reason": "Conflict",
-        "status": 409,
-    }
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__over_threshold__condition_of_sale__new(api_client: HitasAPIClient, freezer):
+def test__api__apartment_sale__delete__old_sale__condition_of_sale__new(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 
-    under_three_months = timezone.now().date() - relativedelta(months=12) - relativedelta(days=1)
+    old_sale_date = timezone.now().date() - relativedelta(years=10)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=under_three_months,
-        apartment__completion_date=under_three_months,
+        purchase_date=old_sale_date,
+        apartment__completion_date=old_sale_date,
     )
     ConditionOfSaleFactory.create(new_ownership=sale.ownerships.first())
 
@@ -1850,14 +1847,14 @@ def test__api__apartment_sale__delete__over_threshold__condition_of_sale__new(ap
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__over_threshold__condition_of_sale__old(api_client: HitasAPIClient, freezer):
+def test__api__apartment_sale__delete__old_sale__condition_of_sale__old(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 
-    under_three_months = timezone.now().date() - relativedelta(months=12) - relativedelta(days=1)
+    old_sale_date = timezone.now().date() - relativedelta(years=10)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=under_three_months,
-        apartment__completion_date=under_three_months,
+        purchase_date=old_sale_date,
+        apartment__completion_date=old_sale_date,
     )
     ConditionOfSaleFactory.create(old_ownership=sale.ownerships.first())
 
@@ -1870,14 +1867,7 @@ def test__api__apartment_sale__delete__over_threshold__condition_of_sale__old(ap
         },
     )
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
-
-    assert response.json() == {
-        "error": "invalid",
-        "message": "This sale can no longer be cancelled",
-        "reason": "Conflict",
-        "status": 409,
-    }
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
 
 @pytest.mark.django_db
