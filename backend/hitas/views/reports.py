@@ -126,7 +126,7 @@ class PropertyManagersReportView(ViewSet):
                 regulation_status=RegulationStatus.REGULATED,
             )
             .select_related("property_manager")
-            .order_by("property_manager__name")
+            .order_by("property_manager__name", "display_name", "pk")
         )
         property_managers_with_no_housing_company = list(
             PropertyManager.objects.filter(housing_companies__isnull=True).order_by("name")

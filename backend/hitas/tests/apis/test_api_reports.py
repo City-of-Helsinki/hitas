@@ -1019,6 +1019,7 @@ def test__api__unregulated_housing_companies_report__multiple_housing_companies(
     )
 
     housing_company_2: HousingCompany = HousingCompanyFactory.create(
+        hitas_type=HitasType.HITAS_I,
         postal_code__value="00001",
         regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
         legacy_release_date=datetime.date(2004, 1, 1),
@@ -1074,8 +1075,13 @@ def test__api__property_managers_report(api_client: HitasAPIClient):
     housing_company_1: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_1)
 
     property_manager_2: PropertyManager = PropertyManagerFactory.create(name="Property Manager B")
-    housing_company_2: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_2)
-    housing_company_3: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_2)
+    # Create companies in reverse name order to check the secondary report ordering.
+    housing_company_2: HousingCompany = HousingCompanyFactory.create(
+        property_manager=property_manager_2, display_name="Housing Company B"
+    )
+    housing_company_3: HousingCompany = HousingCompanyFactory.create(
+        property_manager=property_manager_2, display_name="Housing Company A"
+    )
 
     property_manager_3: PropertyManager = PropertyManagerFactory.create(name="Property Manager C")
     housing_company_4: HousingCompany = HousingCompanyFactory.create(property_manager=property_manager_3)
@@ -1099,10 +1105,10 @@ def test__api__property_managers_report(api_client: HitasAPIClient):
     # Property manager 2 - Two housing companies
     assert rows[2][0] == property_manager_2.name
     assert rows[2][1] == property_manager_2.email
-    assert rows[2][2] == housing_company_2.display_name
+    assert rows[2][2] == housing_company_3.display_name
     assert rows[3][0] == property_manager_2.name
     assert rows[3][1] == property_manager_2.email
-    assert rows[3][2] == housing_company_3.display_name
+    assert rows[3][2] == housing_company_2.display_name
     # Property manager 3
     assert rows[4][0] == property_manager_3.name
     assert rows[4][1] == property_manager_3.email
