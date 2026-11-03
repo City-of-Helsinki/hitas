@@ -21,6 +21,170 @@ from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
+@pytest.fixture
+def half_hitas_apartment(freezer):
+    this_month, _, _ = get_relevant_dates(freezer)
+    completion_date = this_month - relativedelta(years=3)
+
+    create_necessary_indices()
+    create_no_external_sales_data()
+
+    return ApartmentFactory.create(
+        surface_area=10,
+        completion_date=completion_date,
+        sales__purchase_date=completion_date,
+        building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+
+@pytest.mark.django_db
+def test__api__regulation__half_hitas__unsold_apartments_missing_prices(
+    api_client: HitasAPIClient, half_hitas_apartment
+):
+    ApartmentFactory.create(
+        building=half_hitas_apartment.building,
+        completion_date=half_hitas_apartment.completion_date,
+        surface_area=10,
+        sales=[],
+        catalog_purchase_price=None,
+        catalog_primary_loan_amount=None,
+    )
+    housing_company = half_hitas_apartment.housing_company
+    owner = half_hitas_apartment.first_sale().ownerships.get().owner
+    owner_data = OwnerT(name=owner.name, identifier=owner.identifier, email=owner.email)
+
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[],
+    )
+    housing_company.refresh_from_db()
+    assert housing_company.regulation_status == RegulationStatus.REGULATED
+    owner.refresh_from_db()
+    assert OwnerT(name=owner.name, identifier=owner.identifier, email=owner.email) == owner_data
+
+
+@pytest.mark.django_db
+def test__api__regulation__half_hitas__unsold_apartments_with_catalog_prices(
+    api_client: HitasAPIClient, half_hitas_apartment
+):
+    ApartmentFactory.create(
+        building=half_hitas_apartment.building,
+        completion_date=half_hitas_apartment.completion_date,
+        surface_area=10,
+        sales=[],
+        catalog_purchase_price=100_000,
+        catalog_primary_loan_amount=20_000,
+    )
+    housing_company = half_hitas_apartment.housing_company
+    owner = half_hitas_apartment.first_sale().ownerships.get().owner
+    owner_data = OwnerT(name=owner.name, identifier=owner.identifier, email=owner.email)
+
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[],
+    )
+    housing_company.refresh_from_db()
+    assert housing_company.regulation_status == RegulationStatus.REGULATED
+    owner.refresh_from_db()
+    assert OwnerT(name=owner.name, identifier=owner.identifier, email=owner.email) == owner_data
+
+
+@pytest.mark.django_db
+def test__api__regulation__half_hitas__all_apartments_sold_after_two_years(
+    api_client: HitasAPIClient, half_hitas_apartment
+):
+    housing_company = half_hitas_apartment.housing_company
+    owner = half_hitas_apartment.first_sale().ownerships.get().owner
+    owner_data = OwnerT(name=owner.name, identifier=owner.identifier, email=owner.email)
+
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[
+            get_comparison_data_for_single_housing_company(
+                housing_company,
+                half_hitas_apartment.completion_date,
+                price=0,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+            ),
+        ],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[owner_data],
+    )
+    housing_company.refresh_from_db()
+    assert housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+
+
+@pytest.mark.django_db
+def test__api__regulation__half_hitas__missing_prices_does_not_block_other_companies(
+    api_client: HitasAPIClient, half_hitas_apartment
+):
+    ApartmentFactory.create(
+        building=half_hitas_apartment.building,
+        completion_date=half_hitas_apartment.completion_date,
+        surface_area=10,
+        sales=[],
+        catalog_purchase_price=None,
+        catalog_primary_loan_amount=None,
+    )
+    half_hitas_company = half_hitas_apartment.housing_company
+    half_hitas_owner = half_hitas_apartment.first_sale().ownerships.get().owner
+    half_hitas_owner_data = OwnerT(
+        name=half_hitas_owner.name, identifier=half_hitas_owner.identifier, email=half_hitas_owner.email
+    )
+
+    _, _, regulation_month = get_relevant_dates()
+    old_housing_company = create_thirty_year_old_housing_company()
+    old_company_owner = Owner.objects.exclude(pk=half_hitas_owner.pk).get()
+    old_company_owner_data = OwnerT(
+        name=old_company_owner.name, identifier=old_company_owner.identifier, email=old_company_owner.email
+    )
+    create_low_price_sale_for_apartment(create_new_apartment())
+
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[
+            get_comparison_data_for_single_housing_company(
+                old_housing_company,
+                regulation_month,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+            ),
+        ],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[old_company_owner_data],
+    )
+    half_hitas_company.refresh_from_db()
+    assert half_hitas_company.regulation_status == RegulationStatus.REGULATED
+    half_hitas_owner.refresh_from_db()
+    assert (
+        OwnerT(name=half_hitas_owner.name, identifier=half_hitas_owner.identifier, email=half_hitas_owner.email)
+        == half_hitas_owner_data
+    )
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+
+
 @pytest.mark.django_db
 def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: HitasAPIClient, freezer):
     this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)

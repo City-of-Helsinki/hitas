@@ -110,8 +110,10 @@ def get_completed_housing_companies(
         return []
 
     logger.info(f"{len(housing_companies)} housing companies found!")
-    logger.info("Validating housing company apartment prices and surface areas...")
-    _validate_prices_and_surface_areas(housing_companies)
+    # Half-Hitas companies are checked for release eligibility without a price comparison.
+    if not select_half_hitas:
+        logger.info("Validating housing company apartment prices and surface areas...")
+        _validate_prices_and_surface_areas(housing_companies)
 
     return housing_companies
 
