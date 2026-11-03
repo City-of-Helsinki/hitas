@@ -41,7 +41,11 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.audit_log import last_modified
 from hitas.services.condition_of_sale import fulfill_conditions_of_sales_for_housing_companies
-from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
+from hitas.services.housing_company import (
+    get_completed_housing_companies,
+    get_number_of_unsold_apartments,
+    make_index_adjustment_for_housing_companies,
+)
 from hitas.services.indices import subquery_appropriate_cpi
 from hitas.services.owner import obfuscate_owners_without_regulated_apartments
 from hitas.utils import (
@@ -158,7 +162,12 @@ def perform_thirty_year_regulation(
         select_half_hitas=True,
     )
 
-    housing_companies = housing_companies + half_hitas_housing_companies
+    # Unsold Half-Hitas companies remain regulated and do not participate in price comparisons.
+    housing_companies += [
+        housing_company
+        for housing_company in half_hitas_housing_companies
+        if get_number_of_unsold_apartments(housing_company) == 0
+    ]
 
     if not housing_companies:
         logger.info("No housing companies to check regulation for.")
@@ -314,7 +323,7 @@ def _split_automatically_released(
     """
     Separate out housing companies that are automatically released from regulation:
     - 30 Years old housing companies, which follow the New-Hitas ruleset
-    - 2 Years old Half-Hitas housing companies
+    - 2 Years old Half-Hitas housing companies whose apartments have all been sold
 
     Returns a list of housing companies that are automatically released, and a list containing their comparison data
     The original list is then modified to remove the automatically released housing companies
@@ -327,7 +336,7 @@ def _split_automatically_released(
             housing_company.hitas_type.value == HitasType.HALF_HITAS.value
             or housing_company.hitas_type.new_hitas_ruleset
         ):
-            if housing_company.hitas_type == HitasType.HALF_HITAS.value:
+            if housing_company.hitas_type == HitasType.HALF_HITAS:
                 logger.info(
                     f"Housing company {housing_company.display_name!r} is a half-hitas housing company. "
                     f"Automatically qualified for release from regulation."
